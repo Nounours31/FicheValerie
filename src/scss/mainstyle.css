@@ -1,0 +1,24 @@
+div {
+    border: solid 2px;
+    height: 100%;
+}
+
+div.cPositionneur {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: 100%;
+}
+
+div.cDialog {
+    flex-grow: 1;
+    width: 50%;
+}
+
+div.cResultat {
+    flex-grow: 1;
+    width: 50%;
+    
+}
