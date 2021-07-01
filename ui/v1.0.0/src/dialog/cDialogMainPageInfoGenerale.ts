@@ -212,7 +212,6 @@ export default class cDialogMainPageInfoGenerale extends cDialog {
                 return;
             }
         });
-
         return;
     }
 }
