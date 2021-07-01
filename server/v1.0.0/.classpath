@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path="lib/src/main/java"/>
+	<classpathentry kind="lib" path="E:/WS/GitHubPerso/FicheValerie/server/v1.0.0/prereqGradle/jars/barcodes-7.1.12.jar"/>
+	<classpathentry kind="lib" path="E:/WS/GitHubPerso/FicheValerie/server/v1.0.0/prereqGradle/jars/font-asian-7.1.12.jar"/>
+	<classpathentry kind="lib" path="E:/WS/GitHubPerso/FicheValerie/server/v1.0.0/prereqGradle/jars/forms-7.1.12.jar"/>
+	<classpathentry kind="lib" path="E:/WS/GitHubPerso/FicheValerie/server/v1.0.0/prereqGradle/jars/hyph-7.1.12.jar"/>
+	<classpathentry kind="lib" path="E:/WS/GitHubPerso/FicheValerie/server/v1.0.0/prereqGradle/jars/io-7.1.12.jar"/>
+	<classpathentry kind="lib" path="E:/WS/GitHubPerso/FicheValerie/server/v1.0.0/prereqGradle/jars/kernel-7.1.12.jar"/>
+	<classpathentry kind="lib" path="E:/WS/GitHubPerso/FicheValerie/server/v1.0.0/prereqGradle/jars/layout-7.1.12.jar"/>
+	<classpathentry kind="lib" path="E:/WS/GitHubPerso/FicheValerie/server/v1.0.0/prereqGradle/jars/log4j-api-2.14.0.jar"/>
+	<classpathentry kind="lib" path="E:/WS/GitHubPerso/FicheValerie/server/v1.0.0/prereqGradle/jars/log4j-core-2.14.0.jar"/>
+	<classpathentry kind="lib" path="E:/WS/GitHubPerso/FicheValerie/server/v1.0.0/prereqGradle/jars/pdfa-7.1.12.jar"/>
+	<classpathentry kind="lib" path="E:/WS/GitHubPerso/FicheValerie/server/v1.0.0/prereqGradle/jars/sign-7.1.12.jar"/>
+	<classpathentry kind="lib" path="E:/WS/GitHubPerso/FicheValerie/server/v1.0.0/prereqGradle/jars/slf4j-api-1.7.13.jar"/>
+	<classpathentry kind="lib" path="E:/WS/GitHubPerso/FicheValerie/server/v1.0.0/prereqGradle/jars/styled-xml-parser-7.1.12.jar"/>
+	<classpathentry kind="lib" path="E:/WS/GitHubPerso/FicheValerie/server/v1.0.0/prereqGradle/jars/svg-7.1.12.jar"/>
+	<classpathentry kind="lib" path="E:/WS/GitHubPerso/FicheValerie/server/v1.0.0/prereqGradle/jars/javax.ws.rs-api-2.1.1.jar"/>
+	<classpathentry kind="lib" path="E:/WS/GitHubPerso/FicheValerie/server/v1.0.0/prereqGradle/jars/mysql-connector-java-8.0.21.jar"/>
+	<classpathentry kind="output" path="lib/build/classes/java/main"/>
+</classpath>

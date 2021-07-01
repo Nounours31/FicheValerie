@@ -1,0 +1,29 @@
+
+// doc: https://sass-lang.com/documentation/at-rules/function
+
+// ---------------------------------------
+// include
+// ---------------------------------------
+@use 'const' with (
+  $arriereplan: #222
+);
+
+
+div {
+    border: solid 2px $debug_Color;
+    height: 100%;
+}
+
+
+div.cDialog {
+    flex-grow: 1;
+    width: 50%;
+}
+
+div.cResultat {
+    flex-grow: 1;
+    width: 50%;
+    
+}
+
+
