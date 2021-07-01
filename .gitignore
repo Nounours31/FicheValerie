@@ -1,3 +1,5 @@
 node_modules
 dist/
 tomee-8.0.6/
+server/v1.0.0/lib/build/
+server/v1.0.0/.gradle/
