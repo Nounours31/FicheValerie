@@ -1,7 +1,7 @@
 package sfa.fichevalerie.ws.impl;
 
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
+
 import sfa.fichevalerie.tools.E4ALogger;
 
 public abstract class WS implements iWS {
