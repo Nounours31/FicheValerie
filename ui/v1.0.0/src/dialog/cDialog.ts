@@ -3,12 +3,12 @@
 
 
 export default class cDialog {
-    protected static _NomPrefixe : string;
+    protected _NomClasse : string;
 
     constructor(nom : string) {
-        cDialog._NomPrefixe = nom;
+        this._NomClasse = nom;
     }
 
-    public Draw(): JQuery<HTMLDivElement> { throw new Error("virtual unimplemented"); }
+    public Draw(): string { throw new Error("virtual unimplemented"); }
     public addCallBack(): void { throw new Error("virtual unimplemented"); }
 }

@@ -7,10 +7,12 @@ import cDialog from './cDialog';
 
 import cDialogMainPageInfoGenerale from './cDialogMainPageInfoGenerale';
 import cDialogMainPageHoraires from './cDialogMainPageHoraire';
+import cDialogMainPageInfoEdition from './cDialogMainPageInfoEdition'
 
 import {iPersonne} from '../WS/iWSMessages';
 
 export default class cDialogMainPage extends cDialog {
+    private static _NomPrefixe: string = 'cDialogMainPage';
     private static _idTabPage: string;
     private static _idInfoDiv: string;
     private static _idActiviteDiv: string;
@@ -33,56 +35,40 @@ export default class cDialogMainPage extends cDialog {
         this.currentMois = 0;
     }
 
-    public Draw(): JQuery<HTMLDivElement> {
+    public Draw(): string {
         let iInfoGenerales: cDialogMainPageInfoGenerale = new cDialogMainPageInfoGenerale();
         let iInfoHoraires: cDialogMainPageHoraires = new cDialogMainPageHoraires();
+        let iEdition: cDialogMainPageInfoEdition = new cDialogMainPageInfoEdition();
 
-        let divInfosGenerales: JQuery<HTMLDivElement> = $("<div id='InfosGeneralesDiv'></div>");
-        let x: JQuery<HTMLElement> = iInfoGenerales.Draw();
-        divInfosGenerales.append(x);
+        let retour : string = `
+            <div id='MainPage'>
+                <ul class="uk-tab" data-uk-tab="{connect:'#my-id3'}">
+                    <li id="tab1"><a href="">Creation</a></li>
+                    <li id="tab2"><a href="">Consultation-Edition</a></li>
+                    <li id="tab3"><a href="">Horaire pour memo</a></li>
+                </ul>
+                <ul id="my-id3" class="uk-switcher uk-margin">
+                    <li>`+ iInfoGenerales.Draw() + `</li>
+                    <li>`+ iEdition.Draw() +`</li>
+                    <li>`+ iInfoHoraires.Draw() +`</li>
+                </ul>
+            <div>
 
-        let divHoraires: JQuery<HTMLDivElement> = $("<div id='InfosHorairesDiv'></div>");
-        let y: JQuery<HTMLElement> = iInfoHoraires.Draw();
-        divHoraires.append(y);
-
-        let divAggregator: JQuery<HTMLDivElement> = $("<div id='InfosAggregatorDiv'></div>");
-        divAggregator.append(divInfosGenerales);
-        divAggregator.append(divHoraires);
-
-        return divAggregator;
+        `;
+        return retour;
     }
 
     public addCallBack(): void {
         let iInfoGenerales: cDialogMainPageInfoGenerale = new cDialogMainPageInfoGenerale();
         let iInfoHoraires: cDialogMainPageHoraires = new cDialogMainPageHoraires();
+        let iEdition: cDialogMainPageInfoEdition = new cDialogMainPageInfoEdition();
 
         iInfoGenerales.addCallBack();
         iInfoHoraires.addCallBack();
-
-        this.toggleDiv();
-
-        let me : cDialogMainPage = this;
-        $(`#InfosAggregatorDiv`).on('InfoGeneralesDefined', function () {
-            me.switchDiv();
-            iInfoHoraires.refresh();
-        });
-
+        iEdition.addCallBack();
     }
 
-    private switchDiv(): void {
-        cDialogMainPage._toggleDivStatus = !cDialogMainPage._toggleDivStatus;
-        this.toggleDiv();
-    }
 
-    private toggleDiv(): void {
-        if (cDialogMainPage._toggleDivStatus) {
-            $(`#InfosGeneralesDiv`).show(400);
-            $(`#InfosHorairesDiv`).hide(400);
-        }
-        else {
-            $(`#InfosGeneralesDiv`).hide(400);
-            $(`#InfosHorairesDiv`).show(400);
-        }
-    }
+
 
 }

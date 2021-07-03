@@ -3,7 +3,10 @@ import 'uikit/dist/css/uikit.css';
 
 import UIkit from 'UIKit';
 import $ from 'jquery';
+
 import cDialog from './cDialog';
+import cDialogTools from './cDialogTools';
+import cDialogMainPageHoraire from './cDialogMainPageHoraire'
 
 import cWS from '../WS/cWS';
 import {iPersonne, iBulletinSalaire} from '../WS/iWSMessages';
@@ -12,6 +15,10 @@ import cOutilsDivers from '../tools/cOutilsDivers';
 import { cControler } from '../cControler';
 
 export default class cDialogMainPageInfoGenerale extends cDialog {
+    private static _NomPrefixe: string = 'cDialogMainPageInfoGenerale';
+    
+    private _idSaisieInfoGeneraleDiv: string;
+    private _idSaisieInfoHoraireDiv: string;
     private _idSelectOnMois: string;
     private _idSelectOnAnnee: string;
     private _idSelectOnPersonne: string;
@@ -19,6 +26,9 @@ export default class cDialogMainPageInfoGenerale extends cDialog {
     private _idSelectGenre: string;
     private _idInputNom: string;
     private _idInputTarifHoraire: string;
+
+    private dialogueEditionNouvelleFiche: cDialogMainPageHoraire | null = null;
+    private static _toggleDivStatus: boolean;
 
 
 
@@ -31,123 +41,125 @@ export default class cDialogMainPageInfoGenerale extends cDialog {
         this._idSelectGenre = cDialogMainPageInfoGenerale._NomPrefixe + 'idSelectGenre';
         this._idInputNom = cDialogMainPageInfoGenerale._NomPrefixe + 'idInputNom';
         this._idInputTarifHoraire = cDialogMainPageInfoGenerale._NomPrefixe + 'idInputTarifHoraire';
+        this._idSaisieInfoGeneraleDiv = cDialogMainPageInfoGenerale._NomPrefixe + '_idSaisieInfoGeneraleDiv';
+        this._idSaisieInfoHoraireDiv = cDialogMainPageInfoGenerale._NomPrefixe + '_idSaisieInfoHoraireDiv';
+        this.dialogueEditionNouvelleFiche = new cDialogMainPageHoraire();
+
+        cDialogMainPageInfoGenerale._toggleDivStatus = true;
     }
 
-    public Draw(): JQuery<HTMLDivElement> {
+    public Draw(): string {
         let pageHTML : string = `
-            <form style="padding-left: 10px;">
-                <fieldset style="padding-left: 10px;">
-                    <legend>Saisie des infos generales</legend>
+            <div id="${this._idSaisieInfoGeneraleDiv}">
+                <form style="padding-left: 10px;">
+                    <fieldset style="padding-left: 10px;">
+                        <legend>Saisie des infos generales</legend>
 
-                    <div class="uk-grid" style="margin-left: 0px;">
-                        <div class="uk-card uk-card-body uk-padding-small">
-                            <label>Mois
-                            <select class="uk-select" id="${this._idSelectOnMois}" required>
-                            </select>
-                            </label>
+                        <div class="uk-grid" style="margin-left: 0px;">
+                            <div class="uk-card uk-card-body uk-padding-small">
+                                <label>Mois
+                                <select class="uk-select" id="${this._idSelectOnMois}" required>
+                                </select>
+                                </label>
+                            </div>
+                            <div class="uk-card uk-card-body uk-padding-small">
+                                <label>Annee
+                                <select class="uk-select" id="${this._idSelectOnAnnee}" required>
+                                </select>
+                                </label>
+                            </div>
                         </div>
-                        <div class="uk-card uk-card-body uk-padding-small">
-                            <label>Annee
-                            <select class="uk-select" id="${this._idSelectOnAnnee}" required>
-                            </select>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="uk-grid" style="margin-left: 0px;margin-top: 0px;">
-                        <div class="uk-card uk-card-body uk-padding-small">
-                            <label>Personne:
-                            <select class="uk-select" id="${this._idSelectOnPersonne}" required style="">
-                                <option value="-" selected>-</option>
-                            </select>
-                            </label>
-                        </div>
-                        <div class="uk-card uk-card-body uk-padding-small">
-                            <label> Ajout si la personne n'existe pas:
-                                <div class="uk-grid">
-                                    <div class="uk-card uk-card-body" style="padding-top: 0px; padding-bottom: 0px; padding-left: 50px;">
-                                        <label>Genre:
-                                            <select class="uk-select" id="${this._idSelectGenre}">
-                                                <option value="-" selected>-</option>
-                                                <option value="Madame">Madame</option>
-                                                <option value="Monsieur">Monsieur</option>
-                                            </select>
-                                        </label>
+                        <div class="uk-grid" style="margin-left: 0px;margin-top: 0px;">
+                            <div class="uk-card uk-card-body uk-padding-small">
+                                <label>Personne:
+                                <select class="uk-select" id="${this._idSelectOnPersonne}" required style="">
+                                    <option value="-" selected>-</option>
+                                </select>
+                                </label>
+                            </div>
+                            <div class="uk-card uk-card-body uk-padding-small">
+                                <label> Ajout si la personne n'existe pas:
+                                    <div class="uk-grid">
+                                        <div class="uk-card uk-card-body" style="padding-top: 0px; padding-bottom: 0px; padding-left: 50px;">
+                                            <label>Genre:
+                                                <select class="uk-select" id="${this._idSelectGenre}">
+                                                    <option value="-" selected>-</option>
+                                                    <option value="Madame">Madame</option>
+                                                    <option value="Monsieur">Monsieur</option>
+                                                </select>
+                                            </label>
+                                        </div>
+                                        <div class="uk-card uk-card-body" style="padding-top: 0px; padding-right: 0px;">
+                                            <label> Nom:
+                                                <input class="uk-input" type="text" placeholder="Nom de la personne" id="${this._idInputNom}">
+                                        </div>
                                     </div>
-                                    <div class="uk-card uk-card-body" style="padding-top: 0px; padding-right: 0px;">
-                                        <label> Nom:
-                                            <input class="uk-input" type="text" placeholder="Nom de la personne" id="${this._idInputNom}">
-                                    </div>
-                                </div>
-                            </label>
+                                </label>
+                            </div>
                         </div>
-                    </div>
-                    <div class="uk-grid" style="margin-left: 0px;margin-top: 0px;">
-                        <div class="uk-card uk-card-body" style="padding-top: 0px; padding-right: 0px;">
-                            <label> Tarif horaire (en &euro;):
-                                <input class="uk-input" type="number" id="${this._idInputTarifHoraire}" min="10" max="30" value="15">
+                        <div class="uk-grid" style="margin-left: 0px;margin-top: 0px;">
+                            <div class="uk-card uk-card-body" style="padding-top: 0px; padding-right: 0px;">
+                                <label> Tarif horaire (en &euro;):
+                                    <input class="uk-input" type="number" id="${this._idInputTarifHoraire}" min="10" max="30" value="15">
+                            </div>
                         </div>
-                    </div>
-                    <div class="uk-button-group" style="padding-left: 10px;">
-                        <td><button class="uk-button uk-button-small" style="background-color: greenyellow;" id="${this._idValideInfo}" >Valide</button></td>
-                        <td><button class="uk-button uk-button-small" style="background-color: ;"disabled>Modif</button></td>
-                    </div>
-                </fieldset>
-           </form>
+                        <div class="uk-button-group" style="padding-left: 10px;">
+                            <td><button class="uk-button uk-button-small" style="background-color: greenyellow;" id="${this._idValideInfo}" >Valide</button></td>
+                            <td><button class="uk-button uk-button-small" style="background-color: ;"disabled>Modif</button></td>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+            <div id="${this._idSaisieInfoHoraireDiv}">
+                ${this.dialogueEditionNouvelleFiche.Draw()}
+            </div>
         `;
-        let x : JQuery<HTMLDivElement> = $("<div id='InfosGeneralesDivBuilder'></div>");
-        x.append(pageHTML);
-        return x;
+        return pageHTML;
     }
 
     public addCallBack(): void {
         // ------------------------------------------
         // add des mois dans le selected de mois
         // ------------------------------------------
-        let d : Date = new Date();
-        let iIndiceMoisCourant : number = d.getMonth();
-        let monthNames: Array<string> = ["Janvier", "Fevrier", "Mars", "Avril", "Mai", "Juin", "Juillet", "Aout", "Septembre", "Octobre", "Novembre", "Decembre"];
-        for (let i: number = 0; i < 12; i++) {
-            let m: string = monthNames[i];
-            if (i == iIndiceMoisCourant)
-                $(`#${this._idSelectOnMois}`).append($('<option>', { value: m, text: m }).attr('selected', 'selected'));
-            else
-                $(`#${this._idSelectOnMois}`).append($('<option>', { value: m, text: m }));
-        }
+        let jqIdSelectMois: string = `#${this._idSelectOnMois}`;
+        cDialogTools.addMoisInSelect(jqIdSelectMois);
  
  
         // ------------------------------------------
         // add des annees dans le selected des annees
         // ------------------------------------------
-        let iIndiceAnneeCourant : number = d.getFullYear();
-        for (let i: number = 2020; i < 2030; i++) {
-            if (i == iIndiceAnneeCourant)
-                $(`#${this._idSelectOnAnnee}`).append($('<option>', { value: i, text: i }).attr('selected', 'selected'));
-            else
-                $(`#${this._idSelectOnAnnee}`).append($('<option>', { value: i, text: i }));
-        }
+        let jqIdSelectAnnee: string = `#${this._idSelectOnAnnee}`;
+        cDialogTools.addAnneeInSelect(jqIdSelectAnnee);
 
 
         // ------------------------------------------
         // add des personnes dans le selecteur
         // ------------------------------------------
-        let ws: cWS = new cWS();
-        let allPersonnes: iPersonne[] = ws.getAllPersonnes();
-        allPersonnes.forEach(unePersonne => {
-            $(`#${this._idSelectOnPersonne}`).append($('<option>', { value: unePersonne.id, text: (unePersonne.genre + "  " + unePersonne.nom) })); 
-        });
+        let jqIdSelectPersonne: string = `#${this._idSelectOnPersonne}`;
+        cDialogTools.addPersonneInSelect(jqIdSelectPersonne);
+
+        // ------------------------------------------
+        // Zone d'edition
+        //   1. On la cache
+        //   2. Ajout des call back de la zone d'edition
+        // ------------------------------------------
+        this.toggleDiv();
+        this.dialogueEditionNouvelleFiche.addCallBack();
+
 
         // ------------------------------------------
         // add call back du Vaide info
         // ------------------------------------------
         let me: cDialogMainPageInfoGenerale = this;
         $(`#${this._idValideInfo}`).on('click', function (event : JQuery.ClickEvent) {
+            // je gere moi meme l'event
             event.preventDefault();
             event.stopImmediatePropagation();
 
             // ----
             // recup des infos
             // ----
-            let mois : string = $(`#${me._idSelectOnMois}`).val() as string;
+            let mois : number = $(`#${me._idSelectOnMois}`).val() as number;
             let annee: number = $(`#${me._idSelectOnAnnee}`).val() as number;
             let personne: string = $(`#${me._idSelectOnPersonne} option:selected`).text();
 
@@ -181,6 +193,7 @@ export default class cDialogMainPageInfoGenerale extends cDialog {
                     return;
                 }
                 else {
+                    let ws : cWS = new cWS();
                     let lP: iPersonne[] = ws.getPersonne(genre, nom);
                     if ((lP == null) || (lP.length == 0)){ 
                         let p : iPersonne = ws.addNewPersonne(genre, nom);
@@ -214,7 +227,9 @@ export default class cDialogMainPageInfoGenerale extends cDialog {
             // ----
             // gestion de la fiche existe t elle deja ?
             // ----
-            let iMois : number = cOutilsDivers.MoisFromNomToInt(mois);
+            let ws : cWS = new cWS();
+            //let iMois : number = cOutilsDivers.MoisFromNomToInt(mois);
+            let iMois : number = mois;
             let fiche: iBulletinSalaire[] = ws.getBulletinSalaire(idPersonne, iMois, annee);
             if (fiche.length > 0) {
                 UIkit.modal.alert("KO --> cette fiche existe deja, la detruire d'abord");
@@ -230,8 +245,33 @@ export default class cDialogMainPageInfoGenerale extends cDialog {
             let lPer: iPersonne[] = ws.getPersonne(idPersonne);
             c.personne = lPer[0];
 
-            $(this).trigger ('InfoGeneralesDefined');
+
+            // ---------------------------------------
+            // OK 
+            //   On affiche la div
+            //   on la met a jour
+            //   On cree kla fiche
+            //   creer la fiche et on l'edite
+            // ---------------------------------------
+            me.switchDiv();
+            me.dialogueEditionNouvelleFiche.refresh();
         });
         return;
+    }
+
+    private switchDiv(): void {
+        cDialogMainPageInfoGenerale._toggleDivStatus = !cDialogMainPageInfoGenerale._toggleDivStatus;
+        this.toggleDiv();
+    }
+
+    private toggleDiv(): void {
+        if (cDialogMainPageInfoGenerale._toggleDivStatus) {
+            $(`#${this._idSaisieInfoGeneraleDiv}`).show(400);
+            $(`#${this._idSaisieInfoHoraireDiv}`).hide(400);
+        }
+        else {
+            $(`#${this._idSaisieInfoGeneraleDiv}`).hide(400);
+            $(`#${this._idSaisieInfoHoraireDiv}`).show(400);
+        }
     }
 }
