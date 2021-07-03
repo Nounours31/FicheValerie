@@ -18,10 +18,16 @@ public class WsGetAllPersonnes extends WS {
 		
 		String genre = (String) this.getArgs("genre");
 		String nom = (String) this.getArgs("nom");
+
+		Integer  x = ((Integer) this.getArgs("id"));
+		int  id = (x != null)?x.intValue():-1;
 		
 		Personne[] lP;
 		if ((genre != null) && (nom != null))
 			lP = db.getAllPersonnes(genre, nom);
+		else if (id >= 0) {
+			lP = db.getAllPersonnes(id);
+		}
 		else
 			lP = db.getAllPersonnes();
 		

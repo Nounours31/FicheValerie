@@ -1,3 +1,4 @@
+import { iPersonne } from "../WS/iWSMessages";
 
 export default class cOutilsDivers {
 
@@ -15,5 +16,13 @@ export default class cOutilsDivers {
                 return (i+1)
         }
         return -1;
+    }
+
+    public static personne2String(p : iPersonne) : string {
+        let s : string  = "";
+        s += (p.genre + " ");
+        s += p.nom;
+        s += (" ["+p.id+"]");
+        return s;
     }
 }

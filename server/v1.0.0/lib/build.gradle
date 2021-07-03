@@ -65,11 +65,8 @@ war {
 */
 war {
 	enabled=true
-    webXml = file('src/main/webapp/WEB-INF/web.xml')
+    // webXml = file('src/main/webapp/WEB-INF/web.xml')
     from 'src/main/java' // adds a file-set to the root of the archive
-    from 'src/rootContent' // adds a file-set to the root of the archive
-    webInf { from 'src/additionalWebInf' } // adds a file-set to the WEB-INF dir.
-    classpath fileTree('additionalLibs') // adds a file-set to the WEB-INF/lib dir.
 }
 
 

@@ -9,6 +9,6 @@ export default class cDialog {
         cDialog._NomPrefixe = nom;
     }
 
-    public Draw(): HTMLDivElement { throw new Error("virtual unimplemented"); }
+    public Draw(): JQuery<HTMLDivElement> { throw new Error("virtual unimplemented"); }
     public addCallBack(): void { throw new Error("virtual unimplemented"); }
 }

@@ -99,6 +99,17 @@ public class entrypoint {
     }
 
     @GET
+    @Path("/getPersonne/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getPersonne(@PathParam("id") int id) {
+    	iWS ws = cWsFactory.getImpl("getAllPersonnes");
+    	_logger.info(ws.whoami());
+
+    	ws.setArgs ("id", id);
+    	return ws.run();
+    }
+
+    @GET
     @Path("/getBulletinSalaire/{idPersonne}/{mois}/{annee}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getBulletinSalaire(@PathParam("idPersonne") int idPersonne, @PathParam("mois") int mois, @PathParam("annee") int annee) {

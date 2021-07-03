@@ -15,12 +15,12 @@ export default class cResultMainPage extends cDialog {
         cResultMainPage._idTabPage = cResultMainPage._NomPrefixe + 'idMainTab';
     }
 
-    public Draw(): HTMLDivElement {
+    public Draw(): JQuery<HTMLDivElement> {
         let pageHTML: string = `
         <p>Resultats</p>
         `; 
-        let x : HTMLDivElement = document.createElement('div');
-        x.innerHTML = pageHTML;
+        let x: JQuery<HTMLDivElement> = $('<div id="PdfViewerDiv"></div>');
+        x.append(pageHTML);
         return x;
     }
 

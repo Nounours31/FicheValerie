@@ -75,7 +75,8 @@ public abstract class DB implements iDB {
 			String Host = this._DBHost;
 	
 			Class.forName("com.mysql.jdbc.Driver");  
-			String jdbcString = String.format("jdbc:mysql://%s:%s/%s", Host, Port, BaseName);
+			//String jdbcString = String.format("jdbc:mysql://%s:%s/%s", Host, Port, BaseName);
+			String jdbcString = String.format("jdbc:mysql://%s:%s/%s?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC", Host, Port, BaseName);
 			con=DriverManager.getConnection(jdbcString, User, Password);  
 		}
 		finally {

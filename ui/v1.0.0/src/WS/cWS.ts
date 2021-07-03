@@ -22,12 +22,20 @@ export default class cWS {
         return retour;
     }
 
-    public getPersonne(genre : string, nom: string): iPersonne {
-        let retour : iPersonne = null;
-        let URL = cEnv._serverURL + `/getPersonne/${genre}/${nom}`;
+    public getPersonne(id: number): iPersonne[];
+    public getPersonne(genre: string, nom: string): iPersonne[];
+    public getPersonne(idOrGenre?: number|string, nom?: string): iPersonne[] {
+        let retour: iPersonne[] = null;
+        let URL : string = "";
+        // if (typeof abc === "number") {
+        if (nom !== undefined) {
+            URL = cEnv._serverURL + `/getPersonne/${idOrGenre}/${nom}`;
+        } else {
+            URL = cEnv._serverURL + `/getPersonne/${idOrGenre}`;
+        }
         let oResp: boolean = this.t.sendGetWS(URL);
         if (this.t.status) {
-            retour = ((this.t.data as unknown) as iPersonne);
+            retour = ((this.t.data as unknown) as iPersonne[]);
         }
         return retour;
     }

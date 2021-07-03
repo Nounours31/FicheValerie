@@ -26,6 +26,13 @@ public class DbPersonne extends DB  implements iDB {
 		return getAllPersonnes(sql);
 	}
 
+	public Personne[] getAllPersonnes(int id) {
+		String sql = String.format("select * from personne where (id = %d)",
+				id);
+		
+		return getAllPersonnes(sql);
+	}
+
 	public Personne[] getAllPersonnes () {
 		String sql = "select * from personne order by nom";		
 		return getAllPersonnes(sql);
@@ -101,6 +108,7 @@ public class DbPersonne extends DB  implements iDB {
 		
 		return this.insertAsRest(sql);
 	}
+
 
 	
 }

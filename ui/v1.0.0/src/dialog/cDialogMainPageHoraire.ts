@@ -5,6 +5,9 @@ import UIkit from 'UIKit';
 import $ from 'jquery';
 import cDialog from './cDialog';
 
+import { cControler } from '../cControler';
+import cOutilsDivers  from '../tools/cOutilsDivers';
+
 export default class cDialogMainPageHoraire extends cDialog {
     private static  _idTabPage: string;
 
@@ -15,13 +18,16 @@ export default class cDialogMainPageHoraire extends cDialog {
         cDialogMainPageHoraire._idTabPage = cDialogMainPageHoraire._NomPrefixe + 'idMainTab';
     }
 
-    public Draw(): HTMLDivElement {
+    public Draw(): JQuery<HTMLDivElement> {
 
         let pageHTML : string = `
             <form style="padding-left: 10px;">
                 <fieldset style="padding-left: 10px;">
                     <legend>Saisie des infos generales</legend>
 
+                    <label>Personne:<span id="toto"></span></label><br/>
+                    <label>Periode:<span id="titi"></span></label><br/>
+                    <label>Tarif:<span id="tata"></span></label><br/>
                     <table class="uk-table uk-table-striped">
                         <thead>
                             <tr>
@@ -61,9 +67,16 @@ export default class cDialogMainPageHoraire extends cDialog {
                 </fieldset>
             </form>
         `;
-        let x : HTMLDivElement = document.createElement('div');
-        x.innerHTML = pageHTML;
+        let x: JQuery<HTMLDivElement> = $("<div id='InfosHorairesDivBuilder'></div>");
+        x.append(pageHTML);
         return x;
+    }
+
+    public refresh(): void {
+        let c: cControler = cControler.getInstance();
+        $(`#toto`).text(cOutilsDivers.personne2String (c.personne));
+        $(`#titi`).text(c.mois + '/' + c.annee);
+        $(`#tata`).text(c.tarifHoraire + '€');
     }
 
     public addCallBack(): void {

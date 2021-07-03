@@ -9,6 +9,7 @@ import cWS from '../WS/cWS';
 import {iPersonne, iBulletinSalaire} from '../WS/iWSMessages';
 
 import cOutilsDivers from '../tools/cOutilsDivers';
+import { cControler } from '../cControler';
 
 export default class cDialogMainPageInfoGenerale extends cDialog {
     private _idSelectOnMois: string;
@@ -17,6 +18,7 @@ export default class cDialogMainPageInfoGenerale extends cDialog {
     private _idValideInfo: string;
     private _idSelectGenre: string;
     private _idInputNom: string;
+    private _idInputTarifHoraire: string;
 
 
 
@@ -28,9 +30,10 @@ export default class cDialogMainPageInfoGenerale extends cDialog {
         this._idValideInfo = cDialogMainPageInfoGenerale._NomPrefixe + 'idValideInfo';
         this._idSelectGenre = cDialogMainPageInfoGenerale._NomPrefixe + 'idSelectGenre';
         this._idInputNom = cDialogMainPageInfoGenerale._NomPrefixe + 'idInputNom';
+        this._idInputTarifHoraire = cDialogMainPageInfoGenerale._NomPrefixe + 'idInputTarifHoraire';
     }
 
-    public Draw(): HTMLDivElement {
+    public Draw(): JQuery<HTMLDivElement> {
         let pageHTML : string = `
             <form style="padding-left: 10px;">
                 <fieldset style="padding-left: 10px;">
@@ -78,6 +81,12 @@ export default class cDialogMainPageInfoGenerale extends cDialog {
                             </label>
                         </div>
                     </div>
+                    <div class="uk-grid" style="margin-left: 0px;margin-top: 0px;">
+                        <div class="uk-card uk-card-body" style="padding-top: 0px; padding-right: 0px;">
+                            <label> Tarif horaire (en &euro;):
+                                <input class="uk-input" type="number" id="${this._idInputTarifHoraire}" min="10" max="30" value="15">
+                        </div>
+                    </div>
                     <div class="uk-button-group" style="padding-left: 10px;">
                         <td><button class="uk-button uk-button-small" style="background-color: greenyellow;" id="${this._idValideInfo}" >Valide</button></td>
                         <td><button class="uk-button uk-button-small" style="background-color: ;"disabled>Modif</button></td>
@@ -85,8 +94,8 @@ export default class cDialogMainPageInfoGenerale extends cDialog {
                 </fieldset>
            </form>
         `;
-        let x : HTMLDivElement = document.createElement('div');
-        x.innerHTML = pageHTML;
+        let x : JQuery<HTMLDivElement> = $("<div id='InfosGeneralesDivBuilder'></div>");
+        x.append(pageHTML);
         return x;
     }
 
@@ -172,9 +181,9 @@ export default class cDialogMainPageInfoGenerale extends cDialog {
                     return;
                 }
                 else {
-                    let p: iPersonne = ws.getPersonne(genre, nom);
-                    if (p == null) { 
-                        p = ws.addNewPersonne(genre, nom);
+                    let lP: iPersonne[] = ws.getPersonne(genre, nom);
+                    if ((lP == null) || (lP.length == 0)){ 
+                        let p : iPersonne = ws.addNewPersonne(genre, nom);
                         idPersonne = p.id;
 
                         // unset des selection
@@ -211,6 +220,17 @@ export default class cDialogMainPageInfoGenerale extends cDialog {
                 UIkit.modal.alert("KO --> cette fiche existe deja, la detruire d'abord");
                 return;
             }
+
+            let c : cControler = cControler.getInstance();
+            c.mois = iMois
+            c.annee = annee;
+            c.idPersonne = idPersonne;
+            c.tarifHoraire = ($(`#${me._idInputTarifHoraire}`).val() as unknown) as number;
+            
+            let lPer: iPersonne[] = ws.getPersonne(idPersonne);
+            c.personne = lPer[0];
+
+            $(this).trigger ('InfoGeneralesDefined');
         });
         return;
     }

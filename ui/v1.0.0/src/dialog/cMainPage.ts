@@ -1,23 +1,27 @@
-import 'uikit/dist/js/uikit-icons'
-import 'uikit/dist/css/uikit.css';
-
-import UIkit from 'UIKit';
 import $ from 'jquery';
+
 import cDialog from './cDialog';
+import cDialogMainPage from './cDialogMainPage';
 
 export default class cMainPage extends cDialog {
     private static  _idTabPage: string;
 
-    private _myTab : UIkit.UIkitTabElement | null = null;
 
     constructor() {
         super('cMainPage');
     }
 
-    public positionneDivs(mainDivId : String) {
-        $(`#${mainDivId}`).addClass('uk-flex');
+    public CreateMainPageDiv(idParentDiv : string ) {
+        let divMain: JQuery<HTMLDivElement> = $("<div id='MainPage'></div>");
+        $(`#${idParentDiv}`).append(divMain);
+
+        let iDialogMainPage: cDialogMainPage = new cDialogMainPage();
+        divMain.append(iDialogMainPage.Draw());
+
+        iDialogMainPage.addCallBack();
     }
-    public Draw(): HTMLDivElement | null {
+
+    public Draw(): JQuery<HTMLDivElement> | null {
        return null;
     }
 

@@ -11,7 +11,10 @@ import cDialogMainPageHoraires from './cDialogMainPageHoraire';
 import {iPersonne} from '../WS/iWSMessages';
 
 export default class cDialogMainPage extends cDialog {
-    private static  _idTabPage: string;
+    private static _idTabPage: string;
+    private static _idInfoDiv: string;
+    private static _idActiviteDiv: string;
+    private static _toggleDivStatus : boolean;
 
     private currentPersonne: iPersonne;
     private currentAnnee: number;
@@ -23,24 +26,30 @@ export default class cDialogMainPage extends cDialog {
         cDialogMainPage._idInfoDiv = cDialogMainPage._NomPrefixe + '_idInfoDiv';
         cDialogMainPage._idActiviteDiv = cDialogMainPage._NomPrefixe + '_idActiviteDiv';
 
+        cDialogMainPage._toggleDivStatus = true;
+
         this.currentPersonne = null;
         this.currentAnnee = 0;
         this.currentMois = 0;
     }
 
-    public Draw(): HTMLDivElement {
+    public Draw(): JQuery<HTMLDivElement> {
         let iInfoGenerales: cDialogMainPageInfoGenerale = new cDialogMainPageInfoGenerale();
         let iInfoHoraires: cDialogMainPageHoraires = new cDialogMainPageHoraires();
-        let x: HTMLDivElement = document.createElement('div id=``');
-        x.appendChild(iInfoGenerales.Draw());
 
-        let y : HTMLDivElement = document.createElement('div');
-        y.appendChild(iInfoHoraires.Draw());
-        
-        let z: HTMLDivElement = document.createElement('div');
-        z.appendChild(x);
-        z.appendChild(y);
-        return z;
+        let divInfosGenerales: JQuery<HTMLDivElement> = $("<div id='InfosGeneralesDiv'></div>");
+        let x: JQuery<HTMLElement> = iInfoGenerales.Draw();
+        divInfosGenerales.append(x);
+
+        let divHoraires: JQuery<HTMLDivElement> = $("<div id='InfosHorairesDiv'></div>");
+        let y: JQuery<HTMLElement> = iInfoHoraires.Draw();
+        divHoraires.append(y);
+
+        let divAggregator: JQuery<HTMLDivElement> = $("<div id='InfosAggregatorDiv'></div>");
+        divAggregator.append(divInfosGenerales);
+        divAggregator.append(divHoraires);
+
+        return divAggregator;
     }
 
     public addCallBack(): void {
@@ -49,17 +58,31 @@ export default class cDialogMainPage extends cDialog {
 
         iInfoGenerales.addCallBack();
         iInfoHoraires.addCallBack();
+
+        this.toggleDiv();
+
+        let me : cDialogMainPage = this;
+        $(`#InfosAggregatorDiv`).on('InfoGeneralesDefined', function () {
+            me.switchDiv();
+            iInfoHoraires.refresh();
+        });
+
     }
 
-    protected setMois(mois: string) : void {
-        this.currentMois = Number.parseInt (mois);
+    private switchDiv(): void {
+        cDialogMainPage._toggleDivStatus = !cDialogMainPage._toggleDivStatus;
+        this.toggleDiv();
+    }
 
+    private toggleDiv(): void {
+        if (cDialogMainPage._toggleDivStatus) {
+            $(`#InfosGeneralesDiv`).show(400);
+            $(`#InfosHorairesDiv`).hide(400);
+        }
+        else {
+            $(`#InfosGeneralesDiv`).hide(400);
+            $(`#InfosHorairesDiv`).show(400);
+        }
     }
-    protected setAnnee(annee: number) : void {
-        this.currentAnnee = annee;
 
-    }
-    protected setPersonne(p: iPersonne) : void {
-        this.currentPersonne = p;
-    }
 }

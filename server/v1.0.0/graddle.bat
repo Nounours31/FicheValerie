@@ -1,6 +1,7 @@
 @echo on
 
 set Server=dell2259dsy
+set Server=lp5-pds-dsy
 
 if /i "%Server%" == "dell2259dsy" (
 	set JAVA_HOME=C:\java\jdk1.8.0_251
