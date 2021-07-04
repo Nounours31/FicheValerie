@@ -1,6 +1,5 @@
 package sfa.fichevalerie.mysql.db.access;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
@@ -95,10 +94,7 @@ public class DbPersonne extends DB  implements iDB {
 		
 		if (hash.containsKey("nom"))
 			rc.setNom((String)hash.get("nom"));
-		
-		if (hash.containsKey("date"))
-			rc.setDate(((Timestamp)hash.get("date")));
-		
+				
 		return rc;
 	}
 

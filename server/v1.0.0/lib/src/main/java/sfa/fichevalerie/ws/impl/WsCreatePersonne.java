@@ -37,7 +37,6 @@ public class WsCreatePersonne extends WS implements iWS {
 		Response r = null;
 		if (id > 0) {
 			p.setId(id);
-			p.setDate(new Date());
 			r = Response.ok().type(MediaType.APPLICATION_JSON).entity(p).build();			
 		}
 		else

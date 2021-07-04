@@ -14,6 +14,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import sfa.fichevalerie.mysql.api.datawrapper.Activite;
+import sfa.fichevalerie.mysql.api.datawrapper.BulletinSalaire;
 import sfa.fichevalerie.mysql.api.datawrapper.Personne;
 import sfa.fichevalerie.tools.E4ALogger;
 import sfa.fichevalerie.ws.impl.cWsFactory;
@@ -77,7 +79,7 @@ public class entrypoint {
     }
 
     @GET
-    @Path("/getAllPersonnes")
+    @Path("/personne")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllPersonnes() {
     	iWS ws = cWsFactory.getImpl("getAllPersonnes");
@@ -87,7 +89,7 @@ public class entrypoint {
     }
 
     @GET
-    @Path("/getPersonne/{genre}/{nom}")
+    @Path("/personne/{genre}/{nom}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPersonne(@PathParam("genre") String genre, @PathParam("nom") String nom) {
     	iWS ws = cWsFactory.getImpl("getAllPersonnes");
@@ -99,26 +101,13 @@ public class entrypoint {
     }
 
     @GET
-    @Path("/getPersonne/{id}")
+    @Path("/personne/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPersonne(@PathParam("id") int id) {
     	iWS ws = cWsFactory.getImpl("getAllPersonnes");
     	_logger.info(ws.whoami());
 
     	ws.setArgs ("id", id);
-    	return ws.run();
-    }
-
-    @GET
-    @Path("/getBulletinSalaire/{idPersonne}/{mois}/{annee}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getBulletinSalaire(@PathParam("idPersonne") int idPersonne, @PathParam("mois") int mois, @PathParam("annee") int annee) {
-    	iWS ws = cWsFactory.getImpl("getBulletinSalaire");
-    	_logger.info(ws.whoami());
-
-    	ws.setArgs ("idPersonne", idPersonne);
-    	ws.setArgs ("mois", mois);
-    	ws.setArgs ("annee", annee);
     	return ws.run();
     }
 
@@ -131,6 +120,43 @@ public class entrypoint {
     	_logger.info(ws.whoami());
 
     	ws.setArgs ("personne", p);
+    	return ws.run();
+    }
+
+    @GET
+    @Path("/bulletinSalaire/{idPersonne}/{mois}/{annee}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getBulletinSalaire(@PathParam("idPersonne") int idPersonne, @PathParam("mois") int mois, @PathParam("annee") int annee) {
+    	iWS ws = cWsFactory.getImpl("getBulletinSalaire");
+    	_logger.info(ws.whoami());
+
+    	ws.setArgs ("idPersonne", idPersonne);
+    	ws.setArgs ("mois", mois);
+    	ws.setArgs ("annee", annee);
+    	return ws.run();
+    }
+
+    @POST
+    @Path("/bulletinSalaire")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response createBulletinSalaire(BulletinSalaire p) {
+    	iWS ws = cWsFactory.getImpl("createBulletinSalaire");
+    	_logger.info(ws.whoami());
+
+    	ws.setArgs ("BulletinSalaire", p);
+    	return ws.run();
+    }
+
+    @POST
+    @Path("/activite")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response createActivite(Activite a) {
+    	iWS ws = cWsFactory.getImpl("createActivite");
+    	_logger.info(ws.whoami());
+
+    	ws.setArgs ("activite", a);
     	return ws.run();
     }
 }

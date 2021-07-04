@@ -159,8 +159,8 @@ export default class cDialogMainPageInfoGenerale extends cDialog {
             // ----
             // recup des infos
             // ----
-            let mois : number = $(`#${me._idSelectOnMois}`).val() as number;
-            let annee: number = $(`#${me._idSelectOnAnnee}`).val() as number;
+            let mois : number = Number.parseInt($(`#${me._idSelectOnMois}`).val() as string);
+            let annee: number = Number.parseInt($(`#${me._idSelectOnAnnee}`).val() as string);
             let personne: string = $(`#${me._idSelectOnPersonne} option:selected`).text();
 
             console.log("On OK: mois =" + mois);
@@ -220,7 +220,7 @@ export default class cDialogMainPageInfoGenerale extends cDialog {
                 }
             }
             else {
-                idPersonne = $(`#${me._idSelectOnPersonne}`).val() as number;
+                idPersonne = Number.parseInt ($(`#${me._idSelectOnPersonne}`).val() as string);
             }
 
 
@@ -228,7 +228,6 @@ export default class cDialogMainPageInfoGenerale extends cDialog {
             // gestion de la fiche existe t elle deja ?
             // ----
             let ws : cWS = new cWS();
-            //let iMois : number = cOutilsDivers.MoisFromNomToInt(mois);
             let iMois : number = mois;
             let fiche: iBulletinSalaire[] = ws.getBulletinSalaire(idPersonne, iMois, annee);
             if (fiche.length > 0) {
@@ -240,7 +239,7 @@ export default class cDialogMainPageInfoGenerale extends cDialog {
             c.mois = iMois
             c.annee = annee;
             c.idPersonne = idPersonne;
-            c.tarifHoraire = ($(`#${me._idInputTarifHoraire}`).val() as unknown) as number;
+            c.tarifHoraire = Number.parseFloat($(`#${me._idInputTarifHoraire}`).val() as string);
             
             let lPer: iPersonne[] = ws.getPersonne(idPersonne);
             c.personne = lPer[0];

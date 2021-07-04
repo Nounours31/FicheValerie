@@ -18,6 +18,9 @@ public class cWsFactory {
 			case "getAllPersonnes" : rc =  new WsGetAllPersonnes(); break;
 			case "getBulletinSalaire" : rc =  new WsGetBulletinSalaire(); break;
 			case "createPersonne" : rc =  new WsCreatePersonne(); break;
+			case "createBulletinSalaire" : rc =  new WsCreateBulletinSalaire(); break;
+			case "createActivite" : rc =  new WsCreateActivte(); break;
+			
 			default : rc = new WsNoImpl();
 		}
 		return rc;

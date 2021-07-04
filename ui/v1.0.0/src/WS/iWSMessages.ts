@@ -1,7 +1,6 @@
 export interface iPersonne  {
     id: number;
     genre: string;
-    date: string;
     nom: string;
 }
 
@@ -9,7 +8,17 @@ export interface iPersonne  {
 export interface iBulletinSalaire {
     id: number;
     idPersonne: number;
-    mois: string;
+    mois: number;
     annee: number;
+    tarifHoraire: number;
 }
 
+
+export interface iActivite {
+    id: number;
+    idBulletinSalaire: number;
+    tarifHoraire: number;
+    activite: string;
+    debut: Date;
+    fin: Date;
+}

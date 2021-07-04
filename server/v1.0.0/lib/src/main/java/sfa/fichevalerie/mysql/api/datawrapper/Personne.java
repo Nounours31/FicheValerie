@@ -2,6 +2,13 @@ package sfa.fichevalerie.mysql.api.datawrapper;
 
 import java.util.Date;
 
+/*
+export interface iPersonne  {
+    id: number;
+    genre: string;
+    nom: string;
+}
+ */
 
 public class Personne extends ObjectWrapper implements iObjectWrapper{
 
@@ -11,7 +18,6 @@ public class Personne extends ObjectWrapper implements iObjectWrapper{
 
     String nom;
     String genre;
-    Date date;
     int id;
      
     public String getNom() {
@@ -27,14 +33,7 @@ public class Personne extends ObjectWrapper implements iObjectWrapper{
     public void setGenre(String genre) {
         this.genre = genre;
     }
-    
-    public Date getDate() {
-        return date;
-    }
-    public void setDate(Date timestamp) {
-    	this.date = timestamp;
-    }
-    
+       
     public int getId() {
         return id;
     }
@@ -45,8 +44,7 @@ public class Personne extends ObjectWrapper implements iObjectWrapper{
     
     @Override
     public String toString(){
-        return String.format("[Personne: (id=%d)(genre=%s)(nom=%s)(date creation=%s)]", 
-        		getId(), getGenre(), getNom(), _sdf.format(getDate()));
+        return String.format("[Personne: (id=%d)(genre=%s)(nom=%s)]", getId(), getGenre(), getNom());
     }
 
 }

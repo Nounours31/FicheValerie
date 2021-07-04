@@ -5,7 +5,18 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Hashtable;
 
+/*
 
+export interface iBulletinSalaire {
+    id: number;
+    idPersonne: number;
+    mois: string;
+    annee: number;
+    tarifHoraire: number;
+}
+
+
+ */
 public class BulletinSalaire extends ObjectWrapper implements iObjectWrapper {
 
 	public BulletinSalaire() {
@@ -16,17 +27,9 @@ public class BulletinSalaire extends ObjectWrapper implements iObjectWrapper {
     int idPersonne;
     int mois;
     int annee;
-    Calendar date;
+    float tarifHoraire;
      
-    
-    public Date getDate() {
-        return date.getTime();
-    }
-    public void setDate(Timestamp timestamp) {
-    	this.date = Calendar.getInstance();
-    	this.date.setTimeInMillis( timestamp.getTime());
-    }
-    
+        
     public int getId() {
         return id;
     }
@@ -51,11 +54,17 @@ public class BulletinSalaire extends ObjectWrapper implements iObjectWrapper {
 	public void setAnnee(int annee) {
 		this.annee = annee;
 	}
+	public float getTarifHoraire() {
+		return tarifHoraire;
+	}
+	public void setTarifHoraire(float tarifHoraire) {
+		this.tarifHoraire = tarifHoraire;
+	}
 
     @Override
     public String toString(){
-        return String.format("[BulletinSalaire: (id=%d)(idPersonne=%d)(mois=%d)(annee=%d)(date creation=%s)]", 
-        		getId(), getIdPersonne(), getMois(), getAnnee(), _sdf.format(getDate()));
+        return String.format("[BulletinSalaire: (id=%d)(idPersonne=%d)(mois=%d)(annee=%d)(tarifHoraire=%f)]", 
+        		getId(), getIdPersonne(), getMois(), getAnnee(), getTarifHoraire());
     }
 
 }

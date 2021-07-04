@@ -1,7 +1,7 @@
 package sfa.fichevalerie.mysql.db.access;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Hashtable;
 
 import sfa.fichevalerie.mysql.api.datawrapper.BulletinSalaire;
@@ -16,6 +16,20 @@ public class DbBulletinSalaire extends DB implements iDB {
 		// TODO Auto-generated constructor stub
 	}
 
+	public int insertBulletinSalaire (BulletinSalaire bs) {
+		String sql = String.format("insert into bulletinsalaire (idPersonne, mois, annee, date) values (%d, %d, %d, '%s')", 
+				bs.getIdPersonne(), bs.getMois(), bs.getAnnee(), _sdf.format(new Date()));
+		
+		try {
+			return this.insertAsRest(sql);
+		}
+		catch (Exception e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+			return -1;
+		}
+	}
+	
 	public BulletinSalaire[] getAllBulletinSalaire(int idPersonne, int mois, int annee) {
 		String sql = String.format("select * from bulletinsalaire where ((idPersonne=%d) and (mois=%d) and (annee=%d))", idPersonne, mois, annee);
 		return this.getAllBulletinSalaire(sql);
@@ -84,9 +98,6 @@ public class DbBulletinSalaire extends DB implements iDB {
 
 		if (hash.containsKey("annee"))
 			rc.setAnnee(((Integer)hash.get("annee")).intValue());
-
-		if (hash.containsKey("date"))
-			rc.setDate(((Timestamp)hash.get("date")));
 		
 		return rc;	
 	}

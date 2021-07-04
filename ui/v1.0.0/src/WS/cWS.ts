@@ -1,5 +1,5 @@
 import cToolsAjax from '../tools/cToolsAjax';
-import {iPersonne, iBulletinSalaire } from './iWSMessages';
+import {iPersonne, iBulletinSalaire, iActivite } from './iWSMessages';
 import cErr from '../tools/cErr';
 import cEnv from './cEnv';
 
@@ -14,7 +14,7 @@ export default class cWS {
 
     public getAllPersonnes(): iPersonne[] {
         let retour : iPersonne[] = [];
-        let URL = cEnv._serverURL + '/getAllPersonnes';
+        let URL = cEnv._serverURL + '/personne';
         let oResp: boolean = this.t.sendGetWS(URL);
         if (this.t.status) {
             retour = ((this.t.data as unknown) as iPersonne[]);
@@ -29,9 +29,9 @@ export default class cWS {
         let URL : string = "";
         // if (typeof abc === "number") {
         if (nom !== undefined) {
-            URL = cEnv._serverURL + `/getPersonne/${idOrGenre}/${nom}`;
+            URL = cEnv._serverURL + `/personne/${idOrGenre}/${nom}`;
         } else {
-            URL = cEnv._serverURL + `/getPersonne/${idOrGenre}`;
+            URL = cEnv._serverURL + `/personne/${idOrGenre}`;
         }
         let oResp: boolean = this.t.sendGetWS(URL);
         if (this.t.status) {
@@ -42,10 +42,44 @@ export default class cWS {
 
     public getBulletinSalaire(idPersonne: number, mois: number, annee: number): iBulletinSalaire[] {
         let retour : iBulletinSalaire[] = [];
-        let URL = cEnv._serverURL + `/getBulletinSalaire/${idPersonne}/${mois}/${annee}`;
+        let URL = cEnv._serverURL + `/bulletinSalaire/${idPersonne}/${mois}/${annee}`;
         let oResp: boolean = this.t.sendGetWS(URL);
         if (this.t.status) {
             retour = ((this.t.data as unknown) as iBulletinSalaire[]);
+        }
+        return retour;
+    }
+    public createBulletinSalaire(mois: number, annee: number, p: iPersonne, tarifHoraire: number): number {
+        let retour: number = -1;
+        let URL = cEnv._serverURL + `/bulletinSalaire`;
+        let postData: iBulletinSalaire = {
+            'annee': annee as number,
+            'mois': mois as number,
+            'tarifHoraire': tarifHoraire as number,
+            'id': -1,
+            'idPersonne': p.id as number
+        }
+        let oResp: boolean = this.t.sendPostWS(URL, postData);
+        if (this.t.status) {
+            retour = ((this.t.data as unknown) as iBulletinSalaire).id;
+        }
+        return retour;
+    }
+
+    public addActivite(ficheId: number, jour: number, activite: string, debut: Date, fin: Date) : number {
+        let retour: number = -1;
+        let URL = cEnv._serverURL + `/activite`;
+        let postData: iActivite = {
+            'id': -1,
+            'idBulletinSalaire': ficheId,
+            'activite': activite,
+            'debut': debut,
+            'fin': fin,
+            'tarifHoraire': -1.0
+        }
+        let oResp: boolean = this.t.sendPostWS(URL, postData);
+        if (this.t.status) {
+            retour = ((this.t.data as unknown) as iActivite).id;
         }
         return retour;
     }
@@ -56,8 +90,7 @@ export default class cWS {
         let PostData: iPersonne = {
             'genre': genre,
             id: -1,
-            'nom': nom,
-            'date': '1900-01-01T00:00:00'
+            'nom': nom
         };
         let oResp: boolean = this.t.sendPostWS(URL, PostData);
         if (this.t.status) {
