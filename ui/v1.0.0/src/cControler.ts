@@ -65,7 +65,7 @@ export class cControler {
     }
 
     set mois(id: number) {
-        if ((id > 12) || (id < 1)) {
+        if ((id > 12) || (id < 0)) {
             throw new Error("fullName has a max length of " + id);
         }
 

@@ -99,8 +99,10 @@ public class DbPersonne extends DB  implements iDB {
 	}
 
 	public int createPersonne(Personne p) throws Exception {
+		String x = this.escapeStringForMySQL(p.getNom());
+
 		String sql = String.format("insert into personne (genre, nom, date) values ('%s', '%s', '%s')",
-				p.getGenre(), p.getNom(), _sdf.format(new Date()));
+				p.getGenre(), x, _sdf.format(new Date()));
 		
 		return this.insertAsRest(sql);
 	}

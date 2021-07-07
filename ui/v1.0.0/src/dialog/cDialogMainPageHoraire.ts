@@ -9,6 +9,7 @@ import { cControler } from '../cControler';
 import cOutilsDivers  from '../tools/cOutilsDivers';
 import cDuration from '../tools/cDuration';
 import cWS from '../WS/cWS';
+import { iPdf } from '../WS/iWSMessages';
 
 interface iUIDLIGNE {
     racine: number,
@@ -158,11 +159,16 @@ export default class cDialogMainPageHoraire extends cDialog {
                             jour, 
                             $(this).find(`.${cDialogMainPageHoraire._idSelectActivitee} option:selected`).text(),
                             debut,
-                            fin);
+                            fin,
+                            -1.0);
                     }
                 }
             }
         });
+        let pdf: iPdf = ws.generatePdf(ficheId);
+        console.log(pdf.id);
+
+        ws.getPdf(pdf.id);
     }
 
     // ---------------------------------------------

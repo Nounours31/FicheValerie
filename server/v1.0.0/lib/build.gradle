@@ -32,6 +32,7 @@ dependencies {
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     implementation 'com.google.guava:guava:29.0-jre'
 
+
     // https://mvnrepository.com/artifact/com.itextpdf/itext7-core
     implementation group: 'com.itextpdf', name: 'itext7-core', version: '7.1.12'
     implementation group: 'com.itextpdf', name: 'svg', version: '7.1.12'

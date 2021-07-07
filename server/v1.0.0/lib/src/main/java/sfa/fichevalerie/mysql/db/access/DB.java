@@ -169,5 +169,30 @@ public abstract class DB implements iDB {
 		return rc;
 	}
 
+	protected String escapeStringForMySQL(String s1) {
+		String s = escapeStdStringForMySQL(s1);
+		s = escapeWildcardsForMySQL(s);
+		return s;
+	}
+	
+	protected String escapeStdStringForMySQL(String s1) {
+        String s = s1.replace("\\", "\\\\");
+        s = s.replace("\b","\\b");
+        s = s.replace("\n","\\n");
+        s = s.replace("\r", "\\r");
+        s = s.replace("\t", "\\t");
+        s = s.replace("\\x1A", "\\Z");
+        s = s.replace("\\x00", "\\0");
+        s = s.replace("'", "\\'");
+        s = s.replace("\"", "\\\"");
+        return s;
+    }
+
+	protected String escapeWildcardsForMySQL(String s1) {
+        String s = s1.replace("%", "\\%");
+        s = s.replace("_","\\_");
+        return s;
+    }
+
 
 }

@@ -22,7 +22,7 @@ public class DbActivite extends DB implements iDB {
 	public int insertActivite (Activite a) {
 		String sql = String.format("INSERT INTO activite (idBulletinSalaire, activitee, debut, fin, date, tarifHoraire) VALUES ('%d', '%s', '%s', '%s', '%s', %f)", 
 				a.getIdBulletinSalaire(), a.getActivite(), _sdf.format(a.getDebut()), _sdf.format(a.getFin()), _sdf.format(new Date()), a.getTarifHoraire());
-		
+
 		try {
 			return this.insertAsRest(sql);
 		}
@@ -34,10 +34,69 @@ public class DbActivite extends DB implements iDB {
 	}
 
 
-	@Override
-	public iObjectWrapper encode(Hashtable<String, Object> obj) throws E4AException {
+
+	public Activite[] getAllActivitees(int idBulletinSalaire) {
+		String sql = String.format("select * from activite where (idBulletinSalaire = %d)", idBulletinSalaire);
+		return this.getAllActivitees(sql);		
+	}
+
+	private Activite[] getAllActivitees(String sql) {
+		_logger.debug("getAllActivitees START");
+
+		ArrayList<Activite> lActivite = new ArrayList<Activite>();		
+		cInfoFromSelect res = null;;
+		try {
+			res = this.selectAsRest(sql);
+			_logger.debug("Resultat requete: " + res.toString());
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}
+
+		if (res != null) {
+			for (int i = 0; i < res.size(); i++) {
+				Hashtable<String, Object> row = res.get(i);
+				if (row != null) {
+					Activite p = null;
+					try {
+						p = this.encode(row);
+					}
+					catch (E4AException e) {
+						System.out.println(e.getMessage());
+						System.out.println("Raison du KO ?" + res.dump(row));
+						p = null;
+					}
+
+					if (p != null) {
+						_logger.debug("Activite trouvee: " + p.toString());
+						lActivite.add(p);
+					}
+				}
+			}
+		}
+
+		_logger.debug("Nb Activite au total: " +lActivite.size());
+
+		if (lActivite.size() > 0) {
+			Activite[] rc = new Activite[lActivite.size()];
+			rc = lActivite.toArray(rc);
+
+			return rc;
+		}
 		return null;
 	}
 
+	@Override
+	public Activite encode(Hashtable<String, Object> hash) throws E4AException {
+		Activite rc = new Activite();
+		if (hash.containsKey("id")) rc.setId(((Integer)hash.get("id")).intValue());
+		if (hash.containsKey("idBulletinSalaire")) rc.setIdBulletinSalaire(((Integer)hash.get("idBulletinSalaire")).intValue());
+		if (hash.containsKey("tarifHoraire")) rc.setTarifHoraire(((Float)hash.get("tarifHoraire")).floatValue());
+		if (hash.containsKey("activite")) rc.setActivite((String)hash.get("activite"));
+		if (hash.containsKey("debut")) rc.setDebut((Date)hash.get("debut"));
+		if (hash.containsKey("fin")) rc.setFin((Date)hash.get("fin"));
 
+		return rc;	
+	}
 }
+

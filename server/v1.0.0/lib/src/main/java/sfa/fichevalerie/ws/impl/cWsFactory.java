@@ -20,6 +20,8 @@ public class cWsFactory {
 			case "createPersonne" : rc =  new WsCreatePersonne(); break;
 			case "createBulletinSalaire" : rc =  new WsCreateBulletinSalaire(); break;
 			case "createActivite" : rc =  new WsCreateActivte(); break;
+			case "createPdfFile" : rc =  new WsPdfFile(eWsNameInCaseOfMultipleChoice.create); break;
+			case "getPdfFile" : rc =  new WsPdfFile(eWsNameInCaseOfMultipleChoice.get); break;
 			
 			default : rc = new WsNoImpl();
 		}

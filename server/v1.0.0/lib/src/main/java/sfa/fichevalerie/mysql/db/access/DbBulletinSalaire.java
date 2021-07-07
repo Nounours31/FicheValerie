@@ -17,8 +17,8 @@ public class DbBulletinSalaire extends DB implements iDB {
 	}
 
 	public int insertBulletinSalaire (BulletinSalaire bs) {
-		String sql = String.format("insert into bulletinsalaire (idPersonne, mois, annee, date) values (%d, %d, %d, '%s')", 
-				bs.getIdPersonne(), bs.getMois(), bs.getAnnee(), _sdf.format(new Date()));
+		String sql = String.format("insert into bulletinsalaire (idPersonne, mois, annee, tarifHoraire, date) values (%d, %d, %d, %f, '%s')", 
+				bs.getIdPersonne(), bs.getMois(), bs.getAnnee(), bs.getTarifHoraire(), _sdf.format(new Date()));
 		
 		try {
 			return this.insertAsRest(sql);
@@ -30,6 +30,15 @@ public class DbBulletinSalaire extends DB implements iDB {
 		}
 	}
 	
+	public BulletinSalaire getAllBulletinSalaire(int idBulletinSalaire) {
+		String sql = String.format("select * from bulletinsalaire where (id=%d)", idBulletinSalaire);
+		BulletinSalaire[] bs = this.getAllBulletinSalaire(sql);
+		
+		if ((bs != null) && (bs.length > 0))
+			return bs[0];
+		return null;
+	}
+
 	public BulletinSalaire[] getAllBulletinSalaire(int idPersonne, int mois, int annee) {
 		String sql = String.format("select * from bulletinsalaire where ((idPersonne=%d) and (mois=%d) and (annee=%d))", idPersonne, mois, annee);
 		return this.getAllBulletinSalaire(sql);
@@ -38,6 +47,7 @@ public class DbBulletinSalaire extends DB implements iDB {
 		String sql = "select * from bulletinsalaire";
 		return this.getAllBulletinSalaire(sql);		
 	}
+	
 	private BulletinSalaire[] getAllBulletinSalaire(String sql) {
 		_logger.debug("getAllPersonnes START");
 		
@@ -98,8 +108,14 @@ public class DbBulletinSalaire extends DB implements iDB {
 
 		if (hash.containsKey("annee"))
 			rc.setAnnee(((Integer)hash.get("annee")).intValue());
+
+		if (hash.containsKey("tarifHoraire"))
+			rc.setTarifHoraire(((Float)hash.get("tarifHoraire")).floatValue());
+		
+		
 		
 		return rc;	
 	}
+
 
 }

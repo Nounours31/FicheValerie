@@ -1,5 +1,5 @@
 import cToolsAjax from '../tools/cToolsAjax';
-import {iPersonne, iBulletinSalaire, iActivite } from './iWSMessages';
+import {iPersonne, iBulletinSalaire, iActivite, iPdf } from './iWSMessages';
 import cErr from '../tools/cErr';
 import cEnv from './cEnv';
 
@@ -66,7 +66,7 @@ export default class cWS {
         return retour;
     }
 
-    public addActivite(ficheId: number, jour: number, activite: string, debut: Date, fin: Date) : number {
+    public addActivite(ficheId: number, jour: number, activite: string, debut: Date, fin: Date, tarifHoraire: number) : number {
         let retour: number = -1;
         let URL = cEnv._serverURL + `/activite`;
         let postData: iActivite = {
@@ -75,11 +75,36 @@ export default class cWS {
             'activite': activite,
             'debut': debut,
             'fin': fin,
-            'tarifHoraire': -1.0
+            'tarifHoraire': tarifHoraire
         }
         let oResp: boolean = this.t.sendPostWS(URL, postData);
         if (this.t.status) {
             retour = ((this.t.data as unknown) as iActivite).id;
+        }
+        return retour;
+    }
+
+    public generatePdf(ficheId: number) : iPdf {
+        let retour: iPdf = null;
+        let URL = cEnv._serverURL + `/pdf`;
+        let postData: iPdf = {
+            'id': -1,
+            'idBulletinSalaire': ficheId,
+            'file': ''
+        }
+        let oResp: boolean = this.t.sendPostWS(URL, postData);
+        if (this.t.status) {
+            retour = ((this.t.data as unknown) as iPdf);
+        }
+        return retour;
+    }
+
+    public getPdf(ficheId: number): iPdf {
+        let retour: iPdf = null;
+        let URL = cEnv._serverURL + `/pdf/${ficheId}`;
+        let oResp: boolean = this.t.GetPDFFileWS(URL, 'ficheSalaire.pdf');
+        if (this.t.status) {
+            retour = ((this.t.data as unknown) as iPdf);
         }
         return retour;
     }

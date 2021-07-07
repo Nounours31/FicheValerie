@@ -109,4 +109,35 @@ export default class cToolsAjax {
     private error (jqXHR : JQuery.jqXHR, textStatus : string, errorThrown: string) : void {
         console.log("OK error");
     }
+
+    
+    public GetPDFFileWS(url: string, fileName: string): boolean {
+        let xhr: XMLHttpRequest = new XMLHttpRequest();
+        xhr.open("GET", url, true);
+        xhr.responseType = 'arraybuffer';
+        xhr.addEventListener('load', function () {
+            if (xhr.status === 200) {
+                console.log(xhr.response) // ArrayBuffer
+                console.log(new Blob([xhr.response])) // Blob
+                var blob = new Blob([xhr.response], { type: "application/pdf" });
+ 
+                // -----------------------------------------------
+                // Check the Browser type and download the File.
+                // -----------------------------------------------
+                let url: any = window.URL;
+                let link = url.createObjectURL(blob);
+
+                let a: HTMLAnchorElement = document.createElement("a");
+                a.setAttribute('id', 'TemporairePourDownLoadauytzutzueyznyurtbuy');
+                document.body.appendChild(a);
+                a.href = link;
+                a.download = fileName;
+                a.click();
+                a.parentElement.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            }
+        })
+        xhr.send();
+        return true;
+    }   
 }

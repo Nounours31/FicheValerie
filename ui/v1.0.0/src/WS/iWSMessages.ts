@@ -22,3 +22,9 @@ export interface iActivite {
     debut: Date;
     fin: Date;
 }
+
+export interface iPdf {
+    id: number;
+    idBulletinSalaire: number;
+    file: string;
+}

@@ -16,6 +16,7 @@ import javax.ws.rs.core.UriInfo;
 
 import sfa.fichevalerie.mysql.api.datawrapper.Activite;
 import sfa.fichevalerie.mysql.api.datawrapper.BulletinSalaire;
+import sfa.fichevalerie.mysql.api.datawrapper.Pdf;
 import sfa.fichevalerie.mysql.api.datawrapper.Personne;
 import sfa.fichevalerie.tools.E4ALogger;
 import sfa.fichevalerie.ws.impl.cWsFactory;
@@ -63,19 +64,30 @@ public class entrypoint {
 		return ws.run();    	
     }
     
-    private static final String FILE_PATH = "c:\\Android-Book.pdf";
 
     @GET
     @Path("/pdf/{id}")
     @Produces("application/pdf")
-    public Response getFile(@PathParam("id") String input) {
+    public Response getFile(@PathParam("id") int id) {
+    	iWS ws = cWsFactory.getImpl("getPdfFile");
+    	_logger.info(ws.whoami());
 
-        File file = new File(FILE_PATH);
-
-        ResponseBuilder response = Response.ok((Object) file);
+    	ws.setArgs ("id", id);
+    	return ws.run();
+/*        ResponseBuilder response = Response.ok((Object) file);
         response.header("Content-Disposition", "attachment; filename=new-android-book.pdf");
-        return response.build();
+        return response.build();*/
 
+    }
+    @POST
+    @Path("/pdf")
+    @Produces("application/pdf")
+    public Response createPdfFile(Pdf p) {
+    	iWS ws = cWsFactory.getImpl("createPdfFile");
+    	_logger.info(ws.whoami());
+
+    	ws.setArgs ("pdf", p);
+    	return ws.run();
     }
 
     @GET
