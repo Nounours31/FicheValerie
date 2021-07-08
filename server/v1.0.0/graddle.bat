@@ -1,5 +1,8 @@
 @echo off
 
+echo "To install: gradle installDist --warning-mode all --info"
+echo "Use: --warning-mode all --info"
+
 for /f "skip=1 delims=" %%A in (
   'wmic computersystem get name'
 ) do for /f "delims=" %%B in ("%%A") do set "compName=%%A"
