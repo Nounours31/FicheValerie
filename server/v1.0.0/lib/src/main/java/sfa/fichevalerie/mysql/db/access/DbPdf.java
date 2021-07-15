@@ -5,14 +5,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
 
-import com.itextpdf.io.IOException;
-
 import sfa.fichevalerie.mysql.api.datawrapper.Activite;
 import sfa.fichevalerie.mysql.api.datawrapper.BulletinSalaire;
 import sfa.fichevalerie.mysql.api.datawrapper.Pdf;
-import sfa.fichevalerie.mysql.api.datawrapper.Personne;
 import sfa.fichevalerie.mysql.db.tools.cInfoFromSelect;
-import sfa.fichevalerie.pdf.modele.ApiPdf;
 import sfa.fichevalerie.tools.E4AException;
 
 public class DbPdf extends DB  implements iDB {
@@ -53,7 +49,7 @@ public class DbPdf extends DB  implements iDB {
 		if (!dirFile.exists()) 
 			dirFile.mkdirs();
 		
-		ApiPdf pdfCreator = new ApiPdf();
+	/*	ApiPdf pdfCreator = new ApiPdf();
 		try {
 			pdfCreator.createPdf(newPdf.getAbsolutePath(), bs, a);
 			if (newPdf.exists() && newPdf.length() > 0) {
@@ -67,7 +63,7 @@ public class DbPdf extends DB  implements iDB {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-		}
+		}*/
 		return retour;
 	}
 

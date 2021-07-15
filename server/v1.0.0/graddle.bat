@@ -18,12 +18,12 @@ set GRADDLE_HOME=
 
 if /i "%Server%" equ "dell2259dsy" (
 	set JAVA_HOME=C:\java\jdk1.8.0_251
-	set GRADDLE_HOME=E:\programfiles\gradle\gradle-6.8.3
+	set GRADDLE_HOME=E:\programfiles\gradle\gradle-7.1.1
 )
 
 if /i "%Server%" equ "lp5-pfs-dsy" (
 	set JAVA_HOME=C:\java\jdk1.8.0_241
-	set GRADDLE_HOME=E:\ProgramFiles\gradle-7.1
+	set GRADDLE_HOME=E:\ProgramFiles\gradle-7.1.1
 )
 
 echo JAVA_HOME: %JAVA_HOME%

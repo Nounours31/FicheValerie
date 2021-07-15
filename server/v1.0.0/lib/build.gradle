@@ -12,8 +12,9 @@ plugins {
     id 'war'
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+
+
+
 
 repositories {
     mavenCentral()
@@ -44,6 +45,8 @@ dependencies {
     implementation group: 'com.itextpdf', name: 'kernel', version: '7.1.12'
     implementation group: 'com.itextpdf', name: 'io', version: '7.1.12'
 
+    // https://mvnrepository.com/artifact/com.itextpdf/itextpdf
+    /* implementation group: 'com.itextpdf', name: 'itextpdf', version: '5.5.13' */
 
 
     // https://mvnrepository.com/artifact/javax.ws.rs/javax.ws.rs-api
@@ -54,20 +57,22 @@ dependencies {
 	implementation group: 'com.google.protobuf', name: 'protobuf-java', version: '3.11.4'
 }
 
-/*
-war {
-    webAppDirectory = file('src/main/webapp')
-    from 'src/rootContent' // adds a file-set to the root of the archive
-    webInf { from 'src/additionalWebInf' } // adds a file-set to the WEB-INF dir.
-    classpath fileTree('additionalLibs') // adds a file-set to the WEB-INF/lib dir.
-    classpath configurations.moreLibs // adds a configuration to the WEB-INF/lib dir.
-    webXml = file('src/someWeb.xml') // copies a file to WEB-INF/web.xml
+
+
+java {
+	sourceCompatibility(JavaVersion.VERSION_1_8)
+    targetCompatibility(JavaVersion.VERSION_1_8)
 }
-*/
+
+
 war {
-	enabled=true
-    // webXml = file('src/main/webapp/WEB-INF/web.xml')
+    setWebAppDirName('build/archive')
+    enabled = true
     from 'src/main/java' // adds a file-set to the root of the archive
+    webXml(file('src/main/webapp/WEB-INF/web.xml'))
+    archiveBaseName = 'FicheValerie'
+    archiveAppendix = ''
+    archiveVersion  = '1.0.0'
 }
 
 
