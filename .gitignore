@@ -4,3 +4,6 @@ tomee-8.0.6/
 server/v1.0.0/lib/build/
 server/v1.0.0/.gradle/
 store/
+/server/v1.0.0/FicheValerie/.gradle/
+/server/v1.0.1/fichevalerie/.gradle/
+/server/v1.0.1/fichevalerie/build/
