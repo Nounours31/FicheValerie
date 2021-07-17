@@ -498,68 +498,71 @@ public class ApiPdf {
             info = tools.FromMinutesLongToHeure(tools.FromDureeToMinutesLong(debut, fin));
             t.addCell (this.builCell (iJourSemaine, info, true, true, center));
 
-            nbHeureTravailleeTotale += tools.FromDureeToMinutesLong(debut, fin);
+            long dureeActivite = tools.FromDureeToMinutesLong(debut, fin);
+            nbHeureTravailleeTotale += dureeActivite;
             info = tools.FromMinutesLongToHeure(nbHeureTravailleeTotale);
             t.addCell (this.builCell (iJourSemaine, info, true, true, center));
 
-            courranteInfoActivite.setNbHeureMinutes(courranteInfoActivite.getNbHeureMinutes() + nbHeureTravailleeTotale);
+            courranteInfoActivite.AddNbHeureMinutes(dureeActivite);
         }
 
         cell = new Cell(1,7);
         cell.setBorder(Border.NO_BORDER);
         t.addCell(cell);
 
-        cell = new Cell(1,5);
-        cell.add (new Paragraph(new Text(ei18n.activite_depassementforfaitaire.nls())));
-        t.addCell(cell);
-
-        cell = new Cell(1,1);
-        float nbHeureDepassement = 0f;
         if (d != null) {
+            cell = new Cell(1,5);
+            cell.add (new Paragraph(new Text(ei18n.activite_depassementforfaitaire.nls())));
+            t.addCell(cell);
+
+            cell = new Cell(1,1);
+            float nbHeureDepassement = 0f;
+
             for (DepassementForfaitaire unDepassementForfait : d) {
                 nbHeureDepassement += unDepassementForfait.getDureeenheure();
-                courranteInfoActivite = InfoActiviteeHandler.getHandler (rc, unDepassementForfait, bs);
-                courranteInfoActivite.AddNbHeureMinutes((long)nbHeureDepassement * 60);
+                courranteInfoActivite = InfoActiviteeHandler.getHandler(rc, unDepassementForfait, bs);
+                courranteInfoActivite.AddNbHeureMinutes((long) nbHeureDepassement * 60);
             }
+
+            long nbMinutesLongDepassement = (long) nbHeureDepassement * 60;
+            cell.add(new Paragraph(new Text(tools.FromMinutesLongToHeure(nbMinutesLongDepassement))).setTextAlignment(TextAlignment.CENTER));
+            t.addCell(cell);
+
+            nbHeureTravailleeTotale += nbMinutesLongDepassement;
+            cell = new Cell(1, 1);
+            cell.add(new Paragraph(new Text(tools.FromMinutesLongToHeure(nbHeureTravailleeTotale))).setTextAlignment(TextAlignment.CENTER));
+            t.addCell(cell);
         }
-        long nbMinutesLongDepassement = (long)nbHeureDepassement * 60;
-        cell.add (new Paragraph(new Text(tools.FromMinutesLongToHeure(nbMinutesLongDepassement))));
-        t.addCell(cell);
-
-        nbHeureTravailleeTotale += nbMinutesLongDepassement;
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text(tools.FromMinutesLongToHeure(nbHeureTravailleeTotale))));
-        t.addCell(cell);
-
-        cell = new Cell(1,5);
-        cell.add (new Paragraph(new Text(ei18n.activite_RappelPrecedent.nls())));
-        t.addCell(cell);
 
         float nbHeureReportMoisPrecedent = 0f;
         if (r != null) {
-            for (Rappel unRappel: r) {
+            for (Rappel unRappel : r) {
                 nbHeureReportMoisPrecedent += unRappel.getDureeenheure();
-                courranteInfoActivite = InfoActiviteeHandler.getHandler (rc, unRappel, bs);
-                courranteInfoActivite.AddNbHeureMinutes((long)nbHeureReportMoisPrecedent * 60l);
+                courranteInfoActivite = InfoActiviteeHandler.getHandler(rc, unRappel, bs);
+                courranteInfoActivite.AddNbHeureMinutes((long) nbHeureReportMoisPrecedent * 60l);
             }
+
+            cell = new Cell(1,5);
+            cell.add (new Paragraph(new Text(ei18n.activite_RappelPrecedent.nls())));
+            t.addCell(cell);
+
+            long nbMinutesLongReportMoisPrecedent = (long) nbHeureReportMoisPrecedent * 60;
+            cell = new Cell(1, 1);
+            cell.add(new Paragraph(new Text(tools.FromMinutesLongToHeure(nbMinutesLongReportMoisPrecedent))).setTextAlignment(TextAlignment.CENTER));
+            t.addCell(cell);
+
+            nbHeureTravailleeTotale += nbMinutesLongReportMoisPrecedent;
+            cell = new Cell(1, 1);
+            cell.add(new Paragraph(new Text(tools.FromMinutesLongToHeure(nbHeureTravailleeTotale))));
+            t.addCell(cell);
         }
-        long nbMinutesLongReportMoisPrecedent = (long)nbHeureReportMoisPrecedent * 60;
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text(tools.FromMinutesLongToHeure(nbMinutesLongReportMoisPrecedent))));
-        t.addCell(cell);
-
-        nbHeureTravailleeTotale +=  nbMinutesLongReportMoisPrecedent;
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text(tools.FromMinutesLongToHeure(nbHeureTravailleeTotale))));
-        t.addCell(cell);
-
         cell = new Cell(1,6);
         cell.add (new Paragraph(new Text(ei18n.activite_TotalHoraire.nls())));
         cell.setBackgroundColor(_bgBlue);
         t.addCell(cell);
 
         cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text(tools.FromMinutesLongToHeure(nbHeureTravailleeTotale))));
+        cell.add (new Paragraph(new Text(tools.FromMinutesLongToHeure(nbHeureTravailleeTotale))).setTextAlignment(TextAlignment.CENTER));
         cell.setBackgroundColor(_bgBlue);
         t.addCell(cell);
 
@@ -747,31 +750,31 @@ public class ApiPdf {
 
         // ligne salaire brut
         float gainTotal = 0f;
-        cell = new Cell(allInfos.size(),1);
-        cell.add (new Paragraph(ei18n.impot_salaire_brut.nls()).setBold().setTextAlignment(TextAlignment.RIGHT));
+        cell = new Cell(allInfos.size() + 1,1);
+        cell.add (new Paragraph(ei18n.impot_salaire_brut.nls()).setBold().setTextAlignment(TextAlignment.RIGHT)).setVerticalAlignment(VerticalAlignment.MIDDLE);
         cell.setBackgroundColor(_bgBlue);
         t.addCell(cell);
-        cell = new Cell(1,1);
         for (InfoActiviteeHandler uneInfo : allInfos) {
-            cell.add (new Paragraph(new Text(tools.FromMinutesLongToHeure(uneInfo.getNbHeureMinutes()) + tools.encodeUTF8(tools.heures))));
-            cell.setBackgroundColor(_bgBlue);
+            cell = new Cell(1,1);
+            cell.add (new Paragraph(new Text(tools.FromMinutesLongToHeure(uneInfo.getNbHeureMinutes()) )).setTextAlignment(TextAlignment.CENTER));
             t.addCell(cell);
             cell = new Cell(1,1);
-            cell.add (new Paragraph(new Text(uneInfo.taux + tools.encodeUTF8(tools.tauxhoraire))));
-            cell.setBackgroundColor(_bgBlue);
+            cell.add (new Paragraph(new Text(String.format("%02.2f", uneInfo.taux) + tools.encodeUTF8(tools.tauxhoraire))).setTextAlignment(TextAlignment.CENTER));
             t.addCell(cell);
             cell = new Cell(1,1);
             float gain = uneInfo.taux * uneInfo.getNbHeureMinutes() / 60f;
             gainTotal += gain;
-            cell.add (new Paragraph(new Text(String.format("%02.00f", gain) + tools.encodeUTF8(tools.euro))));
-            cell.setBackgroundColor(_bgBlue);
+            cell.add (new Paragraph(new Text(String.format("%02.2f", gain) + tools.encodeUTF8(tools.euro))).setTextAlignment(TextAlignment.CENTER));
             t.addCell(cell);
             cell = new Cell(1,1);
             cell.add (new Paragraph(new Text("")));
-            cell.setBackgroundColor(_bgBlue);
             t.addCell(cell);
 
         }
+        cell = new Cell(1,4);
+        cell.add (new Paragraph(new Text(String.format("%s: %02.2f%s",tools.encodeUTF8(ei18n.TotalBrut.nls()), gainTotal, tools.encodeUTF8(tools.euro))).setTextAlignment(TextAlignment.CENTER)));
+        cell.setBackgroundColor(_bgBlue);
+        t.addCell(cell);
 
         // ligne CSG
         DbEnv dbEnv = new DbEnv();
@@ -781,17 +784,17 @@ public class ApiPdf {
         cell.add (new Paragraph(ei18n.impot_CSG.nls()).setBold().setTextAlignment(TextAlignment.RIGHT));
         t.addCell(cell);
         cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text(String.format("%02.00f", gainTotal))));
+        cell.add (new Paragraph(new Text(String.format("%02.2f", gainTotal))).setTextAlignment(TextAlignment.CENTER));
         t.addCell(cell);
         cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text(String.format("%02.00f", env.getCSG() * 100f) + tools.encodeUTF8(tools.Percent))));
+        cell.add (new Paragraph(new Text(String.format("%02.2f", env.getCSG() * 100f) + tools.encodeUTF8(tools.Percent))).setTextAlignment(TextAlignment.CENTER));
         t.addCell(cell);
         cell = new Cell(1,1);
         cell.add (new Paragraph(new Text("")));
         t.addCell(cell);
         cell = new Cell(1,1);
         float CSG = gainTotal * (-1) * env.getCSG();
-        cell.add (new Paragraph(new Text(String.format("%02.00f", CSG ) + tools.encodeUTF8(tools.euro))));
+        cell.add (new Paragraph(new Text(String.format("%02.2f", CSG ) + tools.encodeUTF8(tools.euro))).setTextAlignment(TextAlignment.CENTER));
         t.addCell(cell);
 
         // ligne impot revenu
@@ -799,17 +802,17 @@ public class ApiPdf {
         cell.add (new Paragraph(ei18n.impot_imposition.nls()).setBold().setTextAlignment(TextAlignment.RIGHT));
         t.addCell(cell);
         cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text(String.format("%02.00f", gainTotal))));
+        cell.add (new Paragraph(new Text(String.format("%02.2f", gainTotal))).setTextAlignment(TextAlignment.CENTER));
         t.addCell(cell);
         cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text(String.format("%02.00f", env.getTauxImposition() * 100f) + tools.encodeUTF8(tools.Percent))));
+        cell.add (new Paragraph(new Text(String.format("%02.2f", env.getTauxImposition() * 100f) + tools.encodeUTF8(tools.Percent))).setTextAlignment(TextAlignment.CENTER));
         t.addCell(cell);
         cell = new Cell(1,1);
         cell.add (new Paragraph(new Text("")));
         t.addCell(cell);
         cell = new Cell(1,1);
         float impot = gainTotal * (-1) * env.getTauxImposition();
-        cell.add (new Paragraph(new Text(String.format("%02.00f", impot ) + tools.encodeUTF8(tools.euro))));
+        cell.add (new Paragraph(new Text(String.format("%02.2f", impot ) + tools.encodeUTF8(tools.euro))).setTextAlignment(TextAlignment.CENTER));
         t.addCell(cell);
 
         // ligne salaire net
@@ -825,7 +828,7 @@ public class ApiPdf {
         cell.add (new Paragraph(""));
         t.addCell(cell);
         cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text(String.format("%02.00f", gainTotal)+ tools.encodeUTF8(tools.euro))));
+        cell.add (new Paragraph(new Text(String.format("%02.2f", gainTotal)+ tools.encodeUTF8(tools.euro))).setTextAlignment(TextAlignment.CENTER));
         t.addCell(cell);
         cell = new Cell(1,1);
         cell.add (new Paragraph(new Text("")));

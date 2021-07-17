@@ -44,8 +44,9 @@ export default class cDialogMainPage extends cDialog {
             <div id='MainPage'>
                 <ul class="uk-tab" data-uk-tab="{connect:'#my-id3'}">
                     <li id="tab1"><a href="">Creation</a></li>
-                    <li id="tab2"><a href="">Consultation-Edition</a></li>
-                    <li id="tab3"><a href="">Horaire pour memo</a></li>
+                    <li id="tab2"><a href="">Edition</a></li>
+                    <li id="tab3"><a href="">Modification</a></li>
+                    <li id="tab4"><a href="">Ajout en DB</a></li>
                 </ul>
                 <ul id="my-id3" class="uk-switcher uk-margin">
                     <li>`+ iInfoGenerales.Draw() + `</li>
