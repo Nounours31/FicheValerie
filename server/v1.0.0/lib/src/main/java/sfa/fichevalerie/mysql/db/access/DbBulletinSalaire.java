@@ -5,6 +5,9 @@ import java.util.Date;
 import java.util.Hashtable;
 
 import sfa.fichevalerie.mysql.api.datawrapper.BulletinSalaire;
+import sfa.fichevalerie.mysql.api.datawrapper.DepassementForfaitaire;
+import sfa.fichevalerie.mysql.api.datawrapper.Personne;
+import sfa.fichevalerie.mysql.api.datawrapper.iObjectWrapper;
 import sfa.fichevalerie.mysql.db.tools.cInfoFromSelect;
 import sfa.fichevalerie.tools.E4AException;
 
@@ -94,6 +97,20 @@ public class DbBulletinSalaire extends DB implements iDB {
 		return null;
 	}
 
+
+	public DepassementForfaitaire[] getAllDepassementForfaitaire (int idBulletin) {
+		String sql = String .format("select * from depassementforfaitaire where (idBulletinSalaire = %d)", idBulletin);
+
+	}
+
+	@Override
+	public iObjectWrapper encode(Hashtable<String, Object> hash) throws E4AException {
+		Personne rc = new Personne();
+		for (String key: rc.allColone()) {
+			rc.set(key, hash.get(key));
+		}
+		return rc;
+	}
 	@Override
 	public BulletinSalaire encode(Hashtable<String, Object> hash) throws E4AException {
 		BulletinSalaire rc = new BulletinSalaire();
