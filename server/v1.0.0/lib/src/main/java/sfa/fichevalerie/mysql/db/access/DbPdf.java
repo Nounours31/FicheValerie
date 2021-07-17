@@ -5,9 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
 
-import sfa.fichevalerie.mysql.api.datawrapper.Activite;
-import sfa.fichevalerie.mysql.api.datawrapper.BulletinSalaire;
-import sfa.fichevalerie.mysql.api.datawrapper.Pdf;
+import sfa.fichevalerie.mysql.api.datawrapper.*;
 import sfa.fichevalerie.mysql.db.tools.cInfoFromSelect;
 import sfa.fichevalerie.pdf.modele.itxt7.ApiPdf;
 import sfa.fichevalerie.tools.E4AException;
@@ -28,6 +26,16 @@ public class DbPdf extends DB  implements iDB {
 		if (hash.containsKey("file")) rc.setFile((String)hash.get("file"));
 		return rc;	
 	}
+
+	@Override
+	public iObjectWrapper encode(Hashtable<String, Object> hash) throws E4AException {
+		Personne rc = new Personne();
+		for (String key: rc.allColone()) {
+			rc.set(key, hash.get(key));
+		}
+		return rc;
+	}
+
 
 	public Pdf createPdf(Pdf p) {
 		Pdf retour = null;

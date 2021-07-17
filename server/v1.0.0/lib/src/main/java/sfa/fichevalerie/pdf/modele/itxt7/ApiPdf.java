@@ -32,10 +32,9 @@ import com.itextpdf.layout.property.TextAlignment;
 
 
 import com.itextpdf.layout.property.VerticalAlignment;
-import sfa.fichevalerie.mysql.api.datawrapper.Activite;
-import sfa.fichevalerie.mysql.api.datawrapper.BulletinSalaire;
-import sfa.fichevalerie.mysql.api.datawrapper.Personne;
+import sfa.fichevalerie.mysql.api.datawrapper.*;
 import sfa.fichevalerie.mysql.db.access.DbPersonne;
+import sfa.fichevalerie.tools.E4ALogger;
 
 // https://kb.itextpdf.com/home/it7kb/examples
 
@@ -63,7 +62,10 @@ public class ApiPdf {
     static private final float fontSizeActivite = fontSizeHeader;
     private static final float fontSizePersonne = fontSizeActivite;
 
+    private E4ALogger _logger = null;
+
 	public ApiPdf()  {
+	    _logger = E4ALogger.getLogger(this.getClass().getCanonicalName());
 		try {
 			ApiPdf.MainFont = PdfFontFactory.createFont ("Courier", PdfEncodings.CP1252, false);
             debugBorderRed.setColor(_red);
@@ -160,44 +162,7 @@ public class ApiPdf {
 
     }
 
-    private Cell builCell(int i, String info) {
-	    return builCell (i, info, true, true, false);
-    }
 
-    private Cell builCell(int i, String info, boolean borderRight, boolean borderLeft) {
-        return builCell (i, info, borderRight, borderLeft, false);
-    }
-
-    private Cell builCell(int i, String info, boolean borderRight, boolean borderLeft, boolean center) {
-	    Color bgC[] = {
-                null,
-                _bgBlue,
-                _bgBisque
-        };
-
-        int hasBG= 0;
-        if (i % 2 == 1)
-            hasBG = 1;
-        String jour = tools.JourFromInt(i % 7);
-        if (jour.toLowerCase().equals("samedi") || jour.toLowerCase().equals("dimanche"))
-            hasBG = 2;
-
-
-        Paragraph p = new Paragraph(info);
-        p.setFontSize(fontSizeActivite);
-        if (center)
-            p.setTextAlignment(TextAlignment.CENTER);
-
-        Cell cell = new Cell(1,1).add(p);
-        if (!borderRight)
-            cell.setBorderRight(Border.NO_BORDER);
-
-        if (!borderLeft)
-            cell.setBorderLeft(Border.NO_BORDER);
-
-        if (hasBG > 0) cell.setBackgroundColor(bgC[hasBG], 0.2f);
-        return cell;
-    }
 
 
     public void createPdf(String dest, BulletinSalaire bs, Activite[] a) throws IOException, java.io.IOException {
@@ -424,7 +389,7 @@ public class ApiPdf {
 
         document.add(t);
     }
-    private void BuildActivitee(Document document, BulletinSalaire bs, Activite[] a) {
+    private void BuildActivitee(Document document, BulletinSalaire bs, Activite[] a, Rappel[] r, DepassementForfaitaire[] d) {
         float tailleTable2 = (float) (this._pageSize.getWidth());
         Table t = new Table(new float[]{
                 tailleTable2 * 0.1f,
@@ -488,42 +453,38 @@ public class ApiPdf {
         cell.add(p);
         t.addCell(cell);
 
-        int hasBG = 0;
-        String jour = "";
+        Long nbHeureTravailleeTotale = 0l;
 
-        int i = a.length;
-        int j = 0;
 
-        while (j < i) {
-            j++;
-
+        for (Activite uneActivite: a) {
+            _logger.debug(uneActivite.toString());
             String info = "";
-            Date debut = a[j].getDebut();
-            Calendar gc = GregorianCalendar.getInstance();
-            gc.setTime(debut);
-            int jourOfTheWeek = gc.get(Calendar.DAY_OF_WEEK);
+            Date debut = uneActivite.getDebut();
+            Date fin = uneActivite.getFin();
 
-            info = tools.JourFromInt(jourOfTheWeek % 7);
-            t.addCell (this.builCell (i, info, false, true));
+            String infoJour[] = tools.JourFromDate(debut);
+            int[] jourSemaine = tools.JourSemaineFromDate(debut);
+            int iJourSemaine = jourSemaine[0];
 
-            info = Integer.toString(gc.get(Calendar.DAY_OF_MONTH));
-            t.addCell (this.builCell (i, info, true, false));
+            t.addCell (this.builCell (iJourSemaine, infoJour[0], false, true));
+            t.addCell (this.builCell (iJourSemaine, infoJour[1], true, false));
 
-            info = a[j].getActivite();
-            t.addCell (this.builCell (i, info, true, true));
+            info = uneActivite.getActivite();
+            t.addCell (this.builCell (iJourSemaine, info, true, true));
 
             boolean center = true;
-            info = _sdf.format(gc.getTime());
-            t.addCell (this.builCell (i, info, true, true, center));
+            info = tools.FromDateToHeure(debut);
+            t.addCell (this.builCell (iJourSemaine, info, true, true, center));
 
-            info = _sdf.format(a[j].getFin());
-            t.addCell (this.builCell (i, info, true, true, center));
+            info = tools.FromDateToHeure(debut);
+            t.addCell (this.builCell (iJourSemaine, info, true, true, center));
 
-            info = String.format("%d", (a[j].getFin().getTime() - a[j].getDebut().getTime()) / (1000 * 60 * 60));
-            t.addCell (this.builCell (i, info, true, true, center));
+            info = tools.FromLongToHeure(tools.FromDureeToLong(debut, fin));
+            t.addCell (this.builCell (iJourSemaine, info, true, true, center));
 
-            info = "04:00";
-            t.addCell (this.builCell (i, info, true, true, center));
+            nbHeureTravailleeTotale += tools.FromDureeToLong(debut, fin);
+            info = tools.FromLongToHeure(nbHeureTravailleeTotale);
+            t.addCell (this.builCell (iJourSemaine, info, true, true, center));
         }
 
         cell = new Cell(1,7);
@@ -567,6 +528,45 @@ public class ApiPdf {
         t.addCell(cell);
 
         document.add(t);
+    }
+
+    private Cell builCell(int i, String info) {
+        return builCell (i, info, true, true, false);
+    }
+
+    private Cell builCell(int i, String info, boolean borderRight, boolean borderLeft) {
+        return builCell (i, info, borderRight, borderLeft, false);
+    }
+
+    private Cell builCell(int i, String info, boolean borderRight, boolean borderLeft, boolean center) {
+        Color bgC[] = {
+                null,
+                _bgBlue,
+                _bgBisque
+        };
+
+        int hasBG= 0;
+        if (i % 2 == 1)
+            hasBG = 1;
+        String jour = tools.JourFromInt(i % 7);
+        if (jour.toLowerCase().equals("samedi") || jour.toLowerCase().equals("dimanche"))
+            hasBG = 2;
+
+
+        Paragraph p = new Paragraph(info);
+        p.setFontSize(fontSizeActivite);
+        if (center)
+            p.setTextAlignment(TextAlignment.CENTER);
+
+        Cell cell = new Cell(1,1).add(p);
+        if (!borderRight)
+            cell.setBorderRight(Border.NO_BORDER);
+
+        if (!borderLeft)
+            cell.setBorderLeft(Border.NO_BORDER);
+
+        if (hasBG > 0) cell.setBackgroundColor(bgC[hasBG], 0.2f);
+        return cell;
     }
 
     private void BuildImpot(Document document) {

@@ -1,5 +1,7 @@
 package sfa.fichevalerie.mysql.api.datawrapper;
 
+import sfa.fichevalerie.tools.E4AException;
+
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
@@ -53,4 +55,22 @@ public class Pdf extends ObjectWrapper implements iObjectWrapper {
         		getId(), getFile(), getIdBulletinSalaire());
     }
 
+    @Override
+	public String[] allColone() {
+		return new String[] {
+				"id","idBulletinSalaire", "idBulletinSalaireOrigine", "status", "date"
+		};
+	}
+
+	@Override
+	public void set(String key, Object val) throws E4AException {
+		switch (key) {
+			case "id": this.setId((Integer)val);break;
+			case "idBulletinSalaire": this.setIdBulletinSalaire((Integer)val);break;
+			case "idBulletinSalaireOrigine": this.setIdBulletinSalaireOrigine((Integer)val);break;
+			case "status": this.setStatus((Integer)val);break;
+			case "date": this.setDate((Date)val);break;
+			default: throw new E4AException("Rappel :Key["+key+"] Inconnue");
+		}
+	}
 }

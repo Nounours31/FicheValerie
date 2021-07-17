@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.Hashtable;
 
 import sfa.fichevalerie.mysql.api.datawrapper.Personne;
+import sfa.fichevalerie.mysql.api.datawrapper.Rappel;
+import sfa.fichevalerie.mysql.api.datawrapper.iObjectWrapper;
 import sfa.fichevalerie.mysql.db.tools.cInfoFromSelect;
 import sfa.fichevalerie.tools.E4AException;
 
@@ -83,18 +85,13 @@ public class DbPersonne extends DB  implements iDB {
 		return null;
 	}
 
+
 	@Override
-	public Personne encode(Hashtable<String, Object> hash) throws E4AException {
+	public iObjectWrapper encode(Hashtable<String, Object> hash) throws E4AException {
 		Personne rc = new Personne();
-		if (hash.containsKey("id"))
-			rc.setId(((Integer)hash.get("id")).intValue());
-		
-		if (hash.containsKey("genre"))
-			rc.setGenre((String)hash.get("genre"));
-		
-		if (hash.containsKey("nom"))
-			rc.setNom((String)hash.get("nom"));
-				
+		for (String key: rc.allColone()) {
+			rc.set(key, hash.get(key));
+		}
 		return rc;
 	}
 

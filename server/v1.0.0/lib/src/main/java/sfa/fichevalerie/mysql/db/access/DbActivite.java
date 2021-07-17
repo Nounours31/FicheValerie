@@ -7,6 +7,7 @@ import java.util.Hashtable;
 
 import sfa.fichevalerie.mysql.api.datawrapper.Activite;
 import sfa.fichevalerie.mysql.api.datawrapper.BulletinSalaire;
+import sfa.fichevalerie.mysql.api.datawrapper.Personne;
 import sfa.fichevalerie.mysql.api.datawrapper.iObjectWrapper;
 import sfa.fichevalerie.mysql.db.tools.cInfoFromSelect;
 import sfa.fichevalerie.tools.E4AException;
@@ -86,17 +87,14 @@ public class DbActivite extends DB implements iDB {
 		return null;
 	}
 
-	@Override
-	public Activite encode(Hashtable<String, Object> hash) throws E4AException {
-		Activite rc = new Activite();
-		if (hash.containsKey("id")) rc.setId(((Integer)hash.get("id")).intValue());
-		if (hash.containsKey("idBulletinSalaire")) rc.setIdBulletinSalaire(((Integer)hash.get("idBulletinSalaire")).intValue());
-		if (hash.containsKey("tarifHoraire")) rc.setTarifHoraire(((Float)hash.get("tarifHoraire")).floatValue());
-		if (hash.containsKey("activite")) rc.setActivite((String)hash.get("activite"));
-		if (hash.containsKey("debut")) rc.setDebut((Date)hash.get("debut"));
-		if (hash.containsKey("fin")) rc.setFin((Date)hash.get("fin"));
 
-		return rc;	
+	@Override
+	public iObjectWrapper encode(Hashtable<String, Object> hash) throws E4AException {
+		Activite rc = new Activite();
+		for (String key: rc.allColone()) {
+			rc.set(key, hash.get(key));
+		}
+		return rc;
 	}
 }
 

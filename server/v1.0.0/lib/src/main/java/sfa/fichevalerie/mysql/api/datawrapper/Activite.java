@@ -1,5 +1,7 @@
 package sfa.fichevalerie.mysql.api.datawrapper;
 
+import sfa.fichevalerie.tools.E4AException;
+
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
@@ -107,5 +109,27 @@ public class Activite extends ObjectWrapper implements iObjectWrapper {
         return String.format("[Activite: (id=%d)(Activite=%s)(debut=%s)(fin=%s)(idBulletin=%d)(tarif=%f)]", 
         		getId(), getActivite(), _sdf.format(getDebut()), _sdf.format(getFin()), getIdBulletinSalaire(), getTarifHoraire());
     }
+
+
+
+	@Override
+	public String[] allColone() {
+		return new String[] {
+				"id","idBulletinSalaire", "tarifHoraire", "activitee", "debut", "fin"
+		};
+	}
+
+	@Override
+	public void set(String key, Object val) throws E4AException {
+		switch (key) {
+			case "id": this.setId((Integer)val);break;
+			case "idBulletinSalaire": this.setIdBulletinSalaire((Integer)val);break;
+			case "tarifHoraire": this.setTarifHoraire((Float)val);break;
+			case "activitee": this.setActivite((String)val);break;
+			case "debut": this.setDebut((Date)val);break;
+			case "fin": this.setFin((Date)val);break;
+			default: throw new E4AException("Activite :Key["+key+"] Inconnue");
+		}
+	}
 
 }

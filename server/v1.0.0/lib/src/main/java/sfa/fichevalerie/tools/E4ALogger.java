@@ -5,12 +5,9 @@ import java.io.FileReader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public final class E4ALogger {
 	private static eE4ALoggerLevel _envLevel = eE4ALoggerLevel.debug;
-	private Level _ConfLevel = null;
 	private String _id = null;
 	private final SimpleDateFormat sdf = new SimpleDateFormat("[MM-dd_HH:mm:ss]", Locale.US); 
 	
@@ -40,17 +37,7 @@ public final class E4ALogger {
 		// com.dassault_systemes.e4all.dns.handlers = 1handler.org.apache.juli.FileHandler
 		// com.dassault_systemes.e4all.dns.level = INFO
 		// ------------------------------------------
-		try {
-			Logger log = Logger.getLogger(E4ALogger.class.getName());
-			_ConfLevel = log.getLevel();
-			if (_ConfLevel == null)
-				_ConfLevel = Level.CONFIG;
-		}
-		catch (Exception e ) {
-			System.err.println(e.getMessage());
-			e.printStackTrace();
-			_ConfLevel = Level.OFF;
-		}
+		_envLevel = eE4ALoggerLevel.debug;
 	}
 	
 	public static E4ALogger getLogger(String Id) {
