@@ -52,26 +52,10 @@ public class Personne extends ObjectWrapper implements iObjectWrapper{
 
 
 
-
-    @Override
-    public Personne encode(Hashtable<String, Object> hash) throws E4AException {
-        Personne rc = new Personne();
-        if (hash.containsKey("id"))
-            rc.setId(((Integer)hash.get("id")).intValue());
-
-        if (hash.containsKey("genre"))
-            rc.setGenre((String)hash.get("genre"));
-
-        if (hash.containsKey("nom"))
-            rc.setNom((String)hash.get("nom"));
-
-        return rc;
-    }
-
     @Override
     public String[] allColone() {
         return new String[] {
-                "id","idBulletinSalaire", "idBulletinSalaireOrigine", "status", "date"
+                "id","nom", "genre"
         };
     }
 
@@ -79,10 +63,8 @@ public class Personne extends ObjectWrapper implements iObjectWrapper{
     public void set(String key, Object val) throws E4AException {
         switch (key) {
             case "id": this.setId((Integer)val);break;
-            case "idBulletinSalaire": this.setIdBulletinSalaire((Integer)val);break;
-            case "idBulletinSalaireOrigine": this.setIdBulletinSalaireOrigine((Integer)val);break;
-            case "status": this.setStatus((Integer)val);break;
-            case "date": this.setDate((Date)val);break;
+            case "nom": this.setNom((String)val);break;
+            case "genre": this.setGenre((String)val);break;
             default: throw new E4AException("Rappel :Key["+key+"] Inconnue");
         }
     }

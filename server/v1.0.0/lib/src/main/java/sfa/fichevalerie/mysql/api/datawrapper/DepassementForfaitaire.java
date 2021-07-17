@@ -82,7 +82,7 @@ public class DepassementForfaitaire extends ObjectWrapper implements iObjectWrap
     @Override
     public String[] allColone() {
         return new String[] {
-                "id","idBulletinSalaire", "idBulletinSalaireOrigine", "status", "date"
+                "id","idBulletinSalaire", "dureeenheure", "tarifHoraire", "date"
         };
     }
 
@@ -91,8 +91,8 @@ public class DepassementForfaitaire extends ObjectWrapper implements iObjectWrap
         switch (key) {
             case "id": this.setId((Integer)val);break;
             case "idBulletinSalaire": this.setIdBulletinSalaire((Integer)val);break;
-            case "idBulletinSalaireOrigine": this.setIdBulletinSalaireOrigine((Integer)val);break;
-            case "status": this.setStatus((Integer)val);break;
+            case "dureeenheure": this.setDureeenheure((Float) val);break;
+            case "tarifHoraire": this.setTarifHoraire((Float) val);break;
             case "date": this.setDate((Date)val);break;
             default: throw new E4AException("Rappel :Key["+key+"] Inconnue");
         }

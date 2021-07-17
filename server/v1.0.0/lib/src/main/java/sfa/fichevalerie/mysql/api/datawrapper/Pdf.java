@@ -58,7 +58,7 @@ public class Pdf extends ObjectWrapper implements iObjectWrapper {
     @Override
 	public String[] allColone() {
 		return new String[] {
-				"id","idBulletinSalaire", "idBulletinSalaireOrigine", "status", "date"
+				"id","idBulletinSalaire", "file"
 		};
 	}
 
@@ -67,9 +67,7 @@ public class Pdf extends ObjectWrapper implements iObjectWrapper {
 		switch (key) {
 			case "id": this.setId((Integer)val);break;
 			case "idBulletinSalaire": this.setIdBulletinSalaire((Integer)val);break;
-			case "idBulletinSalaireOrigine": this.setIdBulletinSalaireOrigine((Integer)val);break;
-			case "status": this.setStatus((Integer)val);break;
-			case "date": this.setDate((Date)val);break;
+			case "file": this.setFile((String)val);break;
 			default: throw new E4AException("Rappel :Key["+key+"] Inconnue");
 		}
 	}

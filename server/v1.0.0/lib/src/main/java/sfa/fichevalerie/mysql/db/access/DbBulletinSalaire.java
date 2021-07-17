@@ -98,41 +98,12 @@ public class DbBulletinSalaire extends DB implements iDB {
 	}
 
 
-	public DepassementForfaitaire[] getAllDepassementForfaitaire (int idBulletin) {
-		String sql = String .format("select * from depassementforfaitaire where (idBulletinSalaire = %d)", idBulletin);
-
-	}
-
 	@Override
-	public iObjectWrapper encode(Hashtable<String, Object> hash) throws E4AException {
-		Personne rc = new Personne();
+	public BulletinSalaire encode(Hashtable<String, Object> hash) throws E4AException {
+		BulletinSalaire rc = new BulletinSalaire();
 		for (String key: rc.allColone()) {
 			rc.set(key, hash.get(key));
 		}
 		return rc;
 	}
-	@Override
-	public BulletinSalaire encode(Hashtable<String, Object> hash) throws E4AException {
-		BulletinSalaire rc = new BulletinSalaire();
-		if (hash.containsKey("id"))
-			rc.setId(((Integer)hash.get("id")).intValue());
-		
-		if (hash.containsKey("idPersonne"))
-			rc.setIdPersonne(((Integer)hash.get("idPersonne")).intValue());
-		
-		if (hash.containsKey("mois"))
-			rc.setMois(((Integer)hash.get("mois")).intValue());
-
-		if (hash.containsKey("annee"))
-			rc.setAnnee(((Integer)hash.get("annee")).intValue());
-
-		if (hash.containsKey("tarifHoraire"))
-			rc.setTarifHoraire(((Float)hash.get("tarifHoraire")).floatValue());
-		
-		
-		
-		return rc;	
-	}
-
-
 }

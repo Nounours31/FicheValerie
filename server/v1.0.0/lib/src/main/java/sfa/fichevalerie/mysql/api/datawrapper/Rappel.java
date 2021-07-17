@@ -10,7 +10,26 @@ public class Rappel extends ObjectWrapper implements iObjectWrapper {
     int idBulletinSalaire;
     int idBulletinSalaireOrigine;
     int status;
+    float tarifHoraire;
+    float dureeenheure;
+
+    public float getTarifHoraire() {
+        return tarifHoraire;
+    }
+
+    public void setTarifHoraire(float tarifHoraire) {
+        this.tarifHoraire = tarifHoraire;
+    }
+
     Date date;
+
+    public float getDureeenheure() {
+        return dureeenheure;
+    }
+
+    public void setDureeenheure(float dureeenheure) {
+        this.dureeenheure = dureeenheure;
+    }
 
     public int getIdBulletinSalaire() {
         return idBulletinSalaire;
@@ -66,6 +85,7 @@ public class Rappel extends ObjectWrapper implements iObjectWrapper {
             case "idBulletinSalaire": this.setIdBulletinSalaire((Integer)val);break;
             case "idBulletinSalaireOrigine": this.setIdBulletinSalaireOrigine((Integer)val);break;
             case "status": this.setStatus((Integer)val);break;
+            case "dureeenheure": this.setDureeenheure((Float)val);break;
             case "date": this.setDate((Date)val);break;
             default: throw new E4AException("Rappel :Key["+key+"] Inconnue");
         }

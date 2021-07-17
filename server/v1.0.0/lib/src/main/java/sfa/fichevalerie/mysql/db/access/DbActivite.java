@@ -89,7 +89,7 @@ public class DbActivite extends DB implements iDB {
 
 
 	@Override
-	public iObjectWrapper encode(Hashtable<String, Object> hash) throws E4AException {
+	public Activite encode(Hashtable<String, Object> hash) throws E4AException {
 		Activite rc = new Activite();
 		for (String key: rc.allColone()) {
 			rc.set(key, hash.get(key));
