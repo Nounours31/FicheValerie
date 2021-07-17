@@ -30,6 +30,16 @@ USE `sfa_fichevalerie`;
 -- Structure de la table `activite`
 --
 
+DROP TABLE IF EXISTS `depassementforfaitaire`;
+CREATE TABLE IF NOT EXISTS `depassementforfaitaire` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `idBulletinSalaire` int(11) NOT NULL,
+  `dureeenheure` float NOT NULL,
+  `date` datetime NOT NULL,
+  `tarifHoraire` float NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `activite`;
 CREATE TABLE IF NOT EXISTS `activite` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
