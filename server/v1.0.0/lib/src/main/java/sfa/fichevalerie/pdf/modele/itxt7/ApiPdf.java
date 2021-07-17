@@ -2,9 +2,8 @@ package sfa.fichevalerie.pdf.modele.itxt7;
 
 import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 import com.itextpdf.io.IOException;
 import com.itextpdf.io.font.PdfEncodings;
@@ -33,7 +32,7 @@ import com.itextpdf.layout.property.TextAlignment;
 
 import com.itextpdf.layout.property.VerticalAlignment;
 import sfa.fichevalerie.mysql.api.datawrapper.*;
-import sfa.fichevalerie.mysql.db.access.DbPersonne;
+import sfa.fichevalerie.mysql.db.access.*;
 import sfa.fichevalerie.tools.E4ALogger;
 
 // https://kb.itextpdf.com/home/it7kb/examples
@@ -75,7 +74,7 @@ public class ApiPdf {
 			e.printStackTrace();
 		}
 	}
-	
+
 
     private Document initDoc (String dest) throws FileNotFoundException {
     	WriterProperties wp = new WriterProperties();
@@ -165,13 +164,24 @@ public class ApiPdf {
 
 
 
-    public void createPdf(String dest, BulletinSalaire bs, Activite[] a) throws IOException, java.io.IOException {
+    public void createPdf(String dest, BulletinSalaire bs) throws IOException, java.io.IOException {
         Document document = this.initDoc(dest);
 
         BuildEntete(document);
         BuildInfoPersonne(document, bs);
-        BuildActivitee(document, bs, a);
-        BuildImpot(document, bs, a);
+        DbBulletinSalaire dbBS = new DbBulletinSalaire();
+
+        DbActivite dbActivite = new DbActivite();
+        Activite[] a = dbActivite.getAllActivitees(bs.getId());
+
+        DbRappel dbRappel = new DbRappel();
+        Rappel[] rappels = dbRappel.getAllRappels(bs.getId());
+
+        DbDepassementForfaitaire dbDepassementForfait = new DbDepassementForfaitaire();
+        DepassementForfaitaire[] depasementForfait = dbDepassementForfait.getAllDepassementForfaitaire(bs.getId());
+
+        ArrayList<InfoActiviteeHandler> HeureTravailleeEnMinute = BuildActivitee(document, bs, a, rappels, depasementForfait);
+        BuildImpot(document, HeureTravailleeEnMinute);
 
         //Close document
         document.close();
@@ -222,6 +232,7 @@ public class ApiPdf {
         sb.append(tools.MoisFromInt(bs.getMois()));
         sb.append(" ");
         sb.append(bs.getAnnee());
+        sb.append(" - Référence: " + bs.getId());
         p.add(tools.encodeUTF8(sb.toString()));
 
         p.setTextAlignment(TextAlignment.CENTER);
@@ -389,7 +400,8 @@ public class ApiPdf {
 
         document.add(t);
     }
-    private void BuildActivitee(Document document, BulletinSalaire bs, Activite[] a, Rappel[] r, DepassementForfaitaire[] d) {
+    private ArrayList<InfoActiviteeHandler> BuildActivitee(Document document, BulletinSalaire bs, Activite[] a, Rappel[] r, DepassementForfaitaire[] d) {
+        ArrayList<InfoActiviteeHandler> rc = new ArrayList<InfoActiviteeHandler>();
         float tailleTable2 = (float) (this._pageSize.getWidth());
         Table t = new Table(new float[]{
                 tailleTable2 * 0.1f,
@@ -456,8 +468,12 @@ public class ApiPdf {
         Long nbHeureTravailleeTotale = 0l;
 
 
+        InfoActiviteeHandler courranteInfoActivite = null;
         for (Activite uneActivite: a) {
             _logger.debug(uneActivite.toString());
+
+            courranteInfoActivite = InfoActiviteeHandler.getHandler (rc, uneActivite, bs);
+
             String info = "";
             Date debut = uneActivite.getDebut();
             Date fin = uneActivite.getFin();
@@ -469,22 +485,24 @@ public class ApiPdf {
             t.addCell (this.builCell (iJourSemaine, infoJour[0], false, true));
             t.addCell (this.builCell (iJourSemaine, infoJour[1], true, false));
 
-            info = uneActivite.getActivite();
+            info = String.format("%s [Taux %d]",uneActivite.getActivite(), courranteInfoActivite.tauxIndice);
             t.addCell (this.builCell (iJourSemaine, info, true, true));
 
             boolean center = true;
             info = tools.FromDateToHeure(debut);
             t.addCell (this.builCell (iJourSemaine, info, true, true, center));
 
-            info = tools.FromDateToHeure(debut);
+            info = tools.FromDateToHeure(fin);
             t.addCell (this.builCell (iJourSemaine, info, true, true, center));
 
-            info = tools.FromLongToHeure(tools.FromDureeToLong(debut, fin));
+            info = tools.FromMinutesLongToHeure(tools.FromDureeToMinutesLong(debut, fin));
             t.addCell (this.builCell (iJourSemaine, info, true, true, center));
 
-            nbHeureTravailleeTotale += tools.FromDureeToLong(debut, fin);
-            info = tools.FromLongToHeure(nbHeureTravailleeTotale);
+            nbHeureTravailleeTotale += tools.FromDureeToMinutesLong(debut, fin);
+            info = tools.FromMinutesLongToHeure(nbHeureTravailleeTotale);
             t.addCell (this.builCell (iJourSemaine, info, true, true, center));
+
+            courranteInfoActivite.setNbHeureMinutes(courranteInfoActivite.getNbHeureMinutes() + nbHeureTravailleeTotale);
         }
 
         cell = new Cell(1,7);
@@ -496,38 +514,58 @@ public class ApiPdf {
         t.addCell(cell);
 
         cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("01:00")));
+        float nbHeureDepassement = 0f;
+        if (d != null) {
+            for (DepassementForfaitaire unDepassementForfait : d) {
+                nbHeureDepassement += unDepassementForfait.getDureeenheure();
+                courranteInfoActivite = InfoActiviteeHandler.getHandler (rc, unDepassementForfait, bs);
+                courranteInfoActivite.AddNbHeureMinutes((long)nbHeureDepassement * 60);
+            }
+        }
+        long nbMinutesLongDepassement = (long)nbHeureDepassement * 60;
+        cell.add (new Paragraph(new Text(tools.FromMinutesLongToHeure(nbMinutesLongDepassement))));
         t.addCell(cell);
 
+        nbHeureTravailleeTotale += nbMinutesLongDepassement;
         cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("10:00")));
+        cell.add (new Paragraph(new Text(tools.FromMinutesLongToHeure(nbHeureTravailleeTotale))));
         t.addCell(cell);
 
-        cell = new Cell(1,6);
-        cell.add (new Paragraph(new Text(ei18n.activite_totalMensuel.nls())));
-        t.addCell(cell);
-
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("125:00")));
-        t.addCell(cell);
-
-        cell = new Cell(1,6);
+        cell = new Cell(1,5);
         cell.add (new Paragraph(new Text(ei18n.activite_RappelPrecedent.nls())));
         t.addCell(cell);
 
+        float nbHeureReportMoisPrecedent = 0f;
+        if (r != null) {
+            for (Rappel unRappel: r) {
+                nbHeureReportMoisPrecedent += unRappel.getDureeenheure();
+                courranteInfoActivite = InfoActiviteeHandler.getHandler (rc, unRappel, bs);
+                courranteInfoActivite.AddNbHeureMinutes((long)nbHeureReportMoisPrecedent * 60l);
+            }
+        }
+        long nbMinutesLongReportMoisPrecedent = (long)nbHeureReportMoisPrecedent * 60;
         cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("05:00")));
+        cell.add (new Paragraph(new Text(tools.FromMinutesLongToHeure(nbMinutesLongReportMoisPrecedent))));
+        t.addCell(cell);
+
+        nbHeureTravailleeTotale +=  nbMinutesLongReportMoisPrecedent;
+        cell = new Cell(1,1);
+        cell.add (new Paragraph(new Text(tools.FromMinutesLongToHeure(nbHeureTravailleeTotale))));
         t.addCell(cell);
 
         cell = new Cell(1,6);
         cell.add (new Paragraph(new Text(ei18n.activite_TotalHoraire.nls())));
+        cell.setBackgroundColor(_bgBlue);
         t.addCell(cell);
 
         cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("135:00")));
+        cell.add (new Paragraph(new Text(tools.FromMinutesLongToHeure(nbHeureTravailleeTotale))));
+        cell.setBackgroundColor(_bgBlue);
         t.addCell(cell);
 
         document.add(t);
+
+        return rc;
     }
 
     private Cell builCell(int i, String info) {
@@ -676,7 +714,7 @@ public class ApiPdf {
 
         document.add(t);
     }
-    private void BuildImpot(Document document, BulletinSalaire bs, Activite[] a) {
+    private void BuildImpot(Document document, ArrayList<InfoActiviteeHandler> allInfos) {
         Paragraph p = new Paragraph();
         p.add("");
         document.add(p);
@@ -708,42 +746,52 @@ public class ApiPdf {
         t.addCell(cell);
 
         // ligne salaire brut
-        cell = new Cell(1,1);
+        float gainTotal = 0f;
+        cell = new Cell(allInfos.size(),1);
         cell.add (new Paragraph(ei18n.impot_salaire_brut.nls()).setBold().setTextAlignment(TextAlignment.RIGHT));
         cell.setBackgroundColor(_bgBlue);
         t.addCell(cell);
         cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("325:00" + tools.encodeUTF8(tools.heures))));
-        cell.setBackgroundColor(_bgBlue);
-        t.addCell(cell);
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("15" + tools.encodeUTF8(tools.tauxhoraire))));
-        cell.setBackgroundColor(_bgBlue);
-        t.addCell(cell);
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("45" + tools.encodeUTF8(tools.euro))));
-        cell.setBackgroundColor(_bgBlue);
-        t.addCell(cell);
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("")));
-        cell.setBackgroundColor(_bgBlue);
-        t.addCell(cell);
+        for (InfoActiviteeHandler uneInfo : allInfos) {
+            cell.add (new Paragraph(new Text(tools.FromMinutesLongToHeure(uneInfo.getNbHeureMinutes()) + tools.encodeUTF8(tools.heures))));
+            cell.setBackgroundColor(_bgBlue);
+            t.addCell(cell);
+            cell = new Cell(1,1);
+            cell.add (new Paragraph(new Text(uneInfo.taux + tools.encodeUTF8(tools.tauxhoraire))));
+            cell.setBackgroundColor(_bgBlue);
+            t.addCell(cell);
+            cell = new Cell(1,1);
+            float gain = uneInfo.taux * uneInfo.getNbHeureMinutes() / 60f;
+            gainTotal += gain;
+            cell.add (new Paragraph(new Text(String.format("%02.00f", gain) + tools.encodeUTF8(tools.euro))));
+            cell.setBackgroundColor(_bgBlue);
+            t.addCell(cell);
+            cell = new Cell(1,1);
+            cell.add (new Paragraph(new Text("")));
+            cell.setBackgroundColor(_bgBlue);
+            t.addCell(cell);
+
+        }
 
         // ligne CSG
+        DbEnv dbEnv = new DbEnv();
+        Env env = dbEnv.getEnv();
+
         cell = new Cell(1,1);
         cell.add (new Paragraph(ei18n.impot_CSG.nls()).setBold().setTextAlignment(TextAlignment.RIGHT));
         t.addCell(cell);
         cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("gain du dessus")));
+        cell.add (new Paragraph(new Text(String.format("%02.00f", gainTotal))));
         t.addCell(cell);
         cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("9.7" + tools.encodeUTF8(tools.Percent))));
+        cell.add (new Paragraph(new Text(String.format("%02.00f", env.getCSG() * 100f) + tools.encodeUTF8(tools.Percent))));
         t.addCell(cell);
         cell = new Cell(1,1);
         cell.add (new Paragraph(new Text("")));
         t.addCell(cell);
         cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("-27.50" + tools.encodeUTF8(tools.euro))));
+        float CSG = gainTotal * (-1) * env.getCSG();
+        cell.add (new Paragraph(new Text(String.format("%02.00f", CSG ) + tools.encodeUTF8(tools.euro))));
         t.addCell(cell);
 
         // ligne impot revenu
@@ -751,19 +799,22 @@ public class ApiPdf {
         cell.add (new Paragraph(ei18n.impot_imposition.nls()).setBold().setTextAlignment(TextAlignment.RIGHT));
         t.addCell(cell);
         cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("gain du dessus")));
+        cell.add (new Paragraph(new Text(String.format("%02.00f", gainTotal))));
         t.addCell(cell);
         cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("9.90" + tools.encodeUTF8(tools.Percent))));
+        cell.add (new Paragraph(new Text(String.format("%02.00f", env.getTauxImposition() * 100f) + tools.encodeUTF8(tools.Percent))));
         t.addCell(cell);
         cell = new Cell(1,1);
         cell.add (new Paragraph(new Text("")));
         t.addCell(cell);
         cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("-27.50" + tools.encodeUTF8(tools.euro))));
+        float impot = gainTotal * (-1) * env.getTauxImposition();
+        cell.add (new Paragraph(new Text(String.format("%02.00f", impot ) + tools.encodeUTF8(tools.euro))));
         t.addCell(cell);
 
         // ligne salaire net
+        gainTotal += (CSG + impot);
+
         cell = new Cell(1,1);
         cell.add (new Paragraph(ei18n.impot_salairenet.nls()).setBold().setTextAlignment(TextAlignment.RIGHT));
         t.addCell(cell);
@@ -774,7 +825,7 @@ public class ApiPdf {
         cell.add (new Paragraph(""));
         t.addCell(cell);
         cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("77.5"+ tools.encodeUTF8(tools.euro))));
+        cell.add (new Paragraph(new Text(String.format("%02.00f", gainTotal)+ tools.encodeUTF8(tools.euro))));
         t.addCell(cell);
         cell = new Cell(1,1);
         cell.add (new Paragraph(new Text("")));

@@ -87,7 +87,7 @@ public class DbPersonne extends DB  implements iDB {
 
 
 	@Override
-	public iObjectWrapper encode(Hashtable<String, Object> hash) throws E4AException {
+	public Personne encode(Hashtable<String, Object> hash) throws E4AException {
 		Personne rc = new Personne();
 		for (String key: rc.allColone()) {
 			rc.set(key, hash.get(key));

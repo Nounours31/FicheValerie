@@ -60,7 +60,7 @@ public class tools {
         return retour;
     }
 
-    static String FromLongToHeure (long duree) {
+    static String FromMinutesLongToHeure(long duree) {
         String retour = "";
         long heure = (duree / 60l);
         long min = duree - 60l * heure;
@@ -85,7 +85,7 @@ public class tools {
         return retour;
     }
 
-    public static long FromDureeToLong(Date debut, Date fin) {
+    public static long FromDureeToMinutesLong(Date debut, Date fin) {
         long retour = 0l;
         long x = fin.getTime() - debut.getTime();
 

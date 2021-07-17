@@ -18,18 +18,10 @@ public class DbPdf extends DB  implements iDB {
 		super(DbPdf.class.getName());
 	}
 
+
 	@Override
 	public Pdf encode(Hashtable<String, Object> hash) throws E4AException {
 		Pdf rc = new Pdf();
-		if (hash.containsKey("id")) rc.setId(((Integer)hash.get("id")).intValue());
-		if (hash.containsKey("idBulletinSalaire")) rc.setIdBulletinSalaire(((Integer)hash.get("idBulletinSalaire")).intValue());
-		if (hash.containsKey("file")) rc.setFile((String)hash.get("file"));
-		return rc;	
-	}
-
-	@Override
-	public iObjectWrapper encode(Hashtable<String, Object> hash) throws E4AException {
-		Personne rc = new Personne();
 		for (String key: rc.allColone()) {
 			rc.set(key, hash.get(key));
 		}
@@ -42,11 +34,8 @@ public class DbPdf extends DB  implements iDB {
 		int idBulletinSalaire = p.getIdBulletinSalaire();
 		
 		DbBulletinSalaire dbBs = new DbBulletinSalaire();
-		DbActivite dbAct = new DbActivite();
-		
 		BulletinSalaire bs = dbBs.getAllBulletinSalaire(idBulletinSalaire);
-		Activite[] a = dbAct.getAllActivitees (idBulletinSalaire);
-		
+
 		String UID = java.util.UUID.randomUUID().toString();
 		
 		String FileName = UID + ".pdf";
@@ -60,7 +49,7 @@ public class DbPdf extends DB  implements iDB {
 		
 		ApiPdf pdfCreator = new ApiPdf();
 		try {
-			pdfCreator.createPdf(newPdf.getAbsolutePath(), bs, a);
+			pdfCreator.createPdf(newPdf.getAbsolutePath(), bs);
 			if (newPdf.exists() && newPdf.length() > 0) {
 				SubPath = this.escapeStringForMySQL(SubPath);
 				String sql = String.format("insert into pdf (idBulletinSalaire, file, version, date) values (%d, '%s', %d, '%s')",
