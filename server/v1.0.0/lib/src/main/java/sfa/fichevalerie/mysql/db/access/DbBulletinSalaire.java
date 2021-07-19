@@ -35,7 +35,7 @@ public class DbBulletinSalaire extends DB implements iDB {
 	
 	public BulletinSalaire getAllBulletinSalaire(int idBulletinSalaire) {
 		String sql = String.format("select * from bulletinsalaire where (id=%d)", idBulletinSalaire);
-		BulletinSalaire[] bs = this.getAllBulletinSalaire(sql);
+		BulletinSalaire[] bs = this.RunSelect(sql);
 		
 		if ((bs != null) && (bs.length > 0))
 			return bs[0];
@@ -44,14 +44,14 @@ public class DbBulletinSalaire extends DB implements iDB {
 
 	public BulletinSalaire[] getAllBulletinSalaire(int idPersonne, int mois, int annee) {
 		String sql = String.format("select * from bulletinsalaire where ((idPersonne=%d) and (mois=%d) and (annee=%d))", idPersonne, mois, annee);
-		return this.getAllBulletinSalaire(sql);
+		return this.RunSelect(sql);
 	}
 	public BulletinSalaire[] getAllBulletinSalaire() {
 		String sql = "select * from bulletinsalaire";
-		return this.getAllBulletinSalaire(sql);		
+		return this.RunSelect(sql);
 	}
 	
-	private BulletinSalaire[] getAllBulletinSalaire(String sql) {
+	public BulletinSalaire[] RunSelect(String sql) {
 		_logger.debug("getAllPersonnes START");
 		
 		ArrayList<BulletinSalaire> lBulletinSalaire = new ArrayList<BulletinSalaire>();		

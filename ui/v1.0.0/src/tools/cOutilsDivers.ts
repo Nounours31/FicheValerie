@@ -12,13 +12,17 @@ export default class cOutilsDivers {
     constructor() {
     }
 
-    public static MoisFromNomToInt(mois : string): number {
+    public static MoisFromNomToInt(mois: string): number {
         let i: number = 0;
         for (i = 0; i < 12; i++) {
             if (mois == cOutilsDivers._mois[i])
-                return (i+1)
+                return (i + 1)
         }
         return -1;
+    }
+
+    public static MoisFromIntToNom(mois: number): String {
+        return cOutilsDivers._mois[mois];
     }
 
     public static personne2String(p : iPersonne) : string {
@@ -40,4 +44,6 @@ export default class cOutilsDivers {
     static SemaineFromIntToNom(jour: number): string {
         return cOutilsDivers._days[jour];
     }
+
+    
 }

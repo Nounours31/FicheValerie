@@ -38,7 +38,7 @@ public class cWsTools {
 		}
 		catch (Exception e) {
 			rc = Response.status(500).type(MediaType.APPLICATION_XML).entity("<Error>"+e.getMessage()+"</Error>").build();
-			_logger.severe(String.format("::buildResponse [Erreur 500 --> %s]", e.getMessage()));
+			_logger.fatal(String.format("::buildResponse [Erreur 500 --> %s]", e.getMessage()));
 		}
 		return rc;
 	}
@@ -59,7 +59,7 @@ public class cWsTools {
 		}
 		catch (Exception e) {
 			rc = Response.status(500).type(MediaType.APPLICATION_JSON).entity(e.getMessage()).build();
-			_logger.severe(String.format("::buildResponse [Erreur 500 --> %s]", e.getMessage()));
+			_logger.fatal(String.format("::buildResponse [Erreur 500 --> %s]", e.getMessage()));
 		}
 		return rc;
 	}

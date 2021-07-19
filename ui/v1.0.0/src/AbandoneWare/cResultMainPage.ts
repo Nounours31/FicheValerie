@@ -3,9 +3,9 @@ import 'uikit/dist/css/uikit.css';
 
 import UIkit from 'UIkit';
 import $ from 'jquery';
-import cDialog from './cDialog';
+import cDialogAbstract from '../dialog/cDialogAbstract';
 
-export default class cResultMainPage extends cDialog {
+export default class cResultMainPage extends cDialogAbstract {
     private static _NomPre: string = 'cResultMainPage';
     private static  _idTabPage: string;
 

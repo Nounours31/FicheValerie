@@ -6,7 +6,11 @@ export default class cDuration {
         this.durationMilliSec = 0.0;
     }
 
-    set(annee: number, mois: number, jour: number, heureDebut: string, heureFin: string) {
+    public setActivitees(debut: Date, fin: Date) : void {
+        this.durationMilliSec = fin.getTime() - debut.getTime();
+    }
+
+    public set(annee: number, mois: number, jour: number, heureDebut: string, heureFin: string) : void {
         let infoDebut: string[] = heureDebut.split(':');
         let infoFin: string[] = heureFin.split(':');
 

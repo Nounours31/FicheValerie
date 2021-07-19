@@ -40,15 +40,51 @@ export default class cWS {
         return retour;
     }
 
-    public getBulletinSalaire(idPersonne: number, mois: number, annee: number): iBulletinSalaire[] {
-        let retour : iBulletinSalaire[] = [];
-        let URL = cEnv._serverURL + `/bulletinSalaire/${idPersonne}/${mois}/${annee}`;
+
+    getBulletinSalaireFromSQL(sql: string): iBulletinSalaire[] {
+        let retour: iBulletinSalaire[] = [];
+        let URL = cEnv._serverURL + `/sql`;
+        let postData: Object = {
+            'sql': sql,
+            'retour': 'iBulletinSalaire',
+        }
+        let oResp: boolean = this.t.sendPostWS(URL, postData);
+        if (this.t.status) {
+            retour = ((this.t.data as unknown) as iBulletinSalaire[]);
+        }
+        return retour;
+    }
+
+    public getAllPossibleActivitees(): string[] {
+        let retour: string[] = [];
+        let URL = cEnv._serverURL + `/sql`;
+        let postData: Object = {
+            'sql': 'getAllPossibleActivitees',
+            'retour': 'iListActivitee',
+        }
+        let oResp: boolean = this.t.sendPostWS(URL, postData);
+        if (this.t.status) {
+            retour = ((this.t.data as unknown) as string[]);
+        }
+        return retour;
+    }
+
+    public getBulletinSalaire(idPersonneOrIdBulletin: number, mois: number = null, annee: number = null): iBulletinSalaire[] {
+        let retour: iBulletinSalaire[] = [];
+        let URL : string = "";
+        if ((mois == null) || (annee == null))
+            URL = cEnv._serverURL + `/bulletinSalaire/${idPersonneOrIdBulletin}`;
+        else
+            URL = cEnv._serverURL + `/bulletinSalaire/${idPersonneOrIdBulletin}/${mois}/${annee}`;
+
         let oResp: boolean = this.t.sendGetWS(URL);
         if (this.t.status) {
             retour = ((this.t.data as unknown) as iBulletinSalaire[]);
         }
         return retour;
     }
+
+
     public createBulletinSalaire(mois: number, annee: number, p: iPersonne, tarifHoraire: number): number {
         let retour: number = -1;
         let URL = cEnv._serverURL + `/bulletinSalaire`;
@@ -66,9 +102,33 @@ export default class cWS {
         return retour;
     }
 
+    public getAllActivitee(idBulletinSalaire: number): iActivite[] {
+        let retour: iActivite[] = [];
+        let URL = cEnv._serverURL + `/activitee/${idBulletinSalaire}`;
+        let oResp: boolean = this.t.sendGetWS(URL);
+        if (this.t.status) {
+            retour = ((this.t.data as unknown) as iActivite[]);
+        }
+        this.updateDateActiviteAfterWS (retour);
+        return retour;
+    }
+
+
+    private updateDateActiviteAfterWS(retour: iActivite[]) {
+        for (let i : number = 0; i < retour.length; i++) {
+            let sDebut: string = retour[i].debut as unknown as string;
+            sDebut = sDebut.replace("[UTC]", "");
+            retour[i].debut = new Date(sDebut);
+
+            let sFin: string = retour[i].fin as unknown as string;
+            sFin = sFin.replace("[UTC]", "");
+            retour[i].fin = new Date(sFin);
+        }
+    }
+
     public addActivite(ficheId: number, jour: number, activite: string, debut: Date, fin: Date, tarifHoraire: number) : number {
         let retour: number = -1;
-        let URL = cEnv._serverURL + `/activite`;
+        let URL = cEnv._serverURL + `/activitee`;
         let postData: iActivite = {
             'id': -1,
             'idBulletinSalaire': ficheId,
@@ -82,6 +142,12 @@ export default class cWS {
             retour = ((this.t.data as unknown) as iActivite).id;
         }
         return retour;
+    }
+
+    public deleteActivite (sActiviteId : string) : boolean {
+        let URL = cEnv._serverURL + `/activitee/${sActiviteId}`;
+        let oResp: boolean = this.t.sendDeleteWS(URL);
+        return true;
     }
 
     public generatePdf(ficheId: number) : iPdf {
@@ -101,13 +167,24 @@ export default class cWS {
 
     public getPdf(ficheId: number): iPdf {
         let retour: iPdf = null;
-        let URL = cEnv._serverURL + `/pdf/${ficheId}`;
+        let URL = cEnv._serverURL + `/pdf/file/${ficheId}`;
         let oResp: boolean = this.t.GetPDFFileWS(URL, 'ficheSalaire.pdf');
         if (this.t.status) {
             retour = ((this.t.data as unknown) as iPdf);
         }
         return retour;
     }
+
+    public getAllPDFFromBulletinId(ficheId: number): iPdf[] {
+        let retour: iPdf[] = null;
+        let URL = cEnv._serverURL + `/pdf/${ficheId}`;
+        let oResp: boolean = this.t.sendGetWS(URL);
+        if (this.t.status) {
+            retour = ((this.t.data as unknown) as iPdf[]);
+        }
+        return retour;
+    }
+    
 
     public addNewPersonne(genre: string, nom: string): iPersonne {
         let retour : iPersonne = null;

@@ -2,10 +2,11 @@ import * as _ from 'lodash';
 import $ from 'jquery';
 
 
-import cDialogMainPage from "./dialog/cDialogMainPage";
+import cDialogTabPage from "./dialog/cDialogTabPage";
 
-let iMain: cDialogMainPage = new cDialogMainPage();
+let iMain: cDialogTabPage = new cDialogTabPage();
 $(`#TOP`).html (iMain.Draw());
 iMain.addCallBack();
+iMain.getSwitcherElement().show(cDialogTabPage.IndexCreationTab);
 
 

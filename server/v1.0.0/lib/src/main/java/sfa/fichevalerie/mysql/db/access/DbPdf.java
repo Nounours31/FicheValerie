@@ -65,6 +65,7 @@ public class DbPdf extends DB  implements iDB {
 		return retour;
 	}
 
+
 	public Pdf getPdf(int id) {
 		String sql = String.format("select * from pdf where (id = %d)", id);
 		Pdf[] x = this.getPdf(sql);
@@ -72,7 +73,14 @@ public class DbPdf extends DB  implements iDB {
 			return x[0];
 		return null;
 	}
-	
+
+
+	public Pdf[] getPdfFromBulletin(int idBulletin) {
+		String sql = String.format("select * from pdf where (idBulletinSalaire = %d) order by date asc", idBulletin);
+		Pdf[] x = this.getPdf(sql);
+		return x;
+	}
+
 	private Pdf[] getPdf(String sql) {
 		cInfoFromSelect res = null;;
 		try {

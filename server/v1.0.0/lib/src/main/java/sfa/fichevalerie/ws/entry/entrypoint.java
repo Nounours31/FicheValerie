@@ -1,23 +1,25 @@
 package sfa.fichevalerie.ws.entry;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStream;
+import java.util.Arrays;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.json.JSONObject;
 import sfa.fichevalerie.mysql.api.datawrapper.Activite;
 import sfa.fichevalerie.mysql.api.datawrapper.BulletinSalaire;
 import sfa.fichevalerie.mysql.api.datawrapper.Pdf;
 import sfa.fichevalerie.mysql.api.datawrapper.Personne;
+import sfa.fichevalerie.mysql.db.access.DbActivite;
+import sfa.fichevalerie.mysql.db.access.DbBulletinSalaire;
 import sfa.fichevalerie.tools.E4ALogger;
 import sfa.fichevalerie.ws.impl.cWsFactory;
 import sfa.fichevalerie.ws.impl.iWS;
@@ -63,10 +65,21 @@ public class entrypoint {
     	
 		return ws.run();    	
     }
-    
+
 
     @GET
-    @Path("/pdf/{id}")
+    @Path("/pdf/{idBulletin}")
+    @Produces("application/pdf")
+    public Response getPdfInfoFromBulletin(@PathParam("idBulletin") int idBulletin) {
+        iWS ws = cWsFactory.getImpl("getPdfInfoFromBulletin");
+        _logger.info(ws.whoami());
+
+        ws.setArgs ("idBulletin", idBulletin);
+        return ws.run();
+    }
+
+    @GET
+    @Path("/pdf/file/{id}")
     @Produces("application/pdf")
     public Response getFile(@PathParam("id") int id) {
     	iWS ws = cWsFactory.getImpl("getPdfFile");
@@ -74,11 +87,8 @@ public class entrypoint {
 
     	ws.setArgs ("id", id);
     	return ws.run();
-/*        ResponseBuilder response = Response.ok((Object) file);
-        response.header("Content-Disposition", "attachment; filename=new-android-book.pdf");
-        return response.build();*/
-
     }
+
     @POST
     @Path("/pdf")
     @Produces("application/pdf")
@@ -138,14 +148,25 @@ public class entrypoint {
     @GET
     @Path("/bulletinSalaire/{idPersonne}/{mois}/{annee}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getBulletinSalaire(@PathParam("idPersonne") int idPersonne, @PathParam("mois") int mois, @PathParam("annee") int annee) {
-    	iWS ws = cWsFactory.getImpl("getBulletinSalaire");
-    	_logger.info(ws.whoami());
+    public Response getBulletinSalaireByPersonneAndMois(@PathParam("idPersonne") int idPersonne, @PathParam("mois") int mois, @PathParam("annee") int annee) {
+        iWS ws = cWsFactory.getImpl("getBulletinSalaire");
+        _logger.info(ws.whoami());
 
-    	ws.setArgs ("idPersonne", idPersonne);
-    	ws.setArgs ("mois", mois);
-    	ws.setArgs ("annee", annee);
-    	return ws.run();
+        ws.setArgs ("idPersonne", idPersonne);
+        ws.setArgs ("mois", mois);
+        ws.setArgs ("annee", annee);
+        return ws.run();
+    }
+
+    @GET
+    @Path("/bulletinSalaire/{idBulletin}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getBulletinSalaireById(@PathParam("idBulletin") int idBulletin) {
+        iWS ws = cWsFactory.getImpl("getBulletinSalaire");
+        _logger.info(ws.whoami());
+
+        ws.setArgs ("idBulletin", idBulletin);
+        return ws.run();
     }
 
     @POST
@@ -160,16 +181,104 @@ public class entrypoint {
     	return ws.run();
     }
 
+    @DELETE
+    @Path("/activitee/{idActivitee}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteActivitee(@PathParam("idActivitee") int idActivitee) {
+        iWS ws = cWsFactory.getImpl("deleteActivitee");
+        _logger.info(ws.whoami());
+
+        ws.setArgs ("idActivitee", idActivitee);
+        return ws.run();
+    }
+
+    @GET
+    @Path("/activitee/{idBulletin}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getActiviteFromIdBulletinSalaire(@PathParam("idBulletin") int idBulletin) {
+        iWS ws = cWsFactory.getImpl("getActivitee");
+        _logger.info(ws.whoami());
+
+        ws.setArgs ("idBulletin", idBulletin);
+        return ws.run();
+    }
+
     @POST
-    @Path("/activite")
+    @Path("/activitee")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createActivite(Activite a) {
-    	iWS ws = cWsFactory.getImpl("createActivite");
-    	_logger.info(ws.whoami());
+        iWS ws = cWsFactory.getImpl("createActivitee");
+        _logger.info(ws.whoami());
 
-    	ws.setArgs ("activite", a);
-    	return ws.run();
+        ws.setArgs ("activite", a);
+        return ws.run();
+    }
+
+    @GET
+    @Path("/debug/${sLevel}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response setDebug(@PathParam("sLevel") String sLevel) {
+        iWS ws = cWsFactory.getImpl("setDebug");
+        _logger.info(ws.whoami());
+        E4ALogger.setEnvLevel (sLevel);
+        return Response.ok().type(MediaType.APPLICATION_JSON).entity("OK").build();
+    }
+
+    @POST
+    @Path("/sql")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response parseSQL(@Context HttpServletRequest request) {
+        iWS ws = cWsFactory.getImpl("parseSQL");
+        _logger.info(ws.whoami());
+
+        int buffer[] = new int[1024];
+        int i, j = 0;
+        try {
+            BufferedInputStream reader = new BufferedInputStream(request.getInputStream());
+            while (((i = reader.read()) != -1) && (j < 1024))
+                buffer[j++] = i;
+        } catch (Exception e) {
+            _logger.fatal (e.getMessage());
+            e.printStackTrace();
+        }
+
+        String input = new String (buffer, 0, j);
+        _logger.debug("String:");
+        _logger.debug(input);
+
+        JSONObject jsonObject = null;
+        try {
+            jsonObject =  new JSONObject(input);
+            _logger.debug("JSON: " + jsonObject.toString());
+        } catch (Exception e) {
+            _logger.fatal (e.getMessage());
+            e.printStackTrace();
+        }
+        if (jsonObject.has("retour")) {
+            if (jsonObject.getString("retour").equals("iBulletinSalaire")) {
+                DbBulletinSalaire x = new DbBulletinSalaire();
+                BulletinSalaire[] y = x.RunSelect(jsonObject.getString("sql"));
+                return Response.ok().type(MediaType.APPLICATION_JSON).entity(y).build();
+            }
+            if (jsonObject.getString("retour").equals("iListActivitee")) {
+                if (jsonObject.getString("sql") != null) {
+                    DbActivite x = new DbActivite();
+                    if (jsonObject.getString("sql").equals("getAllPossibleActivitees")) {
+                        String[] y = x.getAllPossibleActivitees();
+                        return Response.ok().type(MediaType.APPLICATION_JSON).entity(y).build();
+                    }
+                    if (jsonObject.getString("sql").startsWith("insertAPossibleActivitees_")) {
+                        String s = jsonObject.getString("sql").replaceAll("insertAPossibleActivitees_", "");
+                        int y = x.insertAPossibleActivitees(s);
+                        return Response.ok().type(MediaType.APPLICATION_JSON).entity(new Integer(y)).build();
+                    }
+                }
+            }
+        }
+        return Response.serverError().type(MediaType.APPLICATION_JSON).entity("KO").build();
     }
 }
 

@@ -57,6 +57,41 @@ export default class cToolsAjax {
         return this._status;
     }
 
+    public sendDeleteWS(url: string): boolean {
+        this._status = false;
+        let me: cToolsAjax = this;
+        let oData: object = {};
+
+        let settings: JQueryAjaxSettings = {
+            crossDomain: true,
+            contentType: "application/json; charset=utf-8",
+            headers: {},
+
+            // type de retour parse par jquery
+            accepts: {
+                text: "application/txt",
+                json: "application/json",
+                xml: "application/xml",
+                pdf: "application/pdf"
+            },
+            async: false,
+            type: 'DELETE',
+            timeout: 10000,
+
+            complete: function (jqXHR: JQuery.jqXHR, textStatus: string): void {
+                me.complete(jqXHR, textStatus);
+            },
+            success: function (data: any, textStatus: string, jqXHR: JQuery.jqXHR): void {
+                me.success(data, textStatus, jqXHR);
+            },
+            error: this.error,
+        }
+
+        $.ajax(url, settings);
+        return this._status;
+    }
+
+
     public sendGetWS(url: string): boolean {
         this._status = false;
         let me: cToolsAjax = this;

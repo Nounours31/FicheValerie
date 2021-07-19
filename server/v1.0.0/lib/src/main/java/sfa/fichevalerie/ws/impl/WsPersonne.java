@@ -9,7 +9,7 @@ import javax.ws.rs.core.Response.Status;
 import sfa.fichevalerie.mysql.api.datawrapper.Personne;
 import sfa.fichevalerie.mysql.db.access.DbPersonne;
 
-public class WsCreatePersonne extends WS implements iWS {
+public class WsPersonne extends WS implements iWS {
 
 	@Override
 	public String whoami() {
@@ -17,9 +17,8 @@ public class WsCreatePersonne extends WS implements iWS {
 	}
 
 	@Override
-	public Response run() {
+	public Response post() {
 		DbPersonne db = new DbPersonne();
-		
 		Personne p = (Personne)this.getArgs ("personne");
 		_logger.debug("Persone to create: " + p.toString());
     	
@@ -41,6 +40,31 @@ public class WsCreatePersonne extends WS implements iWS {
 		}
 		else
 			r = Response.status(Status.INTERNAL_SERVER_ERROR).type(MediaType.APPLICATION_JSON).entity(p).build();
+		return r;
+	}
+
+	@Override
+	public Response get() {
+		DbPersonne db = new DbPersonne();
+
+		String genre = (String) this.getArgs("genre");
+		String nom = (String) this.getArgs("nom");
+
+		Integer  x = ((Integer) this.getArgs("id"));
+		int  id = (x != null)?x.intValue():-1;
+
+		Personne[] lP;
+		if ((genre != null) && (nom != null))
+			lP = db.getAllPersonnes(genre, nom);
+		else if (id >= 0) {
+			lP = db.getAllPersonnes(id);
+		}
+		else
+			lP = db.getAllPersonnes();
+
+		_logger.debug("Personne trouvees: " + (lP == null ? "NULL ..." : lP.length));
+
+		Response r = Response.ok().type(MediaType.APPLICATION_JSON).entity(lP).build();
 		return r;
 	}
 }

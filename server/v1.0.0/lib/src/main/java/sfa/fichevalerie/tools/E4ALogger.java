@@ -23,6 +23,7 @@ public final class E4ALogger {
 			case "debug" : _envLevel = eE4ALoggerLevel.debug; break;
 			case "severe" : _envLevel = eE4ALoggerLevel.severe; break;
 			case "allways" : _envLevel = eE4ALoggerLevel.allways; break;
+			default : _envLevel = eE4ALoggerLevel.debug; break;
 		}
 	}
 
@@ -47,7 +48,6 @@ public final class E4ALogger {
 
 
 
-
 	public void debug(String msg) {
 		this._log(eE4ALoggerLevel.debug, msg);
 	}
@@ -56,38 +56,8 @@ public final class E4ALogger {
 		this._log(eE4ALoggerLevel.info, msg);
 	}
 
-	public void severe(String msg) {
+	public void fatal(String msg) {
 		this._log(eE4ALoggerLevel.severe, msg);		
-	}
-
-	public void allways(String msg) {
-		this._log(eE4ALoggerLevel.allways, msg);		
-	}
-	
-	public void dumpFile(eE4ALoggerLevel l, String pathToFile) {
-		if (this.isActive(l)) {
-			StringBuffer sb = new StringBuffer("Dump of: ");
-			sb.append(pathToFile);
-			sb.append(System.lineSeparator());
-
-			try {
-				BufferedReader r = new BufferedReader(new FileReader(pathToFile));
-				String line = r.readLine();
-				while (line != null)
-				{
-					sb.append(line);
-					sb.append(System.lineSeparator());
-
-					line = r.readLine();
-				}
-				r.close();
-			}
-			catch (Exception e) {
-				sb.append(e.getMessage());
-			}
-			_log(l, sb.toString());
-		}
-		return;
 	}
 
 	public boolean isActive(eE4ALoggerLevel l) {

@@ -2,15 +2,13 @@ package sfa.fichevalerie.ws.impl;
 
 import javax.ws.rs.core.Response;
 
-import sfa.fichevalerie.tools.E4AError;
+public class WsDebug extends WS {
 
-public class WsTest extends WS {
-
-	public WsTest() {
+	public WsDebug() {
 		super();
 	}
 
-	
+
 	@Override
 	public String whoami() {
 		return this.getClass().getCanonicalName();
