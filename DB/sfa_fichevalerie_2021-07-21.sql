@@ -40,18 +40,8 @@ CREATE TABLE IF NOT EXISTS `activite` (
   `date` datetime NOT NULL,
   `tarifHoraire` float NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=119 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8  COLLATE=utf8_bin;
 
---
--- Dumping data for table `activite`
---
-
-INSERT INTO `activite` (`id`, `idBulletinSalaire`, `activitee`, `debut`, `fin`, `date`, `tarifHoraire`) VALUES
-(117, 93, 'Aide à la personne', '2021-01-02 01:00:00', '2021-01-02 01:05:00', '2021-07-19 23:18:21', -1),
-(112, 93, 'Aide a la personne', '2021-01-01 02:00:00', '2021-01-01 03:00:00', '2021-07-19 19:45:20', -1),
-(111, 94, 'Cuisine', '2021-11-01 01:00:00', '2021-11-01 02:00:00', '2021-07-18 19:23:16', -1),
-(118, 93, 'Cuisine', '2021-01-03 14:01:00', '2021-01-03 15:00:00', '2021-07-19 23:18:21', -1),
-(115, 93, 'Aide a la personne', '2021-01-02 01:00:00', '2021-01-02 02:00:00', '2021-07-19 21:34:23', -1);
 
 -- --------------------------------------------------------
 
@@ -68,19 +58,8 @@ CREATE TABLE IF NOT EXISTS `bulletinsalaire` (
   `tarifHoraire` float NOT NULL,
   `date` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=95 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8  COLLATE=utf8_bin;
 
---
--- Dumping data for table `bulletinsalaire`
---
-
-INSERT INTO `bulletinsalaire` (`id`, `idPersonne`, `mois`, `annee`, `tarifHoraire`, `date`) VALUES
-(91, 1, 8, 2021, 15, '2021-07-18 18:52:08'),
-(90, 1, 7, 2021, 15, '2021-07-18 18:51:19'),
-(89, 1, 6, 2021, 15, '2021-07-18 18:49:46'),
-(92, 1, 9, 2021, 15, '2021-07-18 18:54:28'),
-(93, 1, 0, 2021, 15, '2021-07-18 19:12:39'),
-(94, 1, 10, 2021, 15, '2021-07-18 19:22:46');
 
 -- --------------------------------------------------------
 
@@ -96,7 +75,7 @@ CREATE TABLE IF NOT EXISTS `depassementforfaitaire` (
   `date` datetime NOT NULL,
   `tarifHoraire` float NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8  COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -139,6 +118,8 @@ CREATE TABLE IF NOT EXISTS `listactivitee` (
 INSERT INTO `listactivitee` (`id`, `nom`) VALUES
 (1, 'Aide à la personne'),
 (2, 'Cuisine'),
+(3, 'Courses'),
+(4, 'Sortie'),
 (5, 'Jeux');
 
 -- --------------------------------------------------------
@@ -155,16 +136,7 @@ CREATE TABLE IF NOT EXISTS `pdf` (
   `version` int(11) NOT NULL,
   `date` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=60 DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `pdf`
---
-
-INSERT INTO `pdf` (`id`, `idBulletinSalaire`, `file`, `version`, `date`) VALUES
-(57, 93, '1c\\1ce8dbf5-60ed-499f-bc58-9e30bf83da90.pdf', 0, '2021-07-19 22:48:35'),
-(58, 93, '02\\0204ab71-262b-49ce-931f-ca14f29d36ab.pdf', 0, '2021-07-19 23:18:38'),
-(59, 93, 'ea\\ea6dbd8b-3f93-4de5-9b45-466c2f27f7c7.pdf', 0, '2021-07-19 23:20:57');
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8  COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -179,16 +151,7 @@ CREATE TABLE IF NOT EXISTS `personne` (
   `nom` text NOT NULL,
   `date` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `personne`
---
-
-INSERT INTO `personne` (`id`, `genre`, `nom`, `date`) VALUES
-(1, 'Madame', 'azerty', '2021-07-05 11:40:00'),
-(2, 'Madame', 'qwerty', '2021-07-05 15:16:04'),
-(3, 'Madame', 'toto', '2021-07-05 15:19:32');
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8  COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -206,7 +169,7 @@ CREATE TABLE IF NOT EXISTS `rappel` (
   `date` datetime NOT NULL,
   `status` tinyint(4) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
