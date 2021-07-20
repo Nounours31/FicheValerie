@@ -12,6 +12,7 @@ public class cWsFactory {
 			case "createBulletinSalaire" : rc =  new WsBulletinSalaire(); ; rc.setType(eWsTypeGetPost.post); break;
 
 			case "getActivitee" : rc =  new WsActivte(); rc.setType(eWsTypeGetPost.get);break;
+			case "getActiviteeByBulletin" : rc =  new WsActivte(); rc.setType(eWsTypeGetPost.get);break;
 			case "createActivitee" : rc =  new WsActivte(); rc.setType(eWsTypeGetPost.post); break;
 			case "deleteActivitee" : rc =  new WsActivte(); rc.setType(eWsTypeGetPost.delete); break;
 

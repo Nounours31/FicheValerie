@@ -30,12 +30,19 @@ public class WsActivte extends WS implements iWS {
 
 	@Override
 	public Response get() {
+		Activite[] a = new Activite[] {};
 		DbActivite bs = new DbActivite();
-		int idBulletin = (Integer)this.getArgs ("idBulletin");
-		_logger.debug("activite to get: " + idBulletin);
+		Integer idBulletin = (Integer)this.getArgs ("idBulletin");
+		if (idBulletin != null) {
+			_logger.debug("activite to get: " + idBulletin.intValue());
+			a = bs.getAllActivitees(idBulletin.intValue());
+		}
 
-		Activite[] a = bs.getAllActivitees(idBulletin);
-
+		Integer idActivitee = (Integer)this.getArgs ("idActivitee");
+		if (idActivitee != null) {
+			_logger.debug("activite to get by Id " + idActivitee.intValue());
+			a = bs.getActivitee(idActivitee.intValue());
+		}
 		return Response.ok().type(MediaType.APPLICATION_JSON).entity(a).build();
 	}
 

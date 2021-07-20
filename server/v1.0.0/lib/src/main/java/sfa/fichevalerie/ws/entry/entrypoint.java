@@ -194,13 +194,24 @@ public class entrypoint {
     }
 
     @GET
-    @Path("/activitee/{idBulletin}")
+    @Path("/activitee/bulletin/{idBulletin}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getActiviteFromIdBulletinSalaire(@PathParam("idBulletin") int idBulletin) {
-        iWS ws = cWsFactory.getImpl("getActivitee");
+        iWS ws = cWsFactory.getImpl("getActiviteeByBulletin");
         _logger.info(ws.whoami());
 
         ws.setArgs ("idBulletin", idBulletin);
+        return ws.run();
+    }
+
+    @GET
+    @Path("/activitee/{idActivitee}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getActivite(@PathParam("idActivitee") int idActivitee) {
+        iWS ws = cWsFactory.getImpl("getActivitee");
+        _logger.info(ws.whoami());
+
+        ws.setArgs ("idActivitee", idActivitee);
         return ws.run();
     }
 
@@ -227,6 +238,18 @@ public class entrypoint {
         return Response.ok().type(MediaType.APPLICATION_JSON).entity("OK").build();
     }
 
+    @GET
+    @Path("/sql/infosExtras/${idBulletin}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getExtraInfos(@Context HttpServletRequest request) {
+        iWS ws = cWsFactory.getImpl("setDebug");
+        _logger.info(ws.whoami());
+        E4ALogger.setEnvLevel (sLevel);
+        return Response.ok().type(MediaType.APPLICATION_JSON).entity("OK").build();
+    	
+    }
+    	
     @POST
     @Path("/sql")
     @Produces(MediaType.APPLICATION_JSON)

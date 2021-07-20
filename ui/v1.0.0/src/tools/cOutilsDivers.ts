@@ -1,4 +1,4 @@
-import { iPersonne } from "../WS/iWSMessages";
+import { iActivite, iPersonne } from "../WS/iWSMessages";
 
 export default class cOutilsDivers {
     static _mois: string[] = [
@@ -82,5 +82,16 @@ export default class cOutilsDivers {
         }
         return s2;
     }
+
+    static ActiviteeToString(x: iActivite) {
+        let retour: string = "";
+        retour += "[id:" + x.id + "]";
+        retour += "[activitee:" + x.activite + "]";
+        retour += "[debut:" + x.debut + "]";
+        retour += "[fin:" + x.fin + "]";
+        retour += "[bulletin:" + x.idBulletinSalaire + "]";
+        return retour;
+    }
+
     
 }

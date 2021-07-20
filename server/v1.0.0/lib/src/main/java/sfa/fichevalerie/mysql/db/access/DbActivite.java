@@ -85,6 +85,11 @@ public class DbActivite extends DB implements iDB {
 		return this.getAllActivitees(sql);		
 	}
 
+	public Activite[] getActivitee(int intValue) {
+		String sql = String.format("select * from activite where (id = %d) ORDER BY debut ASC", intValue);
+		return this.getAllActivitees(sql);		
+	}
+
 	private Activite[] getAllActivitees(String sql) {
 		_logger.debug("getAllActivitees START");
 
@@ -140,6 +145,8 @@ public class DbActivite extends DB implements iDB {
 		}
 		return rc;
 	}
+
+
 
 }
 

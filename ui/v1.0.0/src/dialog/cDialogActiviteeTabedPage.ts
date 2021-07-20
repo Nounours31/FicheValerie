@@ -45,10 +45,15 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
     private static _idButtonPDF: string = cDialogActiviteeTabedPage._NomPrefixe + '_idButtonPDF';
     private static _idButtonKO: string = cDialogActiviteeTabedPage._NomPrefixe + '_idButtonKO';
 
+    private static _idDepassementForfaitaire: string = cDialogActiviteeTabedPage._NomPrefixe + '_idDepassementForfaitaire';
+    private static _idReportPrecedent: string = cDialogActiviteeTabedPage._NomPrefixe + '_idReportPrecedent';
+
+
         // creation en DB du bulletin de salaire
     private _ws: cWS = null;
     private _idBulletinSalaire: number;
 
+    private _inputAsTime: boolean = false;
 
     constructor() {
         super('cDialogActiviteeTabedPage');
@@ -68,6 +73,22 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
                         <label>Personne:<span id="${cDialogActiviteeTabedPage._idLabelOfInputPersonne}"></span></label><br/>
                         <label>Periode:<span id="${cDialogActiviteeTabedPage._idLabelOfInputPeriode}"></span></label><br/>
                         <label>Tarif:<span id="${cDialogActiviteeTabedPage._idLabelOfInputTarif}"></span></label><br/>
+
+                        <fieldset style="padding-left: 10px;">
+                            <legend>Saisie des extras</legend>
+                            <label>Depassement forfaitaire (en heure)</label>
+                            <input type="text" id="${cDialogActiviteeTabedPage._idDepassementForfaitaire}"
+                                    pattern="[0-9]{2}:[0-9]{2}"
+                                    placeholder="hh:mm"/>
+                            <span id="${cDialogActiviteeTabedPage._idDepassementForfaitaire}_span">(*)</span>
+                            <br/>
+                            <label>Rappel mois precedent (en heure)</label>
+                            <input type="text" id="${cDialogActiviteeTabedPage._idReportPrecedent}"
+                                    pattern="[0-9]{2}:[0-9]{2}"
+                                    placeholder="hh:mm"/>
+                            <span id="${cDialogActiviteeTabedPage._idReportPrecedent}_span">(*)</span>
+                        </fieldset>
+
                         <table class="uk-table uk-table-striped" id="${cDialogActiviteeTabedPage._idTable}">
                             <thead>
                                 <tr>
@@ -137,6 +158,18 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
         let tableauDelapage: JQuery<HTMLTableElement> = $(`#${cDialogActiviteeTabedPage._idTable}`);
 
         if (me._idBulletinSalaire > 0) {
+            // collect des extra
+            let nbHeureDepassementForfaitaire : string = $(`#${cDialogActiviteeTabedPage._idDepassementForfaitaire}`).val() as string;
+            let nbHeureReport: string = $(`#${cDialogActiviteeTabedPage._idReportPrecedent}`).val() as string;
+            if ((nbHeureDepassementForfaitaire != null) && (nbHeureDepassementForfaitaire != undefined) && (nbHeureDepassementForfaitaire.length > 3)) {
+                let nbHeure: number = cOutilsDivers.heureString2HeureFloat(nbHeureDepassementForfaitaire);
+                me._ws.setDepassementForfaitaire(me._idBulletinSalaire, nbHeure);
+            }
+            if ((nbHeureReport != null) && (nbHeureReport != undefined) && (nbHeureReport.length > 3)) {
+                let nbHeure : number = cOutilsDivers.heureString2HeureFloat(nbHeureReport);                
+                me._ws.setHeureReport(me._idBulletinSalaire, nbHeure);
+            }
+
             // upload des info
             tableauDelapage.find("tr").each(function (){
                 // sur ma ligne
@@ -153,7 +186,7 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
                         let sFinHoraire: string = $(this).find(`.${cDialogActiviteeTabedPage._idHoraireFin}`).val() as string;
                         
                         let inputDateType: string = $(this).find(`.${cDialogActiviteeTabedPage._idHoraireFin}`).attr('type');
-                        if ((inputDateType == 'time') && (sDebutHoraire.length > 3) && (sFinHoraire.length > 3)) {
+                        if ( ((inputDateType == 'time') || (inputDateType == 'text')) && (sDebutHoraire.length > 3) && (sFinHoraire.length > 3)) {
                             let aDebutHoraire: string[] = sDebutHoraire.split(':');
                             let aFinHoraire: string[] = sFinHoraire.split(':');
                             
@@ -294,9 +327,26 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
                 uneligne += `
                         <td>
                             <select class="uk-select ${cDialogActiviteeTabedPage._idSelectActivitee}"></select>
-                        </td>
+                        </td>`;
+                if (this._inputAsTime) {
+                    uneligne += `
                         <td><input type="time" id="${cDialogActiviteeTabedPage._idHoraireDebut + uidLigne}" class="${cDialogActiviteeTabedPage._idHoraireDebut}" name="${cDialogActiviteeTabedPage._idHoraireDebut + uidLigne}"> </td>
                         <td><input type="time" id="${cDialogActiviteeTabedPage._idHoraireFin + uidLigne}" class="${cDialogActiviteeTabedPage._idHoraireFin}" name="${cDialogActiviteeTabedPage._idHoraireFin + uidLigne}"> </td>
+                    `;
+                }
+                else {
+                    uneligne += `
+                        <td><input type="text" id="${cDialogActiviteeTabedPage._idHoraireDebut + uidLigne}" 
+                                    class="${cDialogActiviteeTabedPage._idHoraireDebut}" name="${cDialogActiviteeTabedPage._idHoraireDebut + uidLigne}"
+                                    pattern="[0-9]{2}:[0-9]{2}"
+                                    placeholder="hh:mm"></td>
+                        <td><input type="text" id="${cDialogActiviteeTabedPage._idHoraireFin + uidLigne}" class="${cDialogActiviteeTabedPage._idHoraireFin}" 
+                                    name="${cDialogActiviteeTabedPage._idHoraireFin + uidLigne}"
+                                    pattern="[0-9]{2}:[0-9]{2}"
+                                    placeholder="hh:mm"></td>
+                    `;
+                }
+                uneligne += `
                         <td id="${cDialogActiviteeTabedPage._idHoraireDurrePresta + uidLigne}" class="${cDialogActiviteeTabedPage._idHoraireDurrePresta}"></td>
                         <td id="${cDialogActiviteeTabedPage._idCummulHoraireDurrePresta + uidLigne}"></td>
                         <td></td >
@@ -342,17 +392,23 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
             // -------------------------------------
             // suppression d'une activite
             // -------------------------------------
-            // $(".RemoveActiviteInDB_ID_ACTIVITEE").on('click', function (event: JQuery.ClickEvent) {
-            $(".toto").on('click', function (event: JQuery.ClickEvent) {
+            $(".RemoveActiviteInDB_ID_ACTIVITEE").on('click', function (event: JQuery.ClickEvent) {
                 console.log(event.type);
                 event.stopImmediatePropagation();
                 event.preventDefault();
 
                 let targetId: string = event.currentTarget.id;
                 let activiteId: string = targetId.replace("RemoveActiviteInDB_ID_ACTIVITEE_", "");
-                me._ws.deleteActivite(activiteId);
 
-                me.refresh (me._idBulletinSalaire);
+                let activite : iActivite[] = me._ws.getActivitee(activiteId);
+                UIkit.modal.confirm('Veux tu vraiment detruire cette activitee?' + cOutilsDivers.ActiviteeToString (activite[0])).then(function() {
+                    console.log('Confirmed.')
+                    me._ws.deleteActivite(activiteId);
+                    me.refresh (me._idBulletinSalaire);
+                }, function () {
+                    console.log('Rejected.')
+                });
+                return true;
             });
 
 

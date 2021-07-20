@@ -41,44 +41,6 @@ export default class cWS {
     }
 
 
-    getBulletinSalaireFromSQL(sql: string): iBulletinSalaire[] {
-        let retour: iBulletinSalaire[] = [];
-        let URL = cEnv._serverURL + `/sql`;
-        let postData: Object = {
-            'sql': sql,
-            'retour': 'iBulletinSalaire',
-        }
-        let oResp: boolean = this.t.sendPostWS(URL, postData);
-        if (this.t.status) {
-            retour = ((this.t.data as unknown) as iBulletinSalaire[]);
-        }
-        return retour;
-    }
-
-    public getAllPossibleActivitees(): string[] {
-        let retour: string[] = [];
-        let URL = cEnv._serverURL + `/sql`;
-        let postData: Object = {
-            'sql': 'getAllPossibleActivitees',
-            'retour': 'iListActivitee',
-        }
-        let oResp: boolean = this.t.sendPostWS(URL, postData);
-        if (this.t.status) {
-            retour = ((this.t.data as unknown) as string[]);
-        }
-        return retour;
-    }
-    public addAPossibleActivitee(activitee: string) : void {
-        let retour: string[] = [];
-        let URL = cEnv._serverURL + `/sql`;
-        let postData: Object = {
-            'infos': [ 'addPossibleActivitee', activitee ],
-            'retour': 'iListActivitee',
-        }
-        let oResp: boolean = this.t.sendPostWS(URL, postData);
-        return;
-    }
-
 
     public getBulletinSalaire(idPersonneOrIdBulletin: number, mois: number = null, annee: number = null): iBulletinSalaire[] {
         let retour: iBulletinSalaire[] = [];
@@ -115,7 +77,7 @@ export default class cWS {
 
     public getAllActivitee(idBulletinSalaire: number): iActivite[] {
         let retour: iActivite[] = [];
-        let URL = cEnv._serverURL + `/activitee/${idBulletinSalaire}`;
+        let URL = cEnv._serverURL + `/activitee/bulletin/${idBulletinSalaire}`;
         let oResp: boolean = this.t.sendGetWS(URL);
         if (this.t.status) {
             retour = ((this.t.data as unknown) as iActivite[]);
@@ -123,6 +85,17 @@ export default class cWS {
         this.updateDateActiviteAfterWS (retour);
         return retour;
     }
+    public getActivitee(activiteId: string): iActivite[] {
+        let retour: iActivite[] = [];
+        let URL = cEnv._serverURL + `/activitee/${activiteId}`;
+        let oResp: boolean = this.t.sendGetWS(URL);
+        if (this.t.status) {
+            retour = ((this.t.data as unknown) as iActivite[]);
+        }
+        this.updateDateActiviteAfterWS (retour);
+        return retour;
+    }
+
 
 
     private updateDateActiviteAfterWS(retour: iActivite[]) {
@@ -212,6 +185,91 @@ export default class cWS {
         console.log('creation de ' + genre + ' ' + nom);
         return retour;
     }
+
+
+
+    // ------------------------------------------------
+    // les cas tordu par lequel je passe par du SQL
+    // ------------------------------------------------
+    public setHeureReport(_idBulletinSalaire: number, nbHeure: number) {
+        let URL = cEnv._serverURL + `/sql`;
+        let postData: Object = {
+            'infos': { 'idBulletin' : _idBulletinSalaire, 'nbHeure' : nbHeure},
+            'retour': 'iHeureReport',
+        }
+        let oResp: boolean = this.t.sendPostWS(URL, postData);
+        return;
+    }
+    public setDepassementForfaitaire(_idBulletinSalaire: number, nbHeure: number) {
+        let URL = cEnv._serverURL + `/sql`;
+        let postData: Object = {
+            'infos': { 'idBulletin' : _idBulletinSalaire, 'nbHeure' : nbHeure},
+            'retour': 'iDepassementForfaitaire',
+        }
+        let oResp: boolean = this.t.sendPostWS(URL, postData);
+        return;
+    }
+
+    public getHeureReport(_idBulletinSalaire: number): number {
+        let retour: number = 0;
+        let URL = cEnv._serverURL + `/sql/infosExtras/${_idBulletinSalaire}`;
+        let oResp: boolean = this.t.sendGetWS(URL);
+        if (this.t.status) {
+            retour = ((this.t.data as unknown) as number);
+        }
+        return retour;
+    }
+    public getDepassementForfaitaire(_idBulletinSalaire: number) : number {
+        let retour: number = 0;
+        let URL = cEnv._serverURL + `/sql/infosExtras/${_idBulletinSalaire}`;
+        let oResp: boolean = this.t.sendGetWS(URL);
+        if (this.t.status) {
+            retour = ((this.t.data as unknown) as number);
+        }
+        return retour;
+    }
+
+    
+    public getBulletinSalaireFromSQL(sql: string): iBulletinSalaire[] {
+        let retour: iBulletinSalaire[] = [];
+        let URL = cEnv._serverURL + `/sql`;
+        let postData: Object = {
+            'sql': sql,
+            'retour': 'iBulletinSalaire',
+        }
+        let oResp: boolean = this.t.sendPostWS(URL, postData);
+        if (this.t.status) {
+            retour = ((this.t.data as unknown) as iBulletinSalaire[]);
+        }
+        return retour;
+    }
+
+    public getAllPossibleActivitees(): string[] {
+        let retour: string[] = [];
+        let URL = cEnv._serverURL + `/sql`;
+        let postData: Object = {
+            'sql': 'getAllPossibleActivitees',
+            'retour': 'iListActivitee',
+        }
+        let oResp: boolean = this.t.sendPostWS(URL, postData);
+        if (this.t.status) {
+            retour = ((this.t.data as unknown) as string[]);
+        }
+        return retour;
+    }
+    public addAPossibleActivitee(activitee: string) : void {
+        let retour: string[] = [];
+        let URL = cEnv._serverURL + `/sql`;
+        let postData: Object = {
+            'infos': [ 'addPossibleActivitee', activitee ],
+            'retour': 'iListActivitee',
+        }
+        let oResp: boolean = this.t.sendPostWS(URL, postData);
+        return;
+    }
+
+
+
 
     public get data() : JSON { return this._data; }
 }
