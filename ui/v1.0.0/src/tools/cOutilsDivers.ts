@@ -36,8 +36,18 @@ export default class cOutilsDivers {
     static periode2String(mois: number, annee: number): string {
         let retour: string = "";
         retour = cOutilsDivers._mois[mois];
-        retour += " " ;
+        retour += " ";
         retour += annee;
+        return retour;
+    }
+
+    static heureFloat2HeureString(aCOnvertir: number): string {
+        let retour: string = "";
+        
+        let heure: number = Math.floor (aCOnvertir / 60.0);
+        let minute : number = Math.floor (aCOnvertir - heure * 60.0 );
+
+        retour = heure.toFixed(0) + ":" minute.toFixed(0);
         return retour;
     }
 

@@ -409,7 +409,8 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
         // mise a jour de la duree de cette activite
         let idCelluleToChange: string = this.encodeLigneUID(cDialogActiviteeTabedPage._idHoraireDurrePresta, info[cDialogActiviteeTabedPage.uidLigneMapping.uid]);
         let nbHeure: number = duree.asHour();
-        $(`#${idCelluleToChange}`).text(nbHeure as unknown as string);
+        let sNbHeure: string =nbHeure.toFixed(2);
+        $(`#${idCelluleToChange}`).text(sNbHeure);
 
         // Update Page duree
         this.updateDesDureeTotalDeTravail();
@@ -420,7 +421,7 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
     // -------------------------------------------------------------
     private updateDesDureeTotalDeTravail() : void {
         // mise  ajour de la page (soome des activite)
-        let letNbHeureCumilee: number = 0.0;
+        let NbHeureCumilee: number = 0.0;
         let x: number = 0.0;
 
         let me: cDialogActiviteeTabedPage = this;
@@ -430,15 +431,16 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
 
             if ((celluleValeur != null) && (celluleValeur.length > 0)) {
                 x = Number.parseFloat($(this).text());
-                letNbHeureCumilee += x;
+                NbHeureCumilee += x;
                 console.log("x: " + x + "  " + $(this).prop('id'));
-                console.log("cumul: " + letNbHeureCumilee);
+                console.log("cumul: " + NbHeureCumilee);
                 if (x > 0) {
                     let local_aTargetId: string[] = me.decodeLigneUID($(this).prop('id'));
                     let local_uidLigne: string = local_aTargetId[cDialogActiviteeTabedPage.uidLigneMapping.uid];
                     let local_idCelluleToChange: string = me.encodeLigneUID(cDialogActiviteeTabedPage._idCummulHoraireDurrePresta, local_uidLigne);
                     console.log(local_idCelluleToChange);
-                    $(`#${local_idCelluleToChange}`).text(letNbHeureCumilee as unknown as string);
+                    let sNbHeureCumulee : string = NbHeureCumilee.toFixed(2);
+                    $(`#${local_idCelluleToChange}`).text(sNbHeureCumulee);
                 }
             }
         });
