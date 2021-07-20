@@ -8,3 +8,8 @@ store/
 /server/v1.0.1/fichevalerie/.gradle/
 /server/v1.0.1/fichevalerie/build/
 linux_a64/
+server/v1.0.0/.settings/org.eclipse.buildship.core.prefs
+server/v1.0.0/lib/.classpath
+server/v1.0.0/lib/.project
+server/v1.0.0/lib/.settings/
+server/v1.0.0/lib/bin/
