@@ -13,6 +13,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import sfa.fichevalerie.mysql.api.datawrapper.Activite;
 import sfa.fichevalerie.mysql.api.datawrapper.BulletinSalaire;
@@ -24,7 +25,7 @@ import sfa.fichevalerie.tools.E4ALogger;
 import sfa.fichevalerie.ws.impl.cWsFactory;
 import sfa.fichevalerie.ws.impl.iWS;
 
-@Path("/fichevalerie/v1.0.0")
+@Path("v1.0.0")
 public class entrypoint {
 	private E4ALogger _logger = null;
 	
@@ -258,23 +259,41 @@ public class entrypoint {
             e.printStackTrace();
         }
         if (jsonObject.has("retour")) {
+        	_logger.debug("SQL retour is :" + jsonObject.getString("retour"));
             if (jsonObject.getString("retour").equals("iBulletinSalaire")) {
+            	_logger.debug("iBulletinSalaire");
                 DbBulletinSalaire x = new DbBulletinSalaire();
                 BulletinSalaire[] y = x.RunSelect(jsonObject.getString("sql"));
                 return Response.ok().type(MediaType.APPLICATION_JSON).entity(y).build();
             }
             if (jsonObject.getString("retour").equals("iListActivitee")) {
-                if (jsonObject.getString("sql") != null) {
+            	_logger.debug("iListActivitee");
+                if (jsonObject.has("sql")) {
+                	_logger.debug("sql: " + jsonObject.getString("sql"));
                     DbActivite x = new DbActivite();
                     if (jsonObject.getString("sql").equals("getAllPossibleActivitees")) {
                         String[] y = x.getAllPossibleActivitees();
                         return Response.ok().type(MediaType.APPLICATION_JSON).entity(y).build();
                     }
-                    if (jsonObject.getString("sql").startsWith("insertAPossibleActivitees_")) {
-                        String s = jsonObject.getString("sql").replaceAll("insertAPossibleActivitees_", "");
-                        int y = x.insertAPossibleActivitees(s);
-                        return Response.ok().type(MediaType.APPLICATION_JSON).entity(new Integer(y)).build();
-                    }
+                }
+                if (jsonObject.getJSONArray("infos") != null ) {
+                	_logger.debug("infos: array dispo");
+                	JSONArray infos = jsonObject.getJSONArray("infos");
+                	if (!infos.isEmpty() && (infos.length() == 2) && (infos.getString(0).equals("addPossibleActivitee"))) {
+                		 DbActivite x = new DbActivite();
+                		 String s = infos.getString(1);
+                         int y = x.insertAPossibleActivitees(s);
+
+                         _logger.debug("infos: addPossibleActivitee : " + s);
+                         
+                         return Response.ok().type(MediaType.APPLICATION_JSON).entity(new Integer(y)).build();
+                	}
+                	else {
+                    	_logger.debug("infos: length" + infos.length());
+                    	for (int pipoIndex = 0; pipoIndex < infos.length(); pipoIndex++) {
+                    		_logger.debug(String.format("infos: [%d] : %s",pipoIndex, infos.getString(pipoIndex)));
+						} 
+                	}
                 }
             }
         }

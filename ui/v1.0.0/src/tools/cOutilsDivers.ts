@@ -44,16 +44,43 @@ export default class cOutilsDivers {
     static heureFloat2HeureString(aCOnvertir: number): string {
         let retour: string = "";
         
-        let heure: number = Math.floor (aCOnvertir / 60.0);
-        let minute : number = Math.floor (aCOnvertir - heure * 60.0 );
+        let heure: number = Math.floor (aCOnvertir);
+        let minute : number = Math.floor (((aCOnvertir - heure) * 60.0) + 0.99999999999 );
 
-        retour = heure.toFixed(0) + ":" minute.toFixed(0);
+        let sHeure: string = heure.toFixed(0);
+        let sMinute: string = minute.toFixed(0);
+
+        if (sHeure.length == 0) sHeure = "00";
+        if (sHeure.length == 1) sHeure = "0" + sHeure;
+        if (sHeure.length > 2) sHeure = "##";
+
+        if (sMinute.length == 0) sMinute = "00";
+        if (sMinute.length == 1) sMinute = "0" + sMinute;
+        if (sMinute.length > 2) sMinute = "##";
+        retour = sHeure + ":" + sMinute;
         return retour;
+    }
+
+    static heureString2HeureFloat(aCOnvertir: string): number {
+        let info: string[] = aCOnvertir.split(":");
+        
+        let heure: number = Number.parseInt(info[0]);
+        let minute : number = Number.parseInt(info[1]);
+
+        return ((heure * 1.0) + (minute * 1.0) / 60.0);
     }
 
     static SemaineFromIntToNom(jour: number): string {
         return cOutilsDivers._days[jour];
     }
 
+    public static replaceAll(s: string, a: string, b: string) {
+        let s2: string = s.replace(a, b);
+        while (s2 != s) {
+            s = s2;
+            s2 = s.replace(a, b);
+        }
+        return s2;
+    }
     
 }

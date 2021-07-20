@@ -1,4 +1,4 @@
-@echo off
+@echo on
 
 echo "To install: gradle installDist --warning-mode all --info"
 echo "Use: --warning-mode all --info"
@@ -30,8 +30,12 @@ echo JAVA_HOME: %JAVA_HOME%
 
 if not defined JAVA_HOME (
 	echo "ERROR"
-) else (
-	echo "Update path"
-	set "PATH=%PATH%;%JAVA_HOME%;%JAVA_HOME%\bin;%GRADDLE_HOME%;%GRADDLE_HOME%\bin"
-	echo "Updated"
-)
+	goto :fin
+) 
+echo "Update path"
+echo "set ..."
+set PATH=%JAVA_HOME%;%JAVA_HOME%\bin;%GRADDLE_HOME%;%GRADDLE_HOME%\bin;%PATH%
+echo "Updated"
+
+
+:fin

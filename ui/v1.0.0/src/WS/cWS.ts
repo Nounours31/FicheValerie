@@ -68,6 +68,17 @@ export default class cWS {
         }
         return retour;
     }
+    public addAPossibleActivitee(activitee: string) : void {
+        let retour: string[] = [];
+        let URL = cEnv._serverURL + `/sql`;
+        let postData: Object = {
+            'infos': [ 'addPossibleActivitee', activitee ],
+            'retour': 'iListActivitee',
+        }
+        let oResp: boolean = this.t.sendPostWS(URL, postData);
+        return;
+    }
+
 
     public getBulletinSalaire(idPersonneOrIdBulletin: number, mois: number = null, annee: number = null): iBulletinSalaire[] {
         let retour: iBulletinSalaire[] = [];

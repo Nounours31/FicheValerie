@@ -261,8 +261,7 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
                         bHasPrintFirstRow = true;
                     }
                     uneligne +=`    <td> 
-                                        <textarea rows="1" cols="${curentACtiviteToPrint.activite.length}" class="${cDialogActiviteeTabedPage._idSelectActivitee}" 
-                                            readonly>${curentACtiviteToPrint.activite}</textarea>
+                                        <textarea rows="1" cols="${curentACtiviteToPrint.activite.length}" readonly>${curentACtiviteToPrint.activite}</textarea>
                                     </td>
                                     <td> 
                                         <textarea rows="1" cols="30"
@@ -276,9 +275,12 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
                                             class="${cDialogActiviteeTabedPage._idHoraireFin}"
                                             readonly>${curentACtiviteToPrint.fin}</textarea>
                                     </td>
-                                    <td id="${cDialogActiviteeTabedPage._idHoraireDurrePresta + uidLigne}" class="${cDialogActiviteeTabedPage._idHoraireDurrePresta}">${duree.asHour()}</td>
+                                    <td id="${cDialogActiviteeTabedPage._idHoraireDurrePresta + uidLigne}" class="${cDialogActiviteeTabedPage._idHoraireDurrePresta}">${cOutilsDivers.heureFloat2HeureString(duree.asHour())}</td>
                                     <td id="${cDialogActiviteeTabedPage._idCummulHoraireDurrePresta + uidLigne}">xx</td>
-                                    <td><button style="background-color: "#ff5733";" class="uk-button uk-button-default uk-button-small RemoveActiviteInDB_ID_ACTIVITEE_" id="RemoveActiviteInDB_ID_ACTIVITEE_${curentACtiviteToPrint.id}">-</button></td >
+                                    <td><button style="background-color: #ff5733;"
+                                        class="uk-button uk-button-default uk-button-small RemoveActiviteInDB_ID_ACTIVITEE"
+                                        id="RemoveActiviteInDB_ID_ACTIVITEE_${curentACtiviteToPrint.id}">-</button>
+                                    </td>
                                 </tr>
                     `;
 
@@ -337,11 +339,11 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
                 me.updateDeUneDureeDePrestation(targetId);
             });
 
-
             // -------------------------------------
             // suppression d'une activite
             // -------------------------------------
-            $(".RemoveActiviteInDB_ID_ACTIVITEE_").on('click', function (event: JQuery.ClickEvent) {
+            // $(".RemoveActiviteInDB_ID_ACTIVITEE").on('click', function (event: JQuery.ClickEvent) {
+            $(".toto").on('click', function (event: JQuery.ClickEvent) {
                 console.log(event.type);
                 event.stopImmediatePropagation();
                 event.preventDefault();
@@ -409,7 +411,7 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
         // mise a jour de la duree de cette activite
         let idCelluleToChange: string = this.encodeLigneUID(cDialogActiviteeTabedPage._idHoraireDurrePresta, info[cDialogActiviteeTabedPage.uidLigneMapping.uid]);
         let nbHeure: number = duree.asHour();
-        let sNbHeure: string =nbHeure.toFixed(2);
+        let sNbHeure: string = cOutilsDivers.heureFloat2HeureString(nbHeure);
         $(`#${idCelluleToChange}`).text(sNbHeure);
 
         // Update Page duree
@@ -430,7 +432,7 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
             let celluleValeur: string = $(this).text();
 
             if ((celluleValeur != null) && (celluleValeur.length > 0)) {
-                x = Number.parseFloat($(this).text());
+                x = cOutilsDivers.heureString2HeureFloat ($(this).text());
                 NbHeureCumilee += x;
                 console.log("x: " + x + "  " + $(this).prop('id'));
                 console.log("cumul: " + NbHeureCumilee);
@@ -439,7 +441,7 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
                     let local_uidLigne: string = local_aTargetId[cDialogActiviteeTabedPage.uidLigneMapping.uid];
                     let local_idCelluleToChange: string = me.encodeLigneUID(cDialogActiviteeTabedPage._idCummulHoraireDurrePresta, local_uidLigne);
                     console.log(local_idCelluleToChange);
-                    let sNbHeureCumulee : string = NbHeureCumilee.toFixed(2);
+                    let sNbHeureCumulee : string = cOutilsDivers.heureFloat2HeureString(NbHeureCumilee);
                     $(`#${local_idCelluleToChange}`).text(sNbHeureCumulee);
                 }
             }
