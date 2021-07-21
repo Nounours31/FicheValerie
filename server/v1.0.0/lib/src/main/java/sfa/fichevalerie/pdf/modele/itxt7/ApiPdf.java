@@ -1,6 +1,13 @@
 package sfa.fichevalerie.pdf.modele.itxt7;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -34,12 +41,13 @@ import com.itextpdf.layout.property.VerticalAlignment;
 import sfa.fichevalerie.mysql.api.datawrapper.*;
 import sfa.fichevalerie.mysql.db.access.*;
 import sfa.fichevalerie.tools.E4ALogger;
+import sfa.fichevalerie.tools.eE4ALoggerLevel;
 
 // https://kb.itextpdf.com/home/it7kb/examples
 
 public class ApiPdf {
     private static final SimpleDateFormat _sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private boolean _debugMode =  true;
+    private boolean _debugMode =  false;
 	private PageSize _pageSize = null;;
 
 	static private Color _black = Color.makeColor(PdfColorSpace.makeColorSpace(PdfName.DeviceRGB), new float[]{0.0f, 0.0f, 0.0f});
@@ -65,7 +73,10 @@ public class ApiPdf {
 
 	public ApiPdf()  {
 	    _logger = E4ALogger.getLogger(this.getClass().getCanonicalName());
-		try {
+	    _debugMode = false;
+	    ei18n.debug(_debugMode);
+
+	    try {
 			ApiPdf.MainFont = PdfFontFactory.createFont ("Courier", PdfEncodings.CP1252, false);
             debugBorderRed.setColor(_red);
             debugBorderGreen.setColor(_green);
@@ -123,8 +134,7 @@ public class ApiPdf {
         }
         t.addCell(cell);
         
-        
-        Image fox = new Image(ImageDataFactory.create(tools.CarteVisite));
+        Image fox = new Image(ImageDataFactory.create(getClass().getResource("/sfa/fichevalerie/pdf/modele/itxt7/CarteVisite.png")));
         float xPercent;
 		float yPercent;
 		xPercent = yPercent = 0.5f;
@@ -187,43 +197,8 @@ public class ApiPdf {
         document.close();
     }
 
-    public void createPdf(String dest) throws IOException, java.io.IOException {
-        Document document = this.initDoc(dest);
 
-        BuildEntete(document);
-        BuildInfoPersonne(document);
-        BuildActivitee(document);
-        BuildImpot(document);
-
-        //Close document
-        document.close();
-    }
-
-
-
-    private void BuildInfoPersonne(Document document) {
-        Paragraph p = new Paragraph();
-        p.add("Mois de Luin 2021");
-        p.setTextAlignment(TextAlignment.CENTER);
-        p.setVerticalAlignment(VerticalAlignment.BOTTOM);
-        p.setBackgroundColor(_bgBlue, 0.2f);
-        p.setFontSize(fontSizeMois);
-        if (_debugMode) {
-            p.setBorder(debugBorderGreen);
-        }
-        document.add(p);
-
-        p = new Paragraph();
-        p.add("Hure de presence aupres de mr Matinu");
-        p.setTextAlignment(TextAlignment.CENTER);
-        p.setFontSize(fontSizeActivite);
-        if (_debugMode) {
-            p.setBorder(debugBorderBlue);
-        }
-        document.add(p);
-
-
-    }
+    
     private void BuildInfoPersonne(Document document, BulletinSalaire bs) {
         Paragraph p = new Paragraph();
 
@@ -266,140 +241,7 @@ public class ApiPdf {
 
     }
 
-    private void BuildActivitee(Document document) {
-        float tailleTable2 = (float) (this._pageSize.getWidth());
-        Table t = new Table(new float[]{
-                tailleTable2 * 0.1f,
-                tailleTable2 * 0.01f,
-                tailleTable2 * 0.39f,
-                tailleTable2 * 0.125f,
-                tailleTable2 * 0.125f,
-                tailleTable2 * 0.125f,
-                tailleTable2 * 0.125f
-        });
 
-
-        Cell cell = new Cell(2,2);
-        cell.setBorder(Border.NO_BORDER);
-        t.addCell(cell);
-
-        cell = new Cell(2,1);
-        Paragraph p = new Paragraph(new Text(tools.encodeUTF8(ei18n.activite_libelle.nls())).setBold());
-        p.setTextAlignment(TextAlignment.CENTER);
-        p.setFontSize(fontSizeActivite);
-        if (_debugMode) {
-            p.setBorder(debugBorderBlue);
-        }
-        cell.add(p);
-        cell.setVerticalAlignment(VerticalAlignment.MIDDLE);
-        cell.setHorizontalAlignment(HorizontalAlignment.CENTER);
-        t.addCell(cell);
-
-        cell = new Cell(1,2);
-        p = new Paragraph(tools.encodeUTF8(ei18n.activite_HoraireJournalier.nls())).setBold();
-        p.setTextAlignment(TextAlignment.CENTER);
-        p.setFontSize(fontSizeActivite);
-        cell.add(p);
-        t.addCell(cell);
-
-        cell = new Cell(2,1);
-        p = new Paragraph(tools.encodeUTF8(ei18n.activite_NbHeure.nls())).setBold();
-        p.setTextAlignment(TextAlignment.CENTER);
-        p.setFontSize(fontSizeActivite);
-        cell.add(p);
-        t.addCell(cell);
-
-        cell = new Cell(2,1);
-        p = new Paragraph(tools.encodeUTF8(ei18n.activite_NbHeureCumulatif.nls())).setBold();
-        p.setTextAlignment(TextAlignment.CENTER);
-        p.setFontSize(fontSizeActivite);
-        cell.add(p);
-        t.addCell(cell);
-
-        cell = new Cell(1,1);
-        p = new Paragraph(tools.encodeUTF8(ei18n.activite_HoraireJournalier_debut.nls())).setBold();
-        p.setTextAlignment(TextAlignment.CENTER);
-        p.setFontSize(fontSizeActivite);
-        cell.add(p);
-        t.addCell(cell);
-
-        cell = new Cell(1,1);
-        p = new Paragraph(ei18n.activite_HoraireJournalier_fin.nls()).setBold();
-        p.setTextAlignment(TextAlignment.CENTER);
-        p.setFontSize(fontSizeActivite);
-        cell.add(p);
-        t.addCell(cell);
-
-        int hasBG = 0;
-        String jour = "";
-
-        for (int i = 1; i < 31; i++) {
-            String info = "";
-            info = tools.JourFromInt(i % 7);
-            t.addCell (this.builCell (i, info, false, true));
-
-            info = Integer.toString(i);
-            t.addCell (this.builCell (i, info, true, false));
-
-            info = "Cuisine";
-            t.addCell (this.builCell (i, info, true, true));
-
-            boolean center = true;
-            info = "12:00";
-            t.addCell (this.builCell (i, info, true, true, center));
-
-            info = "14:00";
-            t.addCell (this.builCell (i, info, true, true, center));
-
-            info = "02:00";
-            t.addCell (this.builCell (i, info, true, true, center));
-
-            info = "04:00";
-            t.addCell (this.builCell (i, info, true, true, center));
-        }
-
-        cell = new Cell(1,7);
-        cell.setBorder(Border.NO_BORDER);
-        t.addCell(cell);
-
-        cell = new Cell(1,5);
-        cell.add (new Paragraph(new Text(ei18n.activite_depassementforfaitaire.nls())));
-        t.addCell(cell);
-
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("01:00")));
-        t.addCell(cell);
-
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("10:00")));
-        t.addCell(cell);
-
-        cell = new Cell(1,6);
-        cell.add (new Paragraph(new Text(ei18n.activite_totalMensuel.nls())));
-        t.addCell(cell);
-
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("125:00")));
-        t.addCell(cell);
-
-        cell = new Cell(1,6);
-        cell.add (new Paragraph(new Text(ei18n.activite_RappelPrecedent.nls())));
-        t.addCell(cell);
-
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("05:00")));
-        t.addCell(cell);
-
-        cell = new Cell(1,6);
-        cell.add (new Paragraph(new Text(ei18n.activite_TotalHoraire.nls())));
-        t.addCell(cell);
-
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("135:00")));
-        t.addCell(cell);
-
-        document.add(t);
-    }
     private ArrayList<InfoActiviteeHandler> BuildActivitee(Document document, BulletinSalaire bs, Activite[] a, Rappel[] r, DepassementForfaitaire[] d) {
         ArrayList<InfoActiviteeHandler> rc = new ArrayList<InfoActiviteeHandler>();
         float tailleTable2 = (float) (this._pageSize.getWidth());
@@ -485,7 +327,8 @@ public class ApiPdf {
             t.addCell (this.builCell (iJourSemaine, infoJour[0], false, true));
             t.addCell (this.builCell (iJourSemaine, infoJour[1], true, false));
 
-            info = String.format("%s [Taux %d]",uneActivite.getActivite(), courranteInfoActivite.tauxIndice);
+            // info = String.format("%s [Taux %d]",uneActivite.getActivite(), courranteInfoActivite.tauxIndice);
+            info = String.format("%s",uneActivite.getActivite(), courranteInfoActivite.tauxIndice);
             t.addCell (this.builCell (iJourSemaine, info, true, true));
 
             boolean center = true;
@@ -553,7 +396,7 @@ public class ApiPdf {
 
             nbHeureTravailleeTotale += nbMinutesLongReportMoisPrecedent;
             cell = new Cell(1, 1);
-            cell.add(new Paragraph(new Text(tools.FromMinutesLongToHeure(nbHeureTravailleeTotale))));
+            cell.add(new Paragraph(new Text(tools.FromMinutesLongToHeure(nbHeureTravailleeTotale))).setTextAlignment(TextAlignment.CENTER));
             t.addCell(cell);
         }
         cell = new Cell(1,6);
@@ -571,9 +414,7 @@ public class ApiPdf {
         return rc;
     }
 
-    private Cell builCell(int i, String info) {
-        return builCell (i, info, true, true, false);
-    }
+
 
     private Cell builCell(int i, String info, boolean borderRight, boolean borderLeft) {
         return builCell (i, info, borderRight, borderLeft, false);
@@ -610,113 +451,7 @@ public class ApiPdf {
         return cell;
     }
 
-    private void BuildImpot(Document document) {
-        Paragraph p = new Paragraph();
-        p.add("");
-        document.add(p);
-
-        float tailleTable2 = (float) (this._pageSize.getWidth());
-
-        Table t = new Table(new float[]{
-                tailleTable2 * 0.60f,
-                tailleTable2 * 0.1f,
-                tailleTable2 * 0.1f,
-                tailleTable2 * 0.1f,
-                tailleTable2 * 0.1f
-        });
-        // Header
-        Cell cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text(ei18n.impot_libelle.nls()).setBold()).setTextAlignment(TextAlignment.CENTER));
-        t.addCell(cell);
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text(ei18n.impot_base.nls()).setBold()).setTextAlignment(TextAlignment.CENTER));
-        t.addCell(cell);
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text(ei18n.impot_taux.nls()).setBold()).setTextAlignment(TextAlignment.CENTER));
-        t.addCell(cell);
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text(ei18n.impot_gain.nls()).setBold()).setTextAlignment(TextAlignment.CENTER));
-        t.addCell(cell);
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text(ei18n.impot_retenu.nls()).setBold()).setTextAlignment(TextAlignment.CENTER));
-        t.addCell(cell);
-
-        // ligne salaire brut
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(ei18n.impot_salaire_brut.nls()).setBold().setTextAlignment(TextAlignment.RIGHT));
-        cell.setBackgroundColor(_bgBlue);
-        t.addCell(cell);
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("325:00" + tools.encodeUTF8(tools.heures))));
-        cell.setBackgroundColor(_bgBlue);
-        t.addCell(cell);
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("15" + tools.encodeUTF8(tools.tauxhoraire))));
-        cell.setBackgroundColor(_bgBlue);
-        t.addCell(cell);
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("45" + tools.encodeUTF8(tools.euro))));
-        cell.setBackgroundColor(_bgBlue);
-        t.addCell(cell);
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("")));
-        cell.setBackgroundColor(_bgBlue);
-        t.addCell(cell);
-
-        // ligne CSG
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(ei18n.impot_CSG.nls()).setBold().setTextAlignment(TextAlignment.RIGHT));
-        t.addCell(cell);
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("gain du dessus")));
-        t.addCell(cell);
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("9.7" + tools.encodeUTF8(tools.Percent))));
-        t.addCell(cell);
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("")));
-        t.addCell(cell);
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("-27.50" + tools.encodeUTF8(tools.euro))));
-        t.addCell(cell);
-
-        // ligne impot revenu
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(ei18n.impot_imposition.nls()).setBold().setTextAlignment(TextAlignment.RIGHT));
-        t.addCell(cell);
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("gain du dessus")));
-        t.addCell(cell);
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("9.90" + tools.encodeUTF8(tools.Percent))));
-        t.addCell(cell);
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("")));
-        t.addCell(cell);
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("-27.50" + tools.encodeUTF8(tools.euro))));
-        t.addCell(cell);
-
-        // ligne salaire net
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(ei18n.impot_salairenet.nls()).setBold().setTextAlignment(TextAlignment.RIGHT));
-        t.addCell(cell);
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(""));
-        t.addCell(cell);
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(""));
-        t.addCell(cell);
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("77.5"+ tools.encodeUTF8(tools.euro))));
-        t.addCell(cell);
-        cell = new Cell(1,1);
-        cell.add (new Paragraph(new Text("")));
-        t.addCell(cell);
-
-
-        document.add(t);
-    }
+    
     private void BuildImpot(Document document, ArrayList<InfoActiviteeHandler> allInfos) {
         Paragraph p = new Paragraph();
         p.add("");

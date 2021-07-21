@@ -14,11 +14,11 @@ public abstract class DB implements iDB {
 	final static SimpleDateFormat _sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	protected String _DBTableName = null;
-	protected String _DBUser = "valerie";
-	protected String _DBPassword = "pwdValerie";
-	protected String _DBDataBase = "sfa_fichevalerie";
-	protected String _DBPort = "3307";
-	protected String _DBHost = "localhost";
+	protected String _DBUser = "";
+	protected String _DBPassword = "";
+	protected String _DBDataBase = "";
+	protected String _DBPort = "";
+	protected String _DBHost = "";
 
 	protected E4ALogger _logger = null;
 
@@ -40,23 +40,7 @@ public abstract class DB implements iDB {
 			this._DBUser = "valerie";
 			this._DBPassword = "pwdValerie";
 			this._DBDataBase = "sfa_fichevalerie";
-			this._DBPort = "3307";
-			this._DBHost = "localhost";
-			break;
-
-		case "free":
-			this._DBUser = "pierre.fages";
-			this._DBPassword = "frifri";
-			this._DBDataBase = "pierre_fages";
 			this._DBPort = "3306";
-			this._DBHost = "sql.free.fr";
-			break;
-
-		case "ovh":
-			this._DBUser = "poids";
-			this._DBPassword = "poids";
-			this._DBDataBase = "poids";
-			this._DBPort = "3307";
 			this._DBHost = "localhost";
 			break;
 
@@ -75,8 +59,9 @@ public abstract class DB implements iDB {
 			String Host = this._DBHost;
 	
 			Class.forName("com.mysql.jdbc.Driver");  
-			//String jdbcString = String.format("jdbc:mysql://%s:%s/%s", Host, Port, BaseName);
 			String jdbcString = String.format("jdbc:mysql://%s:%s/%s?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC", Host, Port, BaseName);
+			this._logger.debug("JDBC: " + jdbcString);
+			
 			con=DriverManager.getConnection(jdbcString, User, Password);  
 		}
 		finally {

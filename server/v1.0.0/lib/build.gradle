@@ -75,11 +75,16 @@ java {
 war {
     setWebAppDirName('build/archive')
     enabled = true
-    from 'src/main/java' // adds a file-set to the root of the archive
+    from( 'src/main/resources' ){
+    	include '*'
+    	into 'WEB-INF/classes'
+  	}
+  	from 'src/main/java' // adds a file-set to the root of the archive
     webXml(file('src/main/webapp/WEB-INF/web.xml'))
     archiveBaseName = 'ficheValerie'
     archiveAppendix = ''
-    archiveVersion  = '1.0.0'
+    archiveVersion  = '2021-07-01'
+    
 }
 
 

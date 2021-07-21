@@ -33,41 +33,23 @@ public class entrypoint {
 		this._logger = E4ALogger.getLogger(entrypoint.class.getName());
 	}
 
-    @POST
-    @Path("/mois") 
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response createHostedZone(@Context UriInfo uriInfo) {
-    	_logger.info("=====================================================================================================================================");
-    	_logger.info("=============>  POST /hostedzone -> createHostedZone");
-    	_logger.info("=====================================================================================================================================");
-    	iWS ws = cWsFactory.getImpl("mois");
-    	_logger.info(ws.whoami());
-		
-    	return ws.run();    	
-    }
-
-
 	// ----------------------------------------------------
-	// WS de test pour la probe
 	// Verifie juste que le tomee n'est pas HS
 	// ----------------------------------------------------
     @GET
     @Path("/test")
     @Produces(MediaType.TEXT_PLAIN)
     public Object test() {
-    	_logger.info("=====================================================================================================================================");
-    	_logger.info("=============> GET test ");
-    	_logger.info("=====================================================================================================================================");
-
-    	iWS ws = cWsFactory.getImpl("test");
-    	_logger.info(ws.whoami());
-
-    	
-		return ws.run();    	
+        return Response.ok().type(MediaType.APPLICATION_JSON).entity("OK").build();
     }
 
+    
 
+
+
+	// ----------------------------------------------------
+	// Gestion des pdf
+	// ----------------------------------------------------
     @GET
     @Path("/pdf/{idBulletin}")
     @Produces("application/pdf")
@@ -101,6 +83,11 @@ public class entrypoint {
     	return ws.run();
     }
 
+
+    
+	// ----------------------------------------------------
+	// Gestion des personnes
+	// ----------------------------------------------------
     @GET
     @Path("/personne")
     @Produces(MediaType.APPLICATION_JSON)
@@ -146,6 +133,11 @@ public class entrypoint {
     	return ws.run();
     }
 
+
+    
+	// ----------------------------------------------------
+	// Gestion des fiches de salaire
+	// ----------------------------------------------------
     @GET
     @Path("/bulletinSalaire/{idPersonne}/{mois}/{annee}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -182,6 +174,12 @@ public class entrypoint {
     	return ws.run();
     }
 
+
+    
+
+    // ----------------------------------------------------
+	// Gestion des activitees d'une fiche de salaire
+	// ----------------------------------------------------
     @DELETE
     @Path("/activitee/{idActivitee}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -227,100 +225,48 @@ public class entrypoint {
         return ws.run();
     }
 
+
+    
+    
+    // ----------------------------------------------------
+	// Divers
+	// ----------------------------------------------------
+
+    // -------
+    // set des traces
+    // -------
     @GET
-    @Path("/debug/${sLevel}")
+    @Path("/debug/{sLevel}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response setDebug(@PathParam("sLevel") String sLevel) {
         iWS ws = cWsFactory.getImpl("setDebug");
         _logger.info(ws.whoami());
         E4ALogger.setEnvLevel (sLevel);
+        _logger.fatal("Now log level is set to: " + _logger.getLogLevel());
         return Response.ok().type(MediaType.APPLICATION_JSON).entity("OK").build();
     }
 
+    // -------
+    // envoie de sql en dur / json en dur POUR recup des info extra et tres specifique
+    // -------
     @GET
-    @Path("/sql/infosExtras/${idBulletin}")
+    @Path("/sql/infosExtras/{idBulletin}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getExtraInfos(@Context HttpServletRequest request) {
-        iWS ws = cWsFactory.getImpl("setDebug");
-        _logger.info(ws.whoami());
-        E4ALogger.setEnvLevel (sLevel);
-        return Response.ok().type(MediaType.APPLICATION_JSON).entity("OK").build();
-    	
+    public Response getExtraInfos(@PathParam("idBulletin") int idBulletin) {
+    	WSForFaignasse wsff = new WSForFaignasse();
+    	return wsff.getExtraInfos(idBulletin);    	
     }
     	
+    
     @POST
     @Path("/sql")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response parseSQL(@Context HttpServletRequest request) {
-        iWS ws = cWsFactory.getImpl("parseSQL");
-        _logger.info(ws.whoami());
-
-        int buffer[] = new int[1024];
-        int i, j = 0;
-        try {
-            BufferedInputStream reader = new BufferedInputStream(request.getInputStream());
-            while (((i = reader.read()) != -1) && (j < 1024))
-                buffer[j++] = i;
-        } catch (Exception e) {
-            _logger.fatal (e.getMessage());
-            e.printStackTrace();
-        }
-
-        String input = new String (buffer, 0, j);
-        _logger.debug("String:");
-        _logger.debug(input);
-
-        JSONObject jsonObject = null;
-        try {
-            jsonObject =  new JSONObject(input);
-            _logger.debug("JSON: " + jsonObject.toString());
-        } catch (Exception e) {
-            _logger.fatal (e.getMessage());
-            e.printStackTrace();
-        }
-        if (jsonObject.has("retour")) {
-        	_logger.debug("SQL retour is :" + jsonObject.getString("retour"));
-            if (jsonObject.getString("retour").equals("iBulletinSalaire")) {
-            	_logger.debug("iBulletinSalaire");
-                DbBulletinSalaire x = new DbBulletinSalaire();
-                BulletinSalaire[] y = x.RunSelect(jsonObject.getString("sql"));
-                return Response.ok().type(MediaType.APPLICATION_JSON).entity(y).build();
-            }
-            if (jsonObject.getString("retour").equals("iListActivitee")) {
-            	_logger.debug("iListActivitee");
-                if (jsonObject.has("sql")) {
-                	_logger.debug("sql: " + jsonObject.getString("sql"));
-                    DbActivite x = new DbActivite();
-                    if (jsonObject.getString("sql").equals("getAllPossibleActivitees")) {
-                        String[] y = x.getAllPossibleActivitees();
-                        return Response.ok().type(MediaType.APPLICATION_JSON).entity(y).build();
-                    }
-                }
-                if (jsonObject.getJSONArray("infos") != null ) {
-                	_logger.debug("infos: array dispo");
-                	JSONArray infos = jsonObject.getJSONArray("infos");
-                	if (!infos.isEmpty() && (infos.length() == 2) && (infos.getString(0).equals("addPossibleActivitee"))) {
-                		 DbActivite x = new DbActivite();
-                		 String s = infos.getString(1);
-                         int y = x.insertAPossibleActivitees(s);
-
-                         _logger.debug("infos: addPossibleActivitee : " + s);
-                         
-                         return Response.ok().type(MediaType.APPLICATION_JSON).entity(new Integer(y)).build();
-                	}
-                	else {
-                    	_logger.debug("infos: length" + infos.length());
-                    	for (int pipoIndex = 0; pipoIndex < infos.length(); pipoIndex++) {
-                    		_logger.debug(String.format("infos: [%d] : %s",pipoIndex, infos.getString(pipoIndex)));
-						} 
-                	}
-                }
-            }
-        }
-        return Response.serverError().type(MediaType.APPLICATION_JSON).entity("KO").build();
+    	WSForFaignasse wsff = new WSForFaignasse();
+    	return wsff.parseSQL(request);
     }
 }
 

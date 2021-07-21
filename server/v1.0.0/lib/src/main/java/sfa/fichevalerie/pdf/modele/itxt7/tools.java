@@ -77,10 +77,17 @@ public class tools {
         return jour[i];
     }
 
+    // -----------------------------
+    // renvoie
+    //     [ "nom du jour", day of month]
+    //
+    // day of week: 1 -> 7 1=SUNDAY 
+    // day of month: 1 -> 31 
+    // -----------------------------
     public static String[] JourFromDate(Date debut) {
         String[] retour = {"", ""};
         int info[] = tools.JourSemaineFromDate(debut);
-        retour[0] = tools.JourFromInt(info[0] - 1);
+        retour[0] = tools.JourFromInt(info[0]);
         retour[1] = Integer.toString(info[1]);
         return retour;
     }
@@ -94,13 +101,20 @@ public class tools {
         return retour;
     }
 
+    // -----------------------------
+    // renvoie
+    //     [ day of week, day of month]
+    //
+    // day of week: 1 -> 7 1=SUNDAY 
+    // day of month: 1 -> 31 
+    // -----------------------------
     public static int[] JourSemaineFromDate(Date debut) {
-        Calendar c = GregorianCalendar.getInstance(TimeZone.getTimeZone("CET"));
+        Calendar c = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
         c.setTime(debut);
         _log.debug(String.format("JourSemaineFromDate: [%s] - c.dayofweek[%d] - - c.dayofmonth[%d] - c.HourOfDay [%d] - c.Minutes[%d]",
                 debut.toString(), c.get(Calendar.DAY_OF_WEEK), c.get(Calendar.DAY_OF_MONTH), c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE)));
         return new int[] {
-            c.get(Calendar.DAY_OF_WEEK),
+            c.get(Calendar.DAY_OF_WEEK) - 1,
             c.get(Calendar.DAY_OF_MONTH)
         };
     }

@@ -36,9 +36,9 @@ public enum ei18n {
     impot_salairenet(25, "Salaire net");
 
 
-    private final int _debug = 1;
-    private final int _code;
+    private static boolean _debug = false;
     private final String _val;
+    private final int _code;
 
     private ei18n(int code, String val) {
         _code = code;
@@ -47,13 +47,17 @@ public enum ei18n {
 
     public String nls() {
         String retour = "";
-        if (_debug != 0)
-            retour = "NLS:" + this._val;
+        if (ei18n._debug)
+            retour = String.format("NLS: %s - [%d]", this._val, this._code);
         else
             retour = this._val;
 
         retour = tools.encodeUTF8(retour);
         return retour;
+    }
+
+    public static void debug(boolean level) {
+    	ei18n._debug = level;
     }
 
 }

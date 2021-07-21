@@ -4,11 +4,8 @@ public enum eE4ALoggerLevel {
 	lowest (0, "ALL", 'L'),
 	debug (300, "DEBUG", 'D'),
 	info (400, "Info", 'I'),
-	severe (500, "PROD", 'P'),
-	allways (5000, "ALLWAYS", 'A');
+	fatal (500, "PROD", 'P');
 	
-	
-
 	
 	private int _level;
 	private String _nom;

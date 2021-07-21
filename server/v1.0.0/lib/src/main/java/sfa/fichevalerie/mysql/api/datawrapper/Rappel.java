@@ -74,7 +74,7 @@ public class Rappel extends ObjectWrapper implements iObjectWrapper {
     @Override
     public String[] allColone() {
         return new String[] {
-                "id","idBulletinSalaire", "idBulletinSalaireOrigine", "status", "date"
+                "id","idBulletinSalaire", "idBulletinSalaireOrigine", "dureeenheure", "tarifHoraire", "status", "date"
         };
     }
 
@@ -86,6 +86,7 @@ public class Rappel extends ObjectWrapper implements iObjectWrapper {
             case "idBulletinSalaireOrigine": this.setIdBulletinSalaireOrigine((Integer)val);break;
             case "status": this.setStatus((Integer)val);break;
             case "dureeenheure": this.setDureeenheure((Float)val);break;
+            case "tarifHoraire": this.setTarifHoraire((Float)val);break;
             case "date": this.setDate((Date)val);break;
             default: throw new E4AException("Rappel :Key["+key+"] Inconnue");
         }

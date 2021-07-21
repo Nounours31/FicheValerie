@@ -1,15 +1,13 @@
 package sfa.fichevalerie.mysql.db.access;
 
-import sfa.fichevalerie.mysql.api.datawrapper.BulletinSalaire;
-import sfa.fichevalerie.mysql.api.datawrapper.DepassementForfaitaire;
-import sfa.fichevalerie.mysql.api.datawrapper.Personne;
-import sfa.fichevalerie.mysql.api.datawrapper.iObjectWrapper;
-import sfa.fichevalerie.mysql.db.tools.cInfoFromSelect;
-import sfa.fichevalerie.tools.E4AException;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
+
+import sfa.fichevalerie.mysql.api.datawrapper.DepassementForfaitaire;
+import sfa.fichevalerie.mysql.api.datawrapper.Rappel;
+import sfa.fichevalerie.mysql.db.tools.cInfoFromSelect;
+import sfa.fichevalerie.tools.E4AException;
 
 public class DbDepassementForfaitaire extends DB implements iDB {
 	final String tableName = "depassementforfaitaire";
@@ -18,9 +16,51 @@ public class DbDepassementForfaitaire extends DB implements iDB {
 		super(DbDepassementForfaitaire.class.getName());
 	}
 
+	
+	public int insertOrUpdate(int idBulletin, float nbHeure) {
+		DepassementForfaitaire[] d = this.getAllDepassementForfaitaire(idBulletin);
+		if ((d == null) || (d.length == 0)) {
+			return insert (idBulletin, nbHeure);
+		}
+		else {
+			return update (idBulletin, nbHeure);
+		}
+			
+	}
 
-
+	private int update(int idBulletin, float nbHeure) {
+		_logger.debug("Start update - id:" + idBulletin + " nbheure: " + nbHeure);
+    	String sql = String.format ("update depassementforfaitaire set dureeenheure=%f where idBulletinSalaire=%d", nbHeure, idBulletin);
+    	
+        try {
+        	int rc = this.updateAsRest(sql);
+            return rc;
+        }
+        catch (Exception e) {
+        	_logger.fatal(e.getMessage());
+        	e.printStackTrace();
+        }
+        return -1;
+	}
+	
+	private int insert (int idBulletin, float nbHeure) {
+		_logger.debug("Start insert - id:" + idBulletin + " nbheure: " + nbHeure);
+    	String sql = String.format ("insert into  depassementforfaitaire (idBulletinSalaire ,  dureeenheure ,  date ,  tarifHoraire ) values (%d, %f, '%s', %f)", 
+    			idBulletin, nbHeure,  _sdf.format(new Date()), -1.0f);
+    	
+        try {
+        	int rc = this.insertAsRest(sql);
+            return rc;
+        }
+        catch (Exception e) {
+        	_logger.fatal(e.getMessage());
+        	e.printStackTrace();
+        }
+        return -1;
+	}
+	
 	public DepassementForfaitaire[] getAllDepassementForfaitaire (int idBulletin) {
+		_logger.debug("Start getAllDepassementForfaitaire - id:" + idBulletin);
 		String sql = String .format("select * from depassementforfaitaire where (idBulletinSalaire = %d)", idBulletin);
 
 		ArrayList<DepassementForfaitaire> lDepassementForfaitaire = new ArrayList<DepassementForfaitaire>();
@@ -63,7 +103,7 @@ public class DbDepassementForfaitaire extends DB implements iDB {
 
 			return rc;
 		}
-		return null;
+		return new DepassementForfaitaire[] {};
 	}
 
 

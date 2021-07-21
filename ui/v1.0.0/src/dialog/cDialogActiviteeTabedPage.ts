@@ -19,6 +19,20 @@ interface iUIDLIGNE {
     index: number,
     uid: number
 }
+interface iRappelExtra {
+    date?: string,
+    idBulletinOrigine?: number,
+    tarif: number,
+    duree: number,
+    id: number,
+    idBulletin: number,
+    status?: number
+}
+
+interface iExtraInfo {
+    rappel?: iRappelExtra[],
+    depassement?: iRappelExtra[]
+}
 
 export default class cDialogActiviteeTabedPage extends cDialogAbstract {
     private _myTab : UIkit.UIkitTabElement | null = null;
@@ -106,8 +120,7 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
                         </table>
                         <div class="uk-button-group" style="padding-left: 10px;">
                             <td><button class="uk-button uk-button-small" style="background-color: greenyellow;" id="${cDialogActiviteeTabedPage._idButtonOK}" >Valide</button></td>
-                            <td><button class="uk-button uk-button-small" style="background-color: yellow;" id="${cDialogActiviteeTabedPage._idButtonPDF}">TestPDF</button></td>
-                            <td><button class="uk-button uk-button-small" style="background-color: red;" id="${cDialogActiviteeTabedPage._idButtonKO}">Annule</button></td>
+                            <td><button class="uk-button uk-button-small" style="background-color: yellow;" id="${cDialogActiviteeTabedPage._idButtonPDF}">Genere bulletin salaire</button></td>
                         </div>
                     </fieldset>
                 </form>
@@ -262,6 +275,32 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
         $(`#${cDialogActiviteeTabedPage._idTableBody}`).empty();
 
         if (this._idBulletinSalaire > 0) {
+            // --------------------------------------------------------------------
+            // est ce qu'il y a des extra ?
+            // --------------------------------------------------------------------
+            let allExtra: iExtraInfo = this._ws.getExtra(this._idBulletinSalaire) as iExtraInfo;
+            if ((allExtra.depassement != null) && (allExtra.depassement.length > 0)) {
+                let InputWithInfo: JQuery<HTMLInputElement> = $(`#${cDialogActiviteeTabedPage._idDepassementForfaitaire}`);
+                InputWithInfo.empty();
+                InputWithInfo.val(cOutilsDivers.heureFloat2HeureString(allExtra.depassement[0].duree));
+
+                let spanWithInfo: JQuery<HTMLSpanElement> = $(`#${cDialogActiviteeTabedPage._idDepassementForfaitaire}_span`);
+                spanWithInfo.empty();
+                spanWithInfo.append(`(lu depuis la FromDB)`);
+            }
+            if ((allExtra.rappel != null) && (allExtra.depassement.length > 0)) {
+                let InputWithInfo: JQuery<HTMLInputElement> = $(`#${cDialogActiviteeTabedPage._idReportPrecedent}`);
+                InputWithInfo.empty();
+                InputWithInfo.val(cOutilsDivers.heureFloat2HeureString(allExtra.rappel[0].duree));
+
+                let spanWithInfo: JQuery<HTMLSpanElement> = $(`#${cDialogActiviteeTabedPage._idReportPrecedent}_span`);
+                spanWithInfo.empty();
+                spanWithInfo.append(`(lu depuis la FromDB)`);
+            }
+            console.log(allExtra);
+
+
+
             let allActiviteeDejaEnDB : iActivite[] = this._ws.getAllActivitee(this._idBulletinSalaire);
             // -----------------------------------
             // ligne journaliere

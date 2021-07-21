@@ -20,9 +20,6 @@ public class cWsFactory {
 			case "getPdfFile" :
 			case "getPdfInfoFromBulletin" : rc =  new WsPdfFile(); rc.setType(eWsTypeGetPost.get); break;
 
-
-			case "test" : rc =  new WsTest(); rc.setType(eWsTypeGetPost.get); break;
-
 			default : rc = new WsXxXNoImpl(wsNom);
 		}
 		return rc;

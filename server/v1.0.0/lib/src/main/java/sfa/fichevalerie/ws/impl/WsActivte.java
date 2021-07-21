@@ -14,7 +14,7 @@ public class WsActivte extends WS implements iWS {
 	public Response post() {
 		DbActivite bs = new DbActivite();
 		Activite p = (Activite)this.getArgs ("activite");
-		_logger.debug("BulletinSalaire to create: " + p.toString());
+		_logger.info("BulletinSalaire to create: " + p.toString());
 
 		int id = bs.insertActivite(p);
 

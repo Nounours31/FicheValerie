@@ -50,7 +50,7 @@ public class sample1 {
         // sample1.createPdf(DEST);
 
         ApiPdf x = new ApiPdf();
-        x.createPdf(DEST);
+        // x.createPdf(DEST);
     }
     
 /*

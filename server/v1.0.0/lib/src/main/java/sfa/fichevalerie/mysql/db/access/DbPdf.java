@@ -11,9 +11,8 @@ import sfa.fichevalerie.pdf.modele.itxt7.ApiPdf;
 import sfa.fichevalerie.tools.E4AException;
 
 public class DbPdf extends DB  implements iDB {
-	final static String dbRepositoryStore = "E:\\WS\\GitHubPerso\\FicheValerie\\store";
 	final String tableName = "pdf";
-
+	static String dbRepositoryStore = null;
 	public DbPdf()  {
 		super(DbPdf.class.getName());
 	}
@@ -28,20 +27,51 @@ public class DbPdf extends DB  implements iDB {
 		return rc;
 	}
 
-
+	private static synchronized String getStorePath () {
+		if (DbPdf.dbRepositoryStore == null) {
+			String sql = "select * from env";
+			try {
+				DB x = new DbPdf();
+				cInfoFromSelect iInfos = x.selectAsRest(sql);
+				DbPdf.dbRepositoryStore = (String)iInfos.get(0).get("storePath");
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			DbPdf.dbRepositoryStore = "/tmp";
+		}
+		return DbPdf.dbRepositoryStore;
+	}
+	
+	private int getlastPdfVersion (int idBulletinSalaire) {
+		String sql = String.format("select version from pdf where (idBulletinSalaire=%d) order by version desc", idBulletinSalaire);
+		try {
+			cInfoFromSelect iInfos = this.selectAsRest(sql);
+			if ((iInfos != null) && (iInfos.size() > 0)) {
+				return ((Integer)iInfos.get(0).get("version")).intValue();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+	
 	public Pdf createPdf(Pdf p) {
+		_logger.debug("START - In Create PDF");
 		Pdf retour = null;
 		int idBulletinSalaire = p.getIdBulletinSalaire();
 		
 		DbBulletinSalaire dbBs = new DbBulletinSalaire();
 		BulletinSalaire bs = dbBs.getAllBulletinSalaire(idBulletinSalaire);
 
+		
 		String UID = java.util.UUID.randomUUID().toString();
 		
 		String FileName = UID + ".pdf";
-		String SubPath = UID.substring(0, 2) + File.separator + FileName;
-		String Path = DbPdf.dbRepositoryStore + File.separator + SubPath;
+		String SubPath = String.format("%d%s%s%s%s", idBulletinSalaire, File.separator, UID.substring(0, 2), File.separator, FileName);
+		String Path = DbPdf.getStorePath() + File.separator + SubPath;
 		File newPdf = new File (Path);
+		_logger.debug("PDF fullpath: " + newPdf.getAbsolutePath());
 
 		File dirFile = newPdf.getParentFile();
 		if (!dirFile.exists()) 
@@ -53,7 +83,7 @@ public class DbPdf extends DB  implements iDB {
 			if (newPdf.exists() && newPdf.length() > 0) {
 				SubPath = this.escapeStringForMySQL(SubPath);
 				String sql = String.format("insert into pdf (idBulletinSalaire, file, version, date) values (%d, '%s', %d, '%s')",
-						idBulletinSalaire, SubPath, 0, _sdf.format(new Date()));
+						idBulletinSalaire, SubPath, this.getlastPdfVersion(idBulletinSalaire) + 1, _sdf.format(new Date()));
 				int id = this.insertAsRest(sql);
 				
 				retour = this.getPdf(id);
@@ -125,6 +155,6 @@ public class DbPdf extends DB  implements iDB {
 	}
 
 	public static File getFileFromPdf(Pdf p) {
-		return new File (DbPdf.dbRepositoryStore + File.separator + p.getFile());
+		return new File (DbPdf.getStorePath() + File.separator + p.getFile());
 	}
 }

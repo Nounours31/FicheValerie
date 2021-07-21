@@ -21,6 +21,8 @@ public class DbActivite extends DB implements iDB {
 
 
 	public int insertActivite (Activite a) {
+		_logger.info("insertActivite - date debut: " + _sdf.format(a.getDebut()));
+		
 		double x = Math.random();
 		float tauxHoraire = a.getTarifHoraire();
 		String sql = String.format("INSERT INTO activite (idBulletinSalaire, activitee, debut, fin, date, tarifHoraire) VALUES ('%d', '%s', '%s', '%s', '%s', %f)", 

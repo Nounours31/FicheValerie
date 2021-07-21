@@ -210,21 +210,18 @@ export default class cWS {
         return;
     }
 
-    public getHeureReport(_idBulletinSalaire: number): number {
-        let retour: number = 0;
-        let URL = cEnv._serverURL + `/sql/infosExtras/${_idBulletinSalaire}`;
-        let oResp: boolean = this.t.sendGetWS(URL);
-        if (this.t.status) {
-            retour = ((this.t.data as unknown) as number);
-        }
-        return retour;
+    public getHeureReport(_idBulletinSalaire: number): object {
+        return this.getExtra(_idBulletinSalaire);
     }
-    public getDepassementForfaitaire(_idBulletinSalaire: number) : number {
-        let retour: number = 0;
+    public getDepassementForfaitaire(_idBulletinSalaire: number) : object {
+        return this.getExtra(_idBulletinSalaire);
+    }
+    public getExtra(_idBulletinSalaire: number) : object {
+        let retour: object = {};
         let URL = cEnv._serverURL + `/sql/infosExtras/${_idBulletinSalaire}`;
         let oResp: boolean = this.t.sendGetWS(URL);
         if (this.t.status) {
-            retour = ((this.t.data as unknown) as number);
+            retour = ((this.t.data as unknown) as object);
         }
         return retour;
     }
