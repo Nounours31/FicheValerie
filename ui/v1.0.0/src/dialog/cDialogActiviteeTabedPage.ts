@@ -61,6 +61,7 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
 
     private static _idDepassementForfaitaire: string = cDialogActiviteeTabedPage._NomPrefixe + '_idDepassementForfaitaire';
     private static _idReportPrecedent: string = cDialogActiviteeTabedPage._NomPrefixe + '_idReportPrecedent';
+    private static _idDivRecurenceActivite: string = cDialogActiviteeTabedPage._NomPrefixe + '_idDivRecurenceActivite';
 
 
         // creation en DB du bulletin de salaire
@@ -76,53 +77,192 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
         this._idBulletinSalaire = -1;
     }
 
+
+    private DrawPersonne(): string {
+        let retour: string = `
+                    <fieldset style="padding-left: 10px;">
+                        <legend>Personne</legend>
+
+                        <label>Personne:<span id="${cDialogActiviteeTabedPage._idLabelOfInputPersonne}"></span></label><br/>
+                        <label>Periode:<span id="${cDialogActiviteeTabedPage._idLabelOfInputPeriode}"></span></label><br/>
+                        <label>Tarif:<span id="${cDialogActiviteeTabedPage._idLabelOfInputTarif}"></span></label><br/>
+                    </fieldset>`;
+        return retour;
+    }
+
+    private DrawExtras(): string {
+        let retour: string = `
+            <fieldset style="padding-left: 10px;">
+                <legend>Saisie des extras</legend>
+                <label>Depassement forfaitaire (en heure)</label>
+                <input type="text" id="${cDialogActiviteeTabedPage._idDepassementForfaitaire}"
+                        pattern="[0-9]{2}:[0-9]{2}"
+                        placeholder="hh:mm"
+                        maxlength="5" size="5"
+                        style="
+                            flex: 0 1 auto;
+                            align-self: auto;
+                            width: 7ch;
+                            "/>
+                <span id="${cDialogActiviteeTabedPage._idDepassementForfaitaire}_span">(*)</span>
+                <br/>
+                <label>Rappel mois precedent (en heure)</label>
+                <input type="text" id="${cDialogActiviteeTabedPage._idReportPrecedent}"
+                        pattern="[0-9]{2}:[0-9]{2}"
+                        placeholder="hh:mm"
+                        maxlength="5" size="5"
+                        style="
+                            flex: 0 1 auto;
+                            align-self: auto;
+                            width: 7ch;
+                            "/>
+                <span id="${cDialogActiviteeTabedPage._idReportPrecedent}_span">(*)</span>
+            </fieldset>
+        `;
+        return retour;
+    }
+
+    private DrawRecurence(): string {
+        let retour : string = `
+            <fieldset style="padding-left: 10px;">
+                <legend>Activitées recurentes</legend>
+                <div id="${cDialogActiviteeTabedPage._idDivRecurenceActivite}"
+                    style="
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: left;
+                        align-items: center;
+                        ">
+                    <select class="${cDialogActiviteeTabedPage._idSelectActivitee}"
+                        style="
+                            flex: 0 1 auto;
+                            align-self: auto;
+                        ">
+                    </select>
+                        `;
+        if (this._inputAsTime) {
+            retour += `
+                    <input type="time" id="${cDialogActiviteeTabedPage._idHoraireDebut}_Recurence"
+                        class="${cDialogActiviteeTabedPage._idHoraireDebut}" 
+                        name="${cDialogActiviteeTabedPage._idHoraireDebut}_Recurence"
+                        style="
+                            flex: 0 1 auto;
+                            align-self: auto;
+                        ">
+                    <input type="time" id="${cDialogActiviteeTabedPage._idHoraireFin}_Recurence" 
+                        class="${cDialogActiviteeTabedPage._idHoraireFin}" 
+                        name="${cDialogActiviteeTabedPage._idHoraireFin}_Recurence"
+                        style="
+                            flex: 0 1 auto;
+                            align-self: auto;
+                        ">`;}
+        else {
+            retour += `           
+                    <input type="text" id="${cDialogActiviteeTabedPage._idHoraireDebut}_Recurence"
+                            class="${cDialogActiviteeTabedPage._idHoraireDebut}" 
+                            name="${cDialogActiviteeTabedPage._idHoraireDebut}_Recurence"
+                            pattern="[0-9]{2}:[0-9]{2}"
+                            placeholder="hh:mm"
+                            maxlength="5" size="5"
+                            style="
+                                flex: 0 1 auto;
+                                align-self: auto;
+                                width: 7ch;
+                            "/>
+                    <input type="text" id="${cDialogActiviteeTabedPage._idHoraireFin}_Recurence" 
+                            class="${cDialogActiviteeTabedPage._idHoraireFin}"
+                            name="${cDialogActiviteeTabedPage._idHoraireFin}_Recurence"
+                            pattern="[0-9]{2}:[0-9]{2}"
+                            placeholder="hh:mm"
+                            maxlength="5" size="5"
+                            style="
+                                flex: 0 1 auto;
+                                align-self: auto;
+                                width: 7ch;
+                            "/>`;}
+
+        retour += ` <div style="
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: left;
+                            align-items: flex-start;
+                            border: solid 1px pink;
+                            ">`;
+
+        let joursCheckBox: string[] = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
+        joursCheckBox.forEach(uneCheckBox => {
+            retour += `  
+                            <div style="
+                                display: flex;
+                                flex-direction: row;
+                                justify-content: left;
+                                align-items: center;
+                                ">
+                                <input type="checkbox"
+                                        class="${cDialogActiviteeTabedPage._idDivRecurenceActivite}_Recurence_Check"
+                                        value="L"
+                                        id="${cDialogActiviteeTabedPage._idDivRecurenceActivite}_Recurence_Check_id_${uneCheckBox}"
+                                        style="
+                                            flex: 0 1 auto;
+                                            align-self: auto;
+                                        "
+                                        checked/>
+                                <label for="${cDialogActiviteeTabedPage._idDivRecurenceActivite}_Recurence_Check_idL"
+                                            style="
+                                            flex: 0 1 auto;
+                                            align-self: auto;
+                                ">${uneCheckBox}</label>
+                            </div>`;
+        });
+        retour += ` </div>
+                    <button class="uk-button uk-button-small" style="background-color: greenyellow;"
+                        id="${cDialogActiviteeTabedPage._idButtonOK}_Recurence" 
+                        style="
+                            flex: 0 1 auto;
+                            align-self: auto;
+                        ">Valide</button>
+                </div>
+            </fieldset>`;
+        return retour;
+
+    }
+
+
     public Draw(): string {
 
         let pageHTML : string = `
             <div id="cDialogActiviteeTabedPage">
                 <form style="padding-left: 10px;">
-                    <fieldset style="padding-left: 10px;">
-                        <legend>Saisie des infos generales</legend>
-
-                        <label>Personne:<span id="${cDialogActiviteeTabedPage._idLabelOfInputPersonne}"></span></label><br/>
-                        <label>Periode:<span id="${cDialogActiviteeTabedPage._idLabelOfInputPeriode}"></span></label><br/>
-                        <label>Tarif:<span id="${cDialogActiviteeTabedPage._idLabelOfInputTarif}"></span></label><br/>
-
-                        <fieldset style="padding-left: 10px;">
-                            <legend>Saisie des extras</legend>
-                            <label>Depassement forfaitaire (en heure)</label>
-                            <input type="text" id="${cDialogActiviteeTabedPage._idDepassementForfaitaire}"
-                                    pattern="[0-9]{2}:[0-9]{2}"
-                                    placeholder="hh:mm"/>
-                            <span id="${cDialogActiviteeTabedPage._idDepassementForfaitaire}_span">(*)</span>
-                            <br/>
-                            <label>Rappel mois precedent (en heure)</label>
-                            <input type="text" id="${cDialogActiviteeTabedPage._idReportPrecedent}"
-                                    pattern="[0-9]{2}:[0-9]{2}"
-                                    placeholder="hh:mm"/>
-                            <span id="${cDialogActiviteeTabedPage._idReportPrecedent}_span">(*)</span>
-                        </fieldset>
-
-                        <table class="uk-table uk-table-striped" id="${cDialogActiviteeTabedPage._idTable}">
-                            <thead>
-                                <tr>
-                                    <th>Jour</th>
-                                    <th>Activite</th>
-                                    <th>Debut</th>
-                                    <th>Fin</th>
-                                    <th>Duree</th>
-                                    <th>Cumulee</th>
-                                    <th>-</th>
-                                </tr>
-                            </thead>
-                            <tbody id="${cDialogActiviteeTabedPage._idTableBody}">
-                            </tbody>
-                        </table>
-                        <div class="uk-button-group" style="padding-left: 10px;">
-                            <td><button class="uk-button uk-button-small" style="background-color: greenyellow;" id="${cDialogActiviteeTabedPage._idButtonOK}" >Valide</button></td>
-                            <td><button class="uk-button uk-button-small" style="background-color: yellow;" id="${cDialogActiviteeTabedPage._idButtonPDF}">Genere bulletin salaire</button></td>
-                        </div>
-                    </fieldset>
+                    <ul uk-accordion="multiple: true">
+                        <li>
+                            <table>
+                                <tr><td><div>${this.DrawPersonne()}</div>  </td>
+                                    <td><div>${this.DrawExtras()}</div>    </td>
+                                    <td><div>${this.DrawRecurence()}</div> </td></tr>
+                            </table>
+                        </li>
+                        <li>
+                            <table class="uk-table uk-table-striped" id="${cDialogActiviteeTabedPage._idTable}">
+                                <thead>
+                                    <tr>
+                                        <th>Jour</th>
+                                        <th>Activite</th>
+                                        <th>Debut</th>
+                                        <th>Fin</th>
+                                        <th>Duree</th>
+                                        <th>Cumulee</th>
+                                        <th>-</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="${cDialogActiviteeTabedPage._idTableBody}">
+                                </tbody>
+                            </table>
+                            <div class="uk-button-group" style="padding-left: 10px;">
+                                <td><button class="uk-button uk-button-small" style="background-color: greenyellow;" id="${cDialogActiviteeTabedPage._idButtonOK}" >Valide</button></td>
+                                <td><button class="uk-button uk-button-small" style="background-color: yellow;" id="${cDialogActiviteeTabedPage._idButtonPDF}">Genere bulletin salaire</button></td>
+                            </div>
+                        </li>
+                    </ul>
                 </form>
             </div>
         `;
@@ -150,10 +290,12 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
             cDialogTools.createAndDownloadPdf (me._idBulletinSalaire);
         });
 
-        $(`#${cDialogActiviteeTabedPage._idButtonKO}`).on("click", function (event: JQuery.ClickEvent) {
+
+        $(`#${cDialogActiviteeTabedPage._idButtonOK}_Recurence`).on("click", function (event: JQuery.ClickEvent) {
             event.stopImmediatePropagation();
             event.preventDefault();
-            // rien pour le moment
+
+            me.AjoutActiviteRecurente();
         });
         return;
     }
@@ -210,12 +352,19 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
                             heure = Number.parseInt(aFinHoraire[0] as string);
                             minute = Number.parseInt(aFinHoraire[1] as string);
                             let fin: Date = new Date(annee, mois, jour, heure, minute);
-                            me._ws.addActivite(me._idBulletinSalaire,
-                                jour, 
-                                $(this).find(`.${cDialogActiviteeTabedPage._idSelectActivitee} option:selected`).text(),
-                                debut,
-                                fin,
-                                -1.0);
+
+                            let activiteeChoisie: string = $(this).find(`.${cDialogActiviteeTabedPage._idSelectActivitee} option:selected`).text();
+                            if (activiteeChoisie == "-") {
+                                UIkit.modal.alert("Une activitee doit avoir une activitee ici: ");
+                            }
+                            else {
+                                me._ws.addActivite(me._idBulletinSalaire,
+                                    jour,
+                                    activiteeChoisie,
+                                    debut,
+                                    fin,
+                                    -1.0);
+                            }
                         }
                         else {
                             console.log("Deja en DB : Info=" + ligneId);
@@ -324,7 +473,13 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
                     let curentACtiviteToPrint: iActivite = allActiviteeDuJourEnDB[i];
 
                     let duree: cDuration = new cDuration();
-                    duree.setActivitees(curentACtiviteToPrint.debut, curentACtiviteToPrint.fin);
+                    
+                    let dateDebutActivite: Date = new Date();
+                    dateDebutActivite.setTime(curentACtiviteToPrint.gmtepoch_debut);
+                    let dateFinActivite: Date = new Date();
+                    dateFinActivite.setTime(curentACtiviteToPrint.gmtepoch_fin);
+
+                    duree.setActivitees(dateDebutActivite, dateFinActivite);
 
                     uidLigne = this.createLigneUID(annee, mois, jourDuMois, indice++);
                     uneligne += `<tr id="tr${uidLigne}">`;
@@ -339,13 +494,13 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
                                         <textarea rows="1" cols="30"
                                             id="${cDialogActiviteeTabedPage._idHoraireDebut + uidLigne}" 
                                             class="${cDialogActiviteeTabedPage._idHoraireDebut}"
-                                            readonly>${curentACtiviteToPrint.debut}</textarea>
+                                            readonly>${dateDebutActivite}</textarea>
                                     </td>
                                     <td> 
                                         <textarea rows="1" cols="30"
                                             id="${cDialogActiviteeTabedPage._idHoraireFin + uidLigne}" 
                                             class="${cDialogActiviteeTabedPage._idHoraireFin}"
-                                            readonly>${curentACtiviteToPrint.fin}</textarea>
+                                            readonly>${dateFinActivite}</textarea>
                                     </td>
                                     <td id="${cDialogActiviteeTabedPage._idHoraireDurrePresta + uidLigne}" class="${cDialogActiviteeTabedPage._idHoraireDurrePresta}">${cOutilsDivers.heureFloat2HeureString(duree.asHour())}</td>
                                     <td id="${cDialogActiviteeTabedPage._idCummulHoraireDurrePresta + uidLigne}">xx</td>
@@ -378,10 +533,12 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
                         <td><input type="text" id="${cDialogActiviteeTabedPage._idHoraireDebut + uidLigne}" 
                                     class="${cDialogActiviteeTabedPage._idHoraireDebut}" name="${cDialogActiviteeTabedPage._idHoraireDebut + uidLigne}"
                                     pattern="[0-9]{2}:[0-9]{2}"
+                                    maxlength="5" size="5"
                                     placeholder="hh:mm"></td>
                         <td><input type="text" id="${cDialogActiviteeTabedPage._idHoraireFin + uidLigne}" class="${cDialogActiviteeTabedPage._idHoraireFin}" 
                                     name="${cDialogActiviteeTabedPage._idHoraireFin + uidLigne}"
                                     pattern="[0-9]{2}:[0-9]{2}"
+                                    maxlength="5" size="5"
                                     placeholder="hh:mm"></td>
                     `;
                 }
@@ -464,7 +621,10 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
     private filtreActiviteDuJour(dateCourante: Date, allActiviteeDejaEnDB: iActivite[]): iActivite[] {
         let retour : iActivite[] = [];
         allActiviteeDejaEnDB.forEach(element => {
-            if (element.debut.getDate() == dateCourante.getDate())
+            let dateDebutActivite: Date = new Date();
+            dateDebutActivite.setTime(element.gmtepoch_debut);
+
+            if (dateDebutActivite.getDate() == dateCourante.getDate())
                 retour.push (element);
         });
         return retour;
@@ -584,5 +744,32 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
     // ---------------------------------------------------------
     private encodeLigneUID(root: string, uid: string): string {
         return root + cDialogActiviteeTabedPage._SplitTagSeparator + uid;
+    }
+
+
+
+
+    private AjoutActiviteRecurente(): void {
+        //----------------------
+        // Recup de l'activitee
+        //----------------------
+
+        //----------------------
+        // Horaire de debut et fin
+        //----------------------
+
+        //----------------------
+        // la recurence
+        //----------------------
+
+        // clean des champs
+        
+        // -------------------------
+        // ajout en dDB
+        // -------------------------
+
+        // -------------------------
+        // Refesh de la page
+        // -------------------------
     }
 }

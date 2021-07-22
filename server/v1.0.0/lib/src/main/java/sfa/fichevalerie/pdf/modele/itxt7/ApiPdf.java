@@ -317,8 +317,10 @@ public class ApiPdf {
             courranteInfoActivite = InfoActiviteeHandler.getHandler (rc, uneActivite, bs);
 
             String info = "";
-            Date debut = uneActivite.getDebut();
-            Date fin = uneActivite.getFin();
+            Date debut = new Date();
+            debut.setTime(uneActivite.getGmtepoch_debut());
+            Date fin = new Date();
+            fin.setTime(uneActivite.getGmtepoch_fin());
 
             String infoJour[] = tools.JourFromDate(debut);
             int[] jourSemaine = tools.JourSemaineFromDate(debut);

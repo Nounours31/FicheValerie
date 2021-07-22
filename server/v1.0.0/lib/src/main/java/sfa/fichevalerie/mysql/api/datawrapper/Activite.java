@@ -7,16 +7,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Hashtable;
 
-/*
-export interface iActivite {
-    id: number;
-    idBulletinSalaire: number;
-    tarifHoraire: number;
-    activite: string;
-    debut: Date;
-    fin: Date;
-}
- */
 public class Activite extends ObjectWrapper implements iObjectWrapper {
 
 	public Activite() {
@@ -27,8 +17,8 @@ public class Activite extends ObjectWrapper implements iObjectWrapper {
     int idBulletinSalaire;
     float tarifHoraire;
     String activite;
-    Date debut;
-    Date fin;
+    long gmtepoch_debut;
+    long gmtepoch_fin;
      
     
 
@@ -80,34 +70,39 @@ public class Activite extends ObjectWrapper implements iObjectWrapper {
 
 
 
-	public Date getDebut() {
-		return debut;
+	public long getGmtepoch_debut() {
+		return gmtepoch_debut;
 	}
 
 
 
-	public void setDebut(Date debut) {
-		this.debut = debut;
+	public void setGmtepoch_debut(long debut) {
+		this.gmtepoch_debut = debut;
 	}
 
 
 
-	public Date getFin() {
-		return fin;
+	public long getGmtepoch_fin() {
+		return gmtepoch_fin;
 	}
 
 
 
-	public void setFin(Date fin) {
-		this.fin = fin;
+	public void setGmtepoch_fin(long fin) {
+		this.gmtepoch_fin = fin;
 	}
 
 
 
 	@Override
     public String toString(){
+		Date debut = new Date();
+		debut.setTime(this.getGmtepoch_debut());
+		
+		Date fin = new Date();
+		fin.setTime(this.getGmtepoch_fin());
         return String.format("[Activite: (id=%d)(Activite=%s)(debut=%s)(fin=%s)(idBulletin=%d)(tarif=%f)]", 
-        		getId(), getActivite(), _sdf.format(getDebut()), _sdf.format(getFin()), getIdBulletinSalaire(), getTarifHoraire());
+        		getId(), getActivite(), _sdf.format(debut), _sdf.format(fin), getIdBulletinSalaire(), getTarifHoraire());
     }
 
 
@@ -115,7 +110,7 @@ public class Activite extends ObjectWrapper implements iObjectWrapper {
 	@Override
 	public String[] allColone() {
 		return new String[] {
-				"id","idBulletinSalaire", "tarifHoraire", "activitee", "debut", "fin"
+				"id","idBulletinSalaire", "tarifHoraire", "activitee", "gmtepoch_debut", "gmtepoch_fin"
 		};
 	}
 
@@ -126,8 +121,8 @@ public class Activite extends ObjectWrapper implements iObjectWrapper {
 			case "idBulletinSalaire": this.setIdBulletinSalaire((Integer)val);break;
 			case "tarifHoraire": this.setTarifHoraire((Float)val);break;
 			case "activitee": this.setActivite((String)val);break;
-			case "debut": this.setDebut((Date)val);break;
-			case "fin": this.setFin((Date)val);break;
+			case "gmtepoch_debut": this.setGmtepoch_debut((Long)val);break;
+			case "gmtepoch_fin": this.setGmtepoch_fin((Long)val);break;
 			default: throw new E4AException("Activite :Key["+key+"] Inconnue");
 		}
 	}

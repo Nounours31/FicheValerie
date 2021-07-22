@@ -157,6 +157,7 @@ export default class cDialogAjoutDBTabedPage extends cDialogAbstract {
             event.stopImmediatePropagation();
 
             let activitee: string = $(`#${me._idInputActivitee}`).val() as string;
+
             let bOK: boolean = true;
             let msgKO : string = "Erreur dans la saisie: "
             if  (activitee == '') {
@@ -178,7 +179,6 @@ export default class cDialogAjoutDBTabedPage extends cDialogAbstract {
                 }
             }
             
-
             ws.addAPossibleActivitee(activitee);
             allActivitees = ws.getAllPossibleActivitees();
             if ((allActivitees == null) || (!me.isActiviteExisteDansLaListe(activitee, allActivitees))) {

@@ -22,6 +22,7 @@ import sfa.fichevalerie.mysql.api.datawrapper.Personne;
 import sfa.fichevalerie.mysql.db.access.DbActivite;
 import sfa.fichevalerie.mysql.db.access.DbBulletinSalaire;
 import sfa.fichevalerie.tools.E4ALogger;
+import sfa.fichevalerie.ws.impl.WSForFaignasse;
 import sfa.fichevalerie.ws.impl.cWsFactory;
 import sfa.fichevalerie.ws.impl.iWS;
 

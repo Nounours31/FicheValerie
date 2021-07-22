@@ -34,11 +34,15 @@ public class DbPdf extends DB  implements iDB {
 				DB x = new DbPdf();
 				cInfoFromSelect iInfos = x.selectAsRest(sql);
 				DbPdf.dbRepositoryStore = (String)iInfos.get(0).get("storePath");
+				File test = new File (DbPdf.dbRepositoryStore);
+				if (!test.isDirectory())
+					DbPdf.dbRepositoryStore = null;
 				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			DbPdf.dbRepositoryStore = "/tmp";
+			if (DbPdf.dbRepositoryStore == null)
+				DbPdf.dbRepositoryStore = "/tmp";
 		}
 		return DbPdf.dbRepositoryStore;
 	}

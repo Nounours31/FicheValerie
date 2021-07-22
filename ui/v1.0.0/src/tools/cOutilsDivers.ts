@@ -87,8 +87,8 @@ export default class cOutilsDivers {
         let retour: string = "";
         retour += "[id:" + x.id + "]";
         retour += "[activitee:" + x.activite + "]";
-        retour += "[debut:" + x.debut + "]";
-        retour += "[fin:" + x.fin + "]";
+        retour += "[debut:" + x.gmtepoch_debut + "]";
+        retour += "[fin:" + x.gmtepoch_fin + "]";
         retour += "[bulletin:" + x.idBulletinSalaire + "]";
         return retour;
     }

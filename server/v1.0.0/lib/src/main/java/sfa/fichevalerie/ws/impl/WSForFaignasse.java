@@ -1,6 +1,7 @@
-package sfa.fichevalerie.ws.entry;
+package sfa.fichevalerie.ws.impl;
 
 import java.io.BufferedInputStream;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,20 +30,32 @@ public class WSForFaignasse {
 	}
 
 	public Response parseSQL(HttpServletRequest request) {
-        int buffer[] = new int[1024];
-        int i, j = 0;
+		int iBuffersize = 16;
+		int iFenetresize = iBuffersize;
+		
+        byte buffer[] = new byte[iBuffersize];
+        int nbLu = 0;
+        
         try {
             BufferedInputStream reader = new BufferedInputStream(request.getInputStream());
-            while (((i = reader.read()) != -1) && (j < 1024))
-                buffer[j++] = i;
+            int start = 0; 
+            while ((nbLu = reader.read(buffer, start, iFenetresize)) == iFenetresize) {
+            	iBuffersize += iFenetresize;
+            	byte newBuffer[] = new byte [iBuffersize];
+            	for (int pipoIndice = 0; pipoIndice < (start + nbLu); pipoIndice++) {
+            		newBuffer[pipoIndice] = buffer[pipoIndice];
+            	}
+            	buffer = newBuffer;
+            	start += iFenetresize;
+            }
         } catch (Exception e) {
             _logger.fatal (e.getMessage());
             e.printStackTrace();
         }
+        
 
-        String input = new String (buffer, 0, j);
-        _logger.debug("String:");
-        _logger.debug(input);
+        String input = new String (buffer, Charset.forName("UTF8"));
+        _logger.debug("String:" + input);
 
         JSONObject jsonObject = null;
         try {

@@ -98,16 +98,17 @@ export default class cWS {
 
 
 
-    private updateDateActiviteAfterWS(retour: iActivite[]) {
-        for (let i : number = 0; i < retour.length; i++) {
+    private updateDateActiviteAfterWS(retour: iActivite[]) : void {
+    /*    for (let i : number = 0; i < retour.length; i++) {
             let sDebut: string = retour[i].debut as unknown as string;
-            sDebut = sDebut.replace("[UTC]", "");
-            retour[i].debut = new Date(sDebut);
+            let lDebut: number = Number.parseInt (sDebut);
+            retour[i].debut = new Date(lDebut);
 
             let sFin: string = retour[i].fin as unknown as string;
-            sFin = sFin.replace("[UTC]", "");
-            retour[i].fin = new Date(sFin);
+            let lFin: number = Number.parseInt (sFin);
+            retour[i].fin = new Date(lFin);
         }
+    */
     }
 
     public addActivite(ficheId: number, jour: number, activite: string, debut: Date, fin: Date, tarifHoraire: number) : number {
@@ -117,8 +118,8 @@ export default class cWS {
             'id': -1,
             'idBulletinSalaire': ficheId,
             'activite': activite,
-            'debut': debut,
-            'fin': fin,
+            'gmtepoch_debut': debut.getTime(),
+            'gmtepoch_fin': fin.getTime(),
             'tarifHoraire': tarifHoraire
         }
         let oResp: boolean = this.t.sendPostWS(URL, postData);

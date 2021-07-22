@@ -19,8 +19,10 @@ export interface iActivite {
     idBulletinSalaire: number;
     tarifHoraire: number;
     activite: string;
-    debut: Date;
-    fin: Date;
+    gmtepoch_debut: number;
+    gmtepoch_fin: number;
+    // debut?: Date;
+    // fin?: Date;
 }
 
 export interface iPdf {

@@ -58,7 +58,7 @@ public abstract class DB implements iDB {
 			String Port = this._DBPort;
 			String Host = this._DBHost;
 	
-			Class.forName("com.mysql.jdbc.Driver");  
+			Class.forName("com.mysql.cj.jdbc.Driver");  
 			String jdbcString = String.format("jdbc:mysql://%s:%s/%s?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC", Host, Port, BaseName);
 			this._logger.debug("JDBC: " + jdbcString);
 			

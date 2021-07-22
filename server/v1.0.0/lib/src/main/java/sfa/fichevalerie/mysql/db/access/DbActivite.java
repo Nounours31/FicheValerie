@@ -1,14 +1,10 @@
 package sfa.fichevalerie.mysql.db.access;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
 
 import sfa.fichevalerie.mysql.api.datawrapper.Activite;
-import sfa.fichevalerie.mysql.api.datawrapper.BulletinSalaire;
-import sfa.fichevalerie.mysql.api.datawrapper.Personne;
-import sfa.fichevalerie.mysql.api.datawrapper.iObjectWrapper;
 import sfa.fichevalerie.mysql.db.tools.cInfoFromSelect;
 import sfa.fichevalerie.tools.E4AException;
 
@@ -21,12 +17,12 @@ public class DbActivite extends DB implements iDB {
 
 
 	public int insertActivite (Activite a) {
-		_logger.info("insertActivite - date debut: " + _sdf.format(a.getDebut()));
+		_logger.info("insertActivite - date debut: " + _sdf.format(a.getGmtepoch_debut()));
 		
 		double x = Math.random();
 		float tauxHoraire = a.getTarifHoraire();
-		String sql = String.format("INSERT INTO activite (idBulletinSalaire, activitee, debut, fin, date, tarifHoraire) VALUES ('%d', '%s', '%s', '%s', '%s', %f)", 
-				a.getIdBulletinSalaire(), a.getActivite(), _sdf.format(a.getDebut()), _sdf.format(a.getFin()), _sdf.format(new Date()), tauxHoraire);
+		String sql = String.format("INSERT INTO activite (idBulletinSalaire, activitee, gmtepoch_debut, gmtepoch_fin, date, tarifHoraire) VALUES ('%d', '%s', '%s', '%s', '%s', %f)", 
+				a.getIdBulletinSalaire(), a.getActivite(), a.getGmtepoch_debut(), a.getGmtepoch_fin(), _sdf.format(new Date()), tauxHoraire);
 
 		try {
 			return this.insertAsRest(sql);
@@ -83,12 +79,12 @@ public class DbActivite extends DB implements iDB {
 
 
 	public Activite[] getAllActivitees(int idBulletinSalaire) {
-		String sql = String.format("select * from activite where (idBulletinSalaire = %d) ORDER BY debut ASC", idBulletinSalaire);
+		String sql = String.format("select * from activite where (idBulletinSalaire = %d) ORDER BY gmtepoch_debut ASC", idBulletinSalaire);
 		return this.getAllActivitees(sql);		
 	}
 
 	public Activite[] getActivitee(int intValue) {
-		String sql = String.format("select * from activite where (id = %d) ORDER BY debut ASC", intValue);
+		String sql = String.format("select * from activite where (id = %d) ORDER BY gmtepoch_debut ASC", intValue);
 		return this.getAllActivitees(sql);		
 	}
 
