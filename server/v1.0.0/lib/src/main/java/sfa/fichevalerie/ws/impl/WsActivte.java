@@ -4,7 +4,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.omg.PortableServer.POAPackage.AdapterAlreadyExistsHelper;
 import sfa.fichevalerie.mysql.api.datawrapper.Activite;
 import sfa.fichevalerie.mysql.db.access.DbActivite;
 

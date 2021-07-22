@@ -28,6 +28,7 @@ import com.itextpdf.kernel.pdf.colorspace.PdfColorSpace;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.borders.DashedBorder;
+import com.itextpdf.layout.element.AreaBreak;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
@@ -254,7 +255,8 @@ public class ApiPdf {
                 tailleTable2 * 0.125f,
                 tailleTable2 * 0.125f
         });
-
+        
+        int nbLineTotal = 0;
 
         Cell cell = new Cell(2,2);
         cell.setBorder(Border.NO_BORDER);
@@ -307,50 +309,133 @@ public class ApiPdf {
         cell.add(p);
         t.addCell(cell);
 
+        nbLineTotal++;
+        
+        
         Long nbHeureTravailleeTotale = 0l;
 
 
+    	boolean hasActiviteMultiple = false;
+        int nbActiviteMultiple = 0;
+        boolean isFirstRow = false;
+
         InfoActiviteeHandler courranteInfoActivite = null;
-        for (Activite uneActivite: a) {
+        for (int iIndice = 0; iIndice < a.length;  iIndice++) {
+        	Activite uneActivite =  a[iIndice];
             _logger.debug(uneActivite.toString());
 
             courranteInfoActivite = InfoActiviteeHandler.getHandler (rc, uneActivite, bs);
 
             String info = "";
             Date debut = new Date();
-            debut.setTime(uneActivite.getGmtepoch_debut());
             Date fin = new Date();
+            debut.setTime(uneActivite.getGmtepoch_debut());
             fin.setTime(uneActivite.getGmtepoch_fin());
 
             String infoJour[] = tools.JourFromDate(debut);
             int[] jourSemaine = tools.JourSemaineFromDate(debut);
             int iJourSemaine = jourSemaine[0];
 
-            t.addCell (this.builCell (iJourSemaine, infoJour[0], false, true));
-            t.addCell (this.builCell (iJourSemaine, infoJour[1], true, false));
+            // ---------------------------
+            // affichage juor et date
+            // ---------------------------
+            // y a t il plusieures activite le meme jour ?
+            if (!hasActiviteMultiple) {
+            	int iNbActiviteCeJour = 0;
+	            Activite activiteSuivante = uneActivite;
+	            Date JourActiviteeSuivate =  new Date();
+	            JourActiviteeSuivate.setTime(activiteSuivante.getGmtepoch_debut());
+	            
+	            while (JourActiviteeSuivate.getDay() == debut.getDay()) {
+	            	iNbActiviteCeJour++;
+	            	if ((iIndice + iNbActiviteCeJour) >= a.length)
+	            		break;
+	                JourActiviteeSuivate.setTime(a[iIndice + iNbActiviteCeJour].getGmtepoch_debut());
+	            }
 
+	            if (iNbActiviteCeJour > 1) {
+	            	hasActiviteMultiple = true;
+	            	nbActiviteMultiple = iNbActiviteCeJour;
+	            	isFirstRow = true;
+	            }
+	            else {
+	            	nbActiviteMultiple = 1;
+	            }
+            }
+            
+            // il y a des activite multiple?
+            if (isFirstRow || !hasActiviteMultiple) {
+            	t.addCell (this.builCell (iJourSemaine, infoJour[0], false, true, nbActiviteMultiple));
+            	t.addCell (this.builCell (iJourSemaine, infoJour[1], true, false, nbActiviteMultiple));
+            	isFirstRow = false;
+            }
+            
+        	// oui et trouve au tour d'avant
+        	// decrementer le rowspan
+        	if (hasActiviteMultiple) {
+        		nbActiviteMultiple--;
+	        	if (nbActiviteMultiple == 0) {
+	        		// c'est la derniere
+	        		hasActiviteMultiple = false;
+	        	}
+	        }
+
+            // ---------------------------
+            // affichage activitee
+            // ---------------------------            
             // info = String.format("%s [Taux %d]",uneActivite.getActivite(), courranteInfoActivite.tauxIndice);
             info = String.format("%s",uneActivite.getActivite(), courranteInfoActivite.tauxIndice);
             t.addCell (this.builCell (iJourSemaine, info, true, true));
+
+            // ---------------------------
+            // heure de debut
+            // ---------------------------
 
             boolean center = true;
             info = tools.FromDateToHeure(debut);
             t.addCell (this.builCell (iJourSemaine, info, true, true, center));
 
+            // ---------------------------
+            // heure de fin
+            // ---------------------------
             info = tools.FromDateToHeure(fin);
             t.addCell (this.builCell (iJourSemaine, info, true, true, center));
 
+            // ---------------------------
+            // duree activite
+            // ---------------------------
             info = tools.FromMinutesLongToHeure(tools.FromDureeToMinutesLong(debut, fin));
             t.addCell (this.builCell (iJourSemaine, info, true, true, center));
 
+            // ---------------------------
+            // duree totale
+            // ---------------------------
             long dureeActivite = tools.FromDureeToMinutesLong(debut, fin);
             nbHeureTravailleeTotale += dureeActivite;
             info = tools.FromMinutesLongToHeure(nbHeureTravailleeTotale);
             t.addCell (this.builCell (iJourSemaine, info, true, true, center));
 
             courranteInfoActivite.AddNbHeureMinutes(dureeActivite);
+            nbLineTotal++;
         }
-
+        document.add(t);
+        
+        // changer de page
+        if ((nbLineTotal > 41) && (nbLineTotal < 46)) {
+        	document.add(new AreaBreak());
+        	nbLineTotal = 0;
+        }        
+        
+        t = new Table(new float[]{
+                tailleTable2 * 0.1f,
+                tailleTable2 * 0.01f,
+                tailleTable2 * 0.39f,
+                tailleTable2 * 0.125f,
+                tailleTable2 * 0.125f,
+                tailleTable2 * 0.125f,
+                tailleTable2 * 0.125f
+        });
+        
         cell = new Cell(1,7);
         cell.setBorder(Border.NO_BORDER);
         t.addCell(cell);
@@ -410,19 +495,34 @@ public class ApiPdf {
         cell.add (new Paragraph(new Text(tools.FromMinutesLongToHeure(nbHeureTravailleeTotale))).setTextAlignment(TextAlignment.CENTER));
         cell.setBackgroundColor(_bgBlue);
         t.addCell(cell);
-
+        nbLineTotal += 3;
         document.add(t);
 
+        // changer de page
+        if ((nbLineTotal > 39) && (nbLineTotal < 46)) {
+        	document.add(new AreaBreak());
+        	nbLineTotal = 0;
+        }        
+        
         return rc;
     }
 
 
 
-    private Cell builCell(int i, String info, boolean borderRight, boolean borderLeft) {
-        return builCell (i, info, borderRight, borderLeft, false);
+    private Cell builCell(int iJourSemaine, String info, boolean borderRight, boolean borderLeft, int rowSpan) {
+        return builCell (iJourSemaine, info, borderRight, borderLeft, false, rowSpan);
+	}
+
+
+	private Cell builCell(int i, String info, boolean borderRight, boolean borderLeft) {
+        return builCell (i, info, borderRight, borderLeft, false, 1);
     }
 
-    private Cell builCell(int i, String info, boolean borderRight, boolean borderLeft, boolean center) {
+	private Cell builCell(int i, String info, boolean borderRight, boolean borderLeft, boolean center) {
+        return builCell (i, info, borderRight, borderLeft, false, 1);
+    }
+
+	private Cell builCell(int i, String info, boolean borderRight, boolean borderLeft, boolean center, int rowSpan) {
         Color bgC[] = {
                 null,
                 _bgBlue,
@@ -442,7 +542,10 @@ public class ApiPdf {
         if (center)
             p.setTextAlignment(TextAlignment.CENTER);
 
-        Cell cell = new Cell(1,1).add(p);
+        Cell cell = new Cell(rowSpan,1).add(p);
+        if (rowSpan > 1)
+        	cell.setVerticalAlignment(VerticalAlignment.MIDDLE);
+        
         if (!borderRight)
             cell.setBorderRight(Border.NO_BORDER);
 

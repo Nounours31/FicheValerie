@@ -74,6 +74,13 @@ export default class cOutilsDivers {
         return cOutilsDivers._days[jour];
     }
 
+    static stringJourSemainetoInt(jour: string): number {
+        for (let i : number = 0; i < cOutilsDivers._days.length; i++)
+            if (cOutilsDivers._days[i].toLowerCase() == jour.toLowerCase())
+                return i;
+        return -1;
+    }
+
     public static replaceAll(s: string, a: string, b: string) {
         let s2: string = s.replace(a, b);
         while (s2 != s) {

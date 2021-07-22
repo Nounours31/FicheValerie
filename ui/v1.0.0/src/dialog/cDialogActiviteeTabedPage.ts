@@ -200,7 +200,7 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
                                 ">
                                 <input type="checkbox"
                                         class="${cDialogActiviteeTabedPage._idDivRecurenceActivite}_Recurence_Check"
-                                        value="L"
+                                        value="${uneCheckBox}"
                                         id="${cDialogActiviteeTabedPage._idDivRecurenceActivite}_Recurence_Check_id_${uneCheckBox}"
                                         style="
                                             flex: 0 1 auto;
@@ -437,7 +437,7 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
                 spanWithInfo.empty();
                 spanWithInfo.append(`(lu depuis la FromDB)`);
             }
-            if ((allExtra.rappel != null) && (allExtra.depassement.length > 0)) {
+            if ((allExtra.rappel != null) && (allExtra.rappel.length > 0)) {
                 let InputWithInfo: JQuery<HTMLInputElement> = $(`#${cDialogActiviteeTabedPage._idReportPrecedent}`);
                 InputWithInfo.empty();
                 InputWithInfo.val(cOutilsDivers.heureFloat2HeureString(allExtra.rappel[0].duree));
@@ -750,26 +750,97 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
 
 
     private AjoutActiviteRecurente(): void {
-        //----------------------
-        // Recup de l'activitee
-        //----------------------
+        if (this._idBulletinSalaire > 0) {
+            let bulletin: iBulletinSalaire[] = this._ws.getBulletinSalaire(this._idBulletinSalaire);
+            if (bulletin.length > 0) {
+                let laFicheDeSalaire: iBulletinSalaire = bulletin[0];
+                let mois: number = laFicheDeSalaire.mois;
+                let annee: number = laFicheDeSalaire.annee;
 
-        //----------------------
-        // Horaire de debut et fin
-        //----------------------
+                //----------------------
+                // Recup de l'activitee
+                //----------------------
+                let activiteeChoisie: string = $(`#${cDialogActiviteeTabedPage._idDivRecurenceActivite}`).find(`.${cDialogActiviteeTabedPage._idSelectActivitee} option:selected`).text();
+                if (activiteeChoisie == "-") {
+                    UIkit.modal.alert("Une activitee doit avoir une activitee ici: ");
+                    return;
+                }
 
-        //----------------------
-        // la recurence
-        //----------------------
 
-        // clean des champs
-        
-        // -------------------------
-        // ajout en dDB
-        // -------------------------
+                //----------------------
+                // Horaire de debut et fin
+                //----------------------
+                let sDebutHoraire: string = $(`#${cDialogActiviteeTabedPage._idHoraireDebut}_Recurence`).val() as string;
+                let sFinHoraire: string = $(`#${cDialogActiviteeTabedPage._idHoraireFin}_Recurence`).val() as string;
 
-        // -------------------------
-        // Refesh de la page
-        // -------------------------
+                let inputDateType: string = $(`#${cDialogActiviteeTabedPage._idHoraireFin}_Recurence`).attr('type');
+                let heure_debut: number = 0;
+                let minute_debut: number = 0;
+                let heure_fin: number = 0;
+                let minute_fin: number = 0;
+
+                if (((inputDateType == 'time') || (inputDateType == 'text')) && (sDebutHoraire.length > 3) && (sFinHoraire.length > 3)) {
+                    let aDebutHoraire: string[] = sDebutHoraire.split(':');
+                    let aFinHoraire: string[] = sFinHoraire.split(':');
+
+                    heure_debut = Number.parseInt(aDebutHoraire[0]);
+                    minute_debut = Number.parseInt(aDebutHoraire[1]);
+                    heure_fin = Number.parseInt(aFinHoraire[0]);
+                    minute_fin = Number.parseInt(aFinHoraire[1]);
+                }
+                else {
+                    UIkit.modal.alert("Il fau definir des horaires");
+                    return;
+                }
+
+
+                //----------------------
+                // la recurence
+                //----------------------
+                let isChanged : boolean = false;
+                let me : cDialogActiviteeTabedPage = this;
+                $(`.${cDialogActiviteeTabedPage._idDivRecurenceActivite}_Recurence_Check`).each (function (iIndexe : number, elem : HTMLElement) {
+                    let isChecked : boolean = $(this).prop('checked');
+                    if (isChecked) {
+                        let Jour : string = $(this).val() as string;
+                        let iJour: number = cOutilsDivers.stringJourSemainetoInt(Jour);
+
+                        let PremierJourDuMois: Date = new Date(annee, mois, 1, 0, 0);
+                        let jourCourant: Date = new Date(annee, mois, 1, 0, 0);
+
+                        while (PremierJourDuMois.getMonth() == jourCourant.getMonth()) {
+                            let jourDeLaSemaine : number = jourCourant.getDay();
+
+                            if (jourDeLaSemaine == iJour) {
+                                let debut: Date = new Date(annee, mois, jourCourant.getDate(), heure_debut, minute_debut);
+                                let fin: Date = new Date(annee, mois, jourCourant.getDate(), heure_fin, minute_fin);
+
+                                me._ws.addActivite(me._idBulletinSalaire,
+                                    jourCourant.getDate(),
+                                    activiteeChoisie,
+                                    debut,
+                                    fin,
+                                    -1.0);
+                                isChanged = true;
+                            }
+                            jourCourant.setDate(jourCourant.getDate() + 1);
+                        }
+                    }
+                });
+
+                // clean des champs
+                $(`#${cDialogActiviteeTabedPage._idDivRecurenceActivite}`).find(`.${cDialogActiviteeTabedPage._idSelectActivitee} option[value="-"]`).prop('selected', true);
+                $(`#${cDialogActiviteeTabedPage._idHoraireDebut}_Recurence`).val("");
+                $(`#${cDialogActiviteeTabedPage._idHoraireFin}_Recurence`).val("");
+                $(`.${cDialogActiviteeTabedPage._idDivRecurenceActivite}_Recurence_Check`).each(function (iIndexe: number, elem: HTMLElement) {
+                    $(this).prop('checked', true);
+                });
+
+                // refresh
+                if (isChanged) {
+                    me.refresh(me._idBulletinSalaire);
+                }
+            }
+        }
     }
 }
