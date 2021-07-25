@@ -23,7 +23,8 @@ public abstract class DB implements iDB {
 	protected E4ALogger _logger = null;
 
 	// private final String _InstallType = "dell";
-	private final String _InstallType = "vape";
+	// private final String _InstallType = "vape";
+	private final String _InstallType = "ovh";
 
 
 	public DB(String tableName) {
@@ -50,6 +51,14 @@ public abstract class DB implements iDB {
 			this._DBPassword = "pwdValerie";
 			this._DBDataBase = "sfa_fichevalerie";
 			this._DBPort = "3307";
+			this._DBHost = "localhost";
+			break;
+
+		case "ovh":
+			this._DBUser = "valerie";
+			this._DBPassword = "pwdValerie";
+			this._DBDataBase = "sfa_fichevalerie";
+			this._DBPort = "3306";
 			this._DBHost = "localhost";
 			break;
 
