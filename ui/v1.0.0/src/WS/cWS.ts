@@ -82,7 +82,6 @@ export default class cWS {
         if (this.t.status) {
             retour = ((this.t.data as unknown) as iActivite[]);
         }
-        this.updateDateActiviteAfterWS (retour);
         return retour;
     }
     public getActivitee(activiteId: string): iActivite[] {
@@ -92,24 +91,11 @@ export default class cWS {
         if (this.t.status) {
             retour = ((this.t.data as unknown) as iActivite[]);
         }
-        this.updateDateActiviteAfterWS (retour);
         return retour;
     }
 
 
 
-    private updateDateActiviteAfterWS(retour: iActivite[]) : void {
-    /*    for (let i : number = 0; i < retour.length; i++) {
-            let sDebut: string = retour[i].debut as unknown as string;
-            let lDebut: number = Number.parseInt (sDebut);
-            retour[i].debut = new Date(lDebut);
-
-            let sFin: string = retour[i].fin as unknown as string;
-            let lFin: number = Number.parseInt (sFin);
-            retour[i].fin = new Date(lFin);
-        }
-    */
-    }
 
     public addActivite(ficheId: number, jour: number, activite: string, debut: Date, fin: Date, tarifHoraire: number) : number {
         let retour: number = -1;
@@ -267,7 +253,37 @@ export default class cWS {
     }
 
 
+    // --------------------------------
+    public getSetEnvInfo(storePath?: string): any {
+        let retour: string[] = [];
+        let URL = cEnv._serverURL + `/sql`;
+        let postData: any = {
+            'retour': 'iEnvInfo',
+            'infos': {},
+        }
+        if ((storePath != undefined) && (storePath != null)) {
+            postData.infos = {
+                'storePath': storePath,
+                'CSG': 0.092,
+                'TauxImposition' : 0.11 
+            };
+        }
+        let oResp: boolean = this.t.sendPostWS(URL, postData);
+        if (this.t.status) {
+            retour = (this.t.data as any);
+        }
+        return retour;
+    }
 
+    public getServerBuildVersion() : string {
+        let retour: string = "";
+        let URL = cEnv._serverURL + `/build`;
+        let oResp: boolean = this.t.sendGetWS(URL);
+        if (this.t.status) {
+            retour = ((this.t.data as unknown) as string);
+        }
+        return retour;
+   }
 
     public get data() : JSON { return this._data; }
 }

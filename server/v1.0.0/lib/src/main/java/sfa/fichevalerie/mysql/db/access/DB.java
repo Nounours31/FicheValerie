@@ -50,7 +50,7 @@ public abstract class DB implements iDB {
 			this._DBUser = "valerie";
 			this._DBPassword = "pwdValerie";
 			this._DBDataBase = "sfa_fichevalerie";
-			this._DBPort = "3307";
+			this._DBPort = "3306";
 			this._DBHost = "localhost";
 			break;
 

@@ -3,6 +3,7 @@ package sfa.fichevalerie.ws.impl;
 import java.io.BufferedInputStream;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
+import java.util.Hashtable;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
@@ -15,10 +16,13 @@ import org.json.JSONObject;
 import sfa.fichevalerie.mysql.api.datawrapper.BulletinSalaire;
 import sfa.fichevalerie.mysql.api.datawrapper.DepassementForfaitaire;
 import sfa.fichevalerie.mysql.api.datawrapper.Rappel;
+import sfa.fichevalerie.mysql.db.access.DB;
 import sfa.fichevalerie.mysql.db.access.DbActivite;
 import sfa.fichevalerie.mysql.db.access.DbBulletinSalaire;
 import sfa.fichevalerie.mysql.db.access.DbDepassementForfaitaire;
+import sfa.fichevalerie.mysql.db.access.DbPourFaignasse;
 import sfa.fichevalerie.mysql.db.access.DbRappel;
+import sfa.fichevalerie.mysql.db.tools.cInfoFromSelect;
 import sfa.fichevalerie.tools.E4ALogger;
 
 public class WSForFaignasse {
@@ -72,6 +76,9 @@ public class WSForFaignasse {
 
         if (rc == null)
         	rc = this.parseSQLForExtraActivitee(jsonObject);
+
+        if (rc == null)
+        	rc = this.parseSQLForEnvInfo(jsonObject);
         
         if (rc == null)
             rc = Response.status(Status.INTERNAL_SERVER_ERROR).type(MediaType.APPLICATION_JSON).entity("KO").build();
@@ -79,6 +86,68 @@ public class WSForFaignasse {
         return rc;
 	}
 	
+	private Response parseSQLForEnvInfo(JSONObject jsonObject) {
+        if (jsonObject.has("retour")) {
+        	_logger.debug("SQL retour is :" + jsonObject.getString("retour"));
+            if (jsonObject.getString("retour").equals("iEnvInfo")) {
+            	_logger.debug("iEnvInfo");
+        		DbPourFaignasse db = new DbPourFaignasse();
+
+            	if (jsonObject.has("infos")) {
+            		JSONObject infos = jsonObject.getJSONObject("infos");
+            	
+	            	StringBuffer sql = new StringBuffer("update env set ");
+	            	boolean hasChangeSOmething = false;
+	            	boolean isFirst = true;
+	            	
+	            	if (infos.has("storePath")) {
+	            		if (!isFirst)
+	            			sql.append(",");
+	            		sql.append ("storePath='"+infos.getString("storePath")+"'");
+	            		hasChangeSOmething = true;
+	            		isFirst = false;
+	            	}
+	            	if (infos.has("CSG")) {
+	            		if (!isFirst)
+	            			sql.append(",");
+	            		sql.append ("CSG="+infos.getFloat("CSG"));
+	            		hasChangeSOmething = true;
+	            		isFirst = false;
+	            	}
+	            	if (infos.has("TauxImposition")) {
+	            		if (!isFirst)
+	            			sql.append(",");
+	            		sql.append ("TauxImposition="+infos.getFloat("TauxImposition"));
+	            		hasChangeSOmething = true;
+	            		isFirst = false;
+	            	}
+	            	sql.append (" where 1");
+	            	if (hasChangeSOmething) {
+	            		try {
+							db.updateAsRest(sql.toString());
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+	            	}
+	            }
+            	try {
+					cInfoFromSelect response = db.selectAsRest("select * from env");
+					Hashtable<String, Object> row = response.get(0);
+					JSONObject retour = new JSONObject();
+					String[] infosToRead = {"storePath", "CSG", "TauxImposition"};
+					if (row.containsKey(infosToRead[0])) retour.put(infosToRead[0], (String)row.get(infosToRead[0])); 						
+					if (row.containsKey(infosToRead[1])) retour.put(infosToRead[1], ((Float)row.get(infosToRead[1])).floatValue()); 						
+					if (row.containsKey(infosToRead[2])) retour.put(infosToRead[2], ((Float)row.get(infosToRead[2])).floatValue());		
+					return Response.ok().type(MediaType.APPLICATION_JSON).entity(retour.toString()).build();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            }            
+        }
+        return null;
+	}
+
 	private Response parseSQLForExtraActivitee(JSONObject jsonObject) {
         if (jsonObject.has("retour")) {
         	_logger.debug("SQL retour is :" + jsonObject.getString("retour"));
@@ -157,6 +226,7 @@ public class WSForFaignasse {
         return null;
 	}
 
+	
 	public Response getExtraInfos(int idBulletin) {
 		_logger.debug(String.format("getExtraInfos: idBulletin[%d]",idBulletin));
 		DbDepassementForfaitaire dbdf = new DbDepassementForfaitaire();

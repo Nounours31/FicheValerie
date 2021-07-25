@@ -50,6 +50,9 @@ export default class cDialogAjoutDBTabedPage extends cDialogAbstract {
         let pageHTML : string = `
             <div id="cDialogAjoutDBTabedPage">
                 <div class="uk-card uk-card-body uk-padding-small">
+                    version: 
+                </div>
+                <div class="uk-card uk-card-body uk-padding-small">
                     <label> Ajout d'une personne:
                         <div class="uk-grid">
                             <div class="uk-card uk-card-body" style="padding-top: 0px; padding-bottom: 0px; padding-left: 50px;">

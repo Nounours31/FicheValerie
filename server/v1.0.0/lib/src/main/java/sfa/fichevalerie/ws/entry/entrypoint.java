@@ -21,6 +21,7 @@ import sfa.fichevalerie.mysql.api.datawrapper.Pdf;
 import sfa.fichevalerie.mysql.api.datawrapper.Personne;
 import sfa.fichevalerie.mysql.db.access.DbActivite;
 import sfa.fichevalerie.mysql.db.access.DbBulletinSalaire;
+import sfa.fichevalerie.tools.E4ABuildVersion;
 import sfa.fichevalerie.tools.E4ALogger;
 import sfa.fichevalerie.ws.impl.WSForFaignasse;
 import sfa.fichevalerie.ws.impl.cWsFactory;
@@ -232,6 +233,19 @@ public class entrypoint {
     // ----------------------------------------------------
 	// Divers
 	// ----------------------------------------------------
+    // -------
+    // set des traces
+    // -------
+    @GET
+    @Path("/build")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getBuild() {
+        _logger.info("getBuild");
+        E4ABuildVersion versionBuilder = new E4ABuildVersion();
+        String rc = versionBuilder.getBuildVersion();
+        return Response.ok().type(MediaType.APPLICATION_JSON).entity(rc).build();
+    }
 
     // -------
     // set des traces

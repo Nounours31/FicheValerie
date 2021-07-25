@@ -33,8 +33,8 @@ var ConfDev = {
 
 var ConfProd = {
     mode: 'production', // development' or 'production
-    watch: true,
-    entry: './src/main_prod.ts',
+    watch: false,
+    entry: './src/main.ts',
     module: {
         rules: [
             // { test: /\.tsx?$/,     use: 'babel-loader' },
