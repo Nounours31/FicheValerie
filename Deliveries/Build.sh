@@ -53,3 +53,7 @@ cp -r /E/WS/GitHubPerso/FicheValerie/ui/v1.0.0/dist /E/WS/GitHubPerso/FicheValer
 cp -r /E/WS/GitHubPerso/FicheValerie/ui/v1.0.0/images /E/WS/GitHubPerso/FicheValerie/Deliveries/ui
 echo "OK cp UI"
 
+cd /E/WS/GitHubPerso/FicheValerie/
+tar -cvf Deliveries.tar Deliveries
+mv Deliveries.tar Deliveries
+echo "Ok Tar"
