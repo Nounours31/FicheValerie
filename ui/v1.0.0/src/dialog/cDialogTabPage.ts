@@ -8,9 +8,8 @@ import cDialog from './cDialogAbstract';
 import cDialogCreateBulletinTabedPage from './cDialogCreateBulletinTabedPage';
 import cDialogActiviteeTabedPage from './cDialogActiviteeTabedPage';
 import cDialogSearchBulletinTabedPage from './cDialogSearchBulletinTabedPage'
-
-import {iPersonne} from '../WS/iWSMessages';
 import cDialogAjoutDBTabedPage from './cDialogAjoutDBTabedPage';
+import cDialogInfoDebugTabedPage from './cDialogInfoDebugTabedPage';
 
 export default class cDialogTabPage extends cDialog {
     private static _NomPrefixe: string = 'cDialogTabPage';
@@ -22,11 +21,13 @@ export default class cDialogTabPage extends cDialog {
     private iCreate: cDialogCreateBulletinTabedPage = null;
     private iSearch: cDialogSearchBulletinTabedPage = null;
     private iAddInDB: cDialogAjoutDBTabedPage = null;
+    private iInfoDebug: cDialogInfoDebugTabedPage = null;
 
     public static IndexCreationTab: number = 0;
     public static IndexSearchTab: number = 1;
     public static IndexEditionTab: number = 2;
     public static IndexAjoutDBTab: number = 3;
+    public static IndexInfoDebugTab: number = 4;
 
     constructor() {
         super('cDialogTabPage');
@@ -34,6 +35,7 @@ export default class cDialogTabPage extends cDialog {
         this.iCreate = new cDialogCreateBulletinTabedPage(this.iAddActivitee, this);
         this.iSearch = new cDialogSearchBulletinTabedPage(this.iAddActivitee, this);
         this.iAddInDB = new cDialogAjoutDBTabedPage();
+        this.iInfoDebug = new cDialogInfoDebugTabedPage();
     }
 
     public Draw(): string {
@@ -44,12 +46,14 @@ export default class cDialogTabPage extends cDialog {
                     <li id="tab2"><a href="">Recherche</a></li>         <!-- IndexSearchTab = 1 -->
                     <li id="tab3"><a href="">Edition</a></li>           <!-- IndexEditionTab = 2 -->
                     <li id="tab5"><a href="">Ajout en DB</a></li>       <!-- IndexAjoutDBTab = 3 -->
+                    <li id="tab7"><a href="">Pour Pap's</a></li>        <!-- DebugTab = 4 -->
                 </ul>
                 <ul id="${cDialogTabPage._idSwitcher}" class="uk-switcher uk-margin">
                     <li>`+ this.iCreate.Draw() + `</li>         
                     <li>`+ this.iSearch.Draw() +`</li>          
                     <li>`+ this.iAddActivitee.Draw() +`</li>    
                     <li>`+ this.iAddInDB.Draw() +`</li>
+                    <li>`+ this.iInfoDebug.Draw() +`</li>
                 </ul>
             <div>
         `;
@@ -61,6 +65,7 @@ export default class cDialogTabPage extends cDialog {
         this.iAddActivitee.addCallBack();
         this.iSearch.addCallBack();
         this.iAddInDB.addCallBack();
+        this.iInfoDebug.addCallBack();
     }
 
     public getSwitcherElement(): UIkit.UIkitSwitcherElement {

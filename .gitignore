@@ -15,3 +15,5 @@ server/v1.0.0/lib/.settings/
 server/v1.0.0/lib/bin/
 OVH/
 Deliveries/Deliveries.tar
+Deliveries/ui
+Deliveries/war

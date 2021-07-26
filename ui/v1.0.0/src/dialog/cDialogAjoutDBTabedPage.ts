@@ -6,9 +6,8 @@ import $ from 'jquery';
 import cDialogAbstract from './cDialogAbstract';
 
 import cOutilsDivers  from '../tools/cOutilsDivers';
-import cDuration from '../tools/cDuration';
 import cWS from '../WS/cWS';
-import { iPdf, iPersonne } from '../WS/iWSMessages';
+import { iPersonne } from '../WS/iWSMessages';
 import cDialogTools from '../tools/cDialogTools';
 
 interface iUIDLIGNE {
@@ -49,9 +48,6 @@ export default class cDialogAjoutDBTabedPage extends cDialogAbstract {
 
         let pageHTML : string = `
             <div id="cDialogAjoutDBTabedPage">
-                <div class="uk-card uk-card-body uk-padding-small">
-                    version: 
-                </div>
                 <div class="uk-card uk-card-body uk-padding-small">
                     <label> Ajout d'une personne:
                         <div class="uk-grid">

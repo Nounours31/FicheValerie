@@ -12,29 +12,33 @@ export default class cVersion {
     constructor() {
     }
 
-    public setDateBuild(): string {
+    public getDateBuild(): string {
         let retour = \"\";
         retour += \"Build Date: ${buildDate}\";
         return retour;
     }
 
-    public setCommitVersionBuild(): string {
+    public getCommitVersionBuild(): string {
         let retour = \"\";
         retour += \"Commit Id: ${comitId} - Commit Date: ${commitDate} - Commit branch: ${comitBranch}\";
         return retour;
     }
 
-    public setServerBuild(): string {
+    public getServerBuild(): string {
         let ws : cWS = new cWS();
         let retour : string = ws.getServerBuildVersion();
         return retour;
     }
 }
 " > /E/WS/GitHubPerso/FicheValerie/ui/v1.0.0/src/cVersion.ts
+ls -al /E/WS/GitHubPerso/FicheValerie/ui/v1.0.0/src/cVersion.ts
+printf "OK mise  ajour de UI\n"
 
 serverFile="/E/WS/GitHubPerso/FicheValerie/server/v1.0.0/lib/src/main/java/sfa/fichevalerie/tools/E4ABuildVersion.java"
 cat ${serverFile} | sed -e "s|String retourTAGGED=\".*\";|String retourTAGGED=\"${buildDate}\";|g" > /tmp/toto
 mv /tmp/toto ${serverFile}
+ls -al ${serverFile}
+printf "OK mise  ajour de Server\n"
 
 echo "changer E:\WS\GitHubPerso\FicheValerie\ui\v1.0.0\src\WS\cEnv.ts" 
 echo "OK continue Y/N ?"

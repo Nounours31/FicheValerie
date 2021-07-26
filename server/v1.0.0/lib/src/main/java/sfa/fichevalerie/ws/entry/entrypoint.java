@@ -238,13 +238,13 @@ public class entrypoint {
     // -------
     @GET
     @Path("/build")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getBuild() {
         _logger.info("getBuild");
         E4ABuildVersion versionBuilder = new E4ABuildVersion();
         String rc = versionBuilder.getBuildVersion();
-        return Response.ok().type(MediaType.APPLICATION_JSON).entity(rc).build();
+        return Response.ok().type(MediaType.TEXT_PLAIN).entity(rc).build();
     }
 
     // -------
@@ -252,14 +252,18 @@ public class entrypoint {
     // -------
     @GET
     @Path("/debug/{sLevel}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response setDebug(@PathParam("sLevel") String sLevel) {
         iWS ws = cWsFactory.getImpl("setDebug");
         _logger.info(ws.whoami());
-        E4ALogger.setEnvLevel (sLevel);
+        
+        if (!sLevel.toLowerCase().equals("level"))
+        	E4ALogger.setEnvLevel (sLevel);
+        
+        String s = _logger.getLogLevel();
         _logger.fatal("Now log level is set to: " + _logger.getLogLevel());
-        return Response.ok().type(MediaType.APPLICATION_JSON).entity("OK").build();
+        return Response.ok().type(MediaType.TEXT_PLAIN).entity(s).build();
     }
 
     // -------

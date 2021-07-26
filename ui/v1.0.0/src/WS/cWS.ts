@@ -254,19 +254,23 @@ export default class cWS {
 
 
     // --------------------------------
-    public getSetEnvInfo(storePath?: string): any {
+    // WS De gestion de l'envt
+    // --------------------------------
+    public getSetEnvInfo(storePath?: string, CSG? : number, TauxImposition? : number): any {
         let retour: string[] = [];
         let URL = cEnv._serverURL + `/sql`;
         let postData: any = {
             'retour': 'iEnvInfo',
             'infos': {},
         }
-        if ((storePath != undefined) && (storePath != null)) {
-            postData.infos = {
-                'storePath': storePath,
-                'CSG': 0.092,
-                'TauxImposition' : 0.11 
-            };
+        if ((storePath != undefined) && (storePath.length > 3)) {
+            postData.infos.storePath = storePath;
+        }
+        if (CSG != undefined) {
+            postData.infos.CSG = CSG;
+        }
+        if (TauxImposition != undefined) {
+            postData.infos.TauxImposition = TauxImposition;
         }
         let oResp: boolean = this.t.sendPostWS(URL, postData);
         if (this.t.status) {
@@ -275,10 +279,21 @@ export default class cWS {
         return retour;
     }
 
+
     public getServerBuildVersion() : string {
         let retour: string = "";
         let URL = cEnv._serverURL + `/build`;
-        let oResp: boolean = this.t.sendGetWS(URL);
+        let oResp: boolean = this.t.sendGetWS(URL, 'text');
+        if (this.t.status) {
+            retour = ((this.t.data as unknown) as string);
+        }
+        return retour;
+   }
+
+    public setServerDebug(level : string): string {
+        let retour: string = "";
+        let URL = cEnv._serverURL + `/debug/${level}`;
+        let oResp: boolean = this.t.sendGetWS(URL, 'text');
         if (this.t.status) {
             retour = ((this.t.data as unknown) as string);
         }

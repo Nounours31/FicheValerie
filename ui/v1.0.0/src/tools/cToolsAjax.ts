@@ -17,6 +17,79 @@ export default class cToolsAjax {
         return this._status;
     }
 
+    /*
+    public sendPostWS(url: string, iData: object = null): boolean {
+        return this.localCallAjax('POST', url);
+    }
+
+    public sendDeleteWS(url: string): boolean {
+        return this.localCallAjax('DELETE', url);
+    }
+
+    public sendGetWS(url: string): boolean {
+        return this.localCallAjax('GET', url);
+    }
+
+    private localCallAjax(verbe : string, url : string, data? : any): boolean {
+        let xhr: XMLHttpRequest = null;
+        let async: boolean = false;
+        if (window.XMLHttpRequest)   
+            xhr = new XMLHttpRequest();
+        
+        if (xhr == null)
+            throw "Unsuported Browser";
+        
+        //xhr.onreadystatechange = this.onreadystatechange.bind(xhr);
+        xhr.onload = this.onreadystatechange.bind(xhr);
+        xhr.open(verbe, url, async);  
+        xhr.withCredentials = true;
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.setRequestHeader("Cache-Control", "no-cache");
+        if (verbe == 'POST')
+            xhr.send(data);
+        else
+            xhr.send();
+        return true;
+    }
+
+    private onreadystatechange(xhr: XMLHttpRequest, event: Event): any {
+        if (xhr.readyState == 0) {
+            console.log("request not initialized");
+        }
+        if (xhr.readyState == 1) {
+            console.log("server connection established");
+        }
+        if (xhr.readyState == 2) {
+            console.log("request received");
+        }
+        if (xhr.readyState == 3) {
+            console.log("processing request");
+        }
+        if (xhr.readyState == 4) {
+            console.log("request finished and response is ready");
+            if (xhr.status === 200) {
+                if ((xhr.responseText != undefined) && (xhr.responseText != null)) {
+                    console.log("responseText: " + xhr.responseText);
+                    this._data = JSON.parse(xhr.responseText);
+                    this._status = true;
+                }
+                if ((xhr.responseXML != undefined) && (xhr.responseXML != null)) {
+                    console.log("responseXML  ext: " + xhr.responseXML);
+                    this._data = xhr.responseXML as unknown as JSON;
+                    this._status = true;
+                }
+            }
+            else {
+                console.log ("httpRequest.status KO: http rc = " + xhr.status)
+                this._data = {} as JSON;
+                this._status = false;
+            }
+        }
+    }
+    */
+
+
+    
     public sendPostWS(url: string, iData: object = null): boolean {
         this._status = false;
         let me: cToolsAjax = this;
@@ -92,7 +165,7 @@ export default class cToolsAjax {
     }
 
 
-    public sendGetWS(url: string): boolean {
+    public sendGetWS(url: string, forceReturnType? : string): boolean {
         this._status = false;
         let me: cToolsAjax = this;
         let oData: object = {};
@@ -122,6 +195,9 @@ export default class cToolsAjax {
                 me.success(data, textStatus, jqXHR);
             },
             error: this.error,
+        }
+        if (forceReturnType != undefined) {
+            settings.dataType = forceReturnType;
         }
 
         $.ajax(url, settings);
