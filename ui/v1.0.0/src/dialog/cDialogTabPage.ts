@@ -66,6 +66,10 @@ export default class cDialogTabPage extends cDialog {
         this.iSearch.addCallBack();
         this.iAddInDB.addCallBack();
         this.iInfoDebug.addCallBack();
+
+        $(`#${cDialogTabPage._idSwitcher}`).on('show', function(event, area){
+            console.log("Switcher switched to ", area);
+        });
     }
 
     public getSwitcherElement(): UIkit.UIkitSwitcherElement {

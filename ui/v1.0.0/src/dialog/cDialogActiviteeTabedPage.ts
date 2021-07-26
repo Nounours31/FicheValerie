@@ -70,6 +70,13 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
 
     private _inputAsTime: boolean = false;
 
+
+    private couleurModifiable: string = "#D5F5E3"; // vert d'eau
+    private couleurInfo: string = "#FFC300"; // info - gold
+    private couleurPasTouche: string = "#F1948A"; // pastouche rouge clair
+
+
+
     constructor() {
         super('cDialogActiviteeTabedPage');
         // creation en DB du bulletin de salaire
@@ -80,7 +87,7 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
 
     private DrawPersonne(): string {
         let retour: string = `
-                    <fieldset style="padding-left: 10px;">
+                    <fieldset style="padding-left: 10px;" class="couleurInfo">
                         <legend>Personne</legend>
 
                         <label>Personne:<span id="${cDialogActiviteeTabedPage._idLabelOfInputPersonne}"></span></label><br/>
@@ -95,7 +102,7 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
             <fieldset style="padding-left: 10px;">
                 <legend>Saisie des extras</legend>
                 <label>Depassement forfaitaire (en heure)</label>
-                <input type="text" id="${cDialogActiviteeTabedPage._idDepassementForfaitaire}"
+                <input type="text" id="${cDialogActiviteeTabedPage._idDepassementForfaitaire}" class="couleurModifiable"
                         pattern="[0-9]{2}:[0-9]{2}"
                         placeholder="hh:mm"
                         maxlength="5" size="5"
@@ -107,7 +114,7 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
                 <span id="${cDialogActiviteeTabedPage._idDepassementForfaitaire}_span">(*)</span>
                 <br/>
                 <label>Rappel mois precedent (en heure)</label>
-                <input type="text" id="${cDialogActiviteeTabedPage._idReportPrecedent}"
+                <input type="text" id="${cDialogActiviteeTabedPage._idReportPrecedent}" class="couleurModifiable"
                         pattern="[0-9]{2}:[0-9]{2}"
                         placeholder="hh:mm"
                         maxlength="5" size="5"
@@ -133,7 +140,7 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
                         justify-content: left;
                         align-items: center;
                         ">
-                    <select class="${cDialogActiviteeTabedPage._idSelectActivitee}"
+                    <select class="${cDialogActiviteeTabedPage._idSelectActivitee} couleurModifiable"
                         style="
                             flex: 0 1 auto;
                             align-self: auto;
@@ -143,14 +150,14 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
         if (this._inputAsTime) {
             retour += `
                     <input type="time" id="${cDialogActiviteeTabedPage._idHoraireDebut}_Recurence"
-                        class="${cDialogActiviteeTabedPage._idHoraireDebut}" 
+                        class="${cDialogActiviteeTabedPage._idHoraireDebut} couleurModifiable" 
                         name="${cDialogActiviteeTabedPage._idHoraireDebut}_Recurence"
                         style="
                             flex: 0 1 auto;
                             align-self: auto;
                         ">
                     <input type="time" id="${cDialogActiviteeTabedPage._idHoraireFin}_Recurence" 
-                        class="${cDialogActiviteeTabedPage._idHoraireFin}" 
+                        class="${cDialogActiviteeTabedPage._idHoraireFin} couleurModifiable" 
                         name="${cDialogActiviteeTabedPage._idHoraireFin}_Recurence"
                         style="
                             flex: 0 1 auto;
@@ -159,7 +166,7 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
         else {
             retour += `           
                     <input type="text" id="${cDialogActiviteeTabedPage._idHoraireDebut}_Recurence"
-                            class="${cDialogActiviteeTabedPage._idHoraireDebut}" 
+                            class="${cDialogActiviteeTabedPage._idHoraireDebut} couleurModifiable" 
                             name="${cDialogActiviteeTabedPage._idHoraireDebut}_Recurence"
                             pattern="[0-9]{2}:[0-9]{2}"
                             placeholder="hh:mm"
@@ -170,7 +177,7 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
                                 width: 7ch;
                             "/>
                     <input type="text" id="${cDialogActiviteeTabedPage._idHoraireFin}_Recurence" 
-                            class="${cDialogActiviteeTabedPage._idHoraireFin}"
+                            class="${cDialogActiviteeTabedPage._idHoraireFin} couleurModifiable"
                             name="${cDialogActiviteeTabedPage._idHoraireFin}_Recurence"
                             pattern="[0-9]{2}:[0-9]{2}"
                             placeholder="hh:mm"
@@ -187,7 +194,8 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
                             justify-content: left;
                             align-items: flex-start;
                             border: solid 1px pink;
-                            ">`;
+                            "
+                        class="couleurModifiable">`;
 
         let joursCheckBox: string[] = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
         joursCheckBox.forEach(uneCheckBox => {
@@ -484,22 +492,22 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
                     uidLigne = this.createLigneUID(annee, mois, jourDuMois, indice++);
                     uneligne += `<tr id="tr${uidLigne}">`;
                     if (!bHasPrintFirstRow) {
-                        uneligne += `<td rowspan="${nbActiviteDuJour}" style="vertical-align : middle;">${jourDeLaSemaine} ${jourDuMois} ${cOutilsDivers.periode2String(mois, annee)} </td>`;
+                        uneligne += `<td rowspan="${nbActiviteDuJour}" style="vertical-align : middle;" >${jourDeLaSemaine} ${jourDuMois} ${cOutilsDivers.periode2String(mois, annee)} </td>`;
                         bHasPrintFirstRow = true;
                     }
                     uneligne +=`    <td> 
-                                        <textarea rows="1" cols="${curentACtiviteToPrint.activite.length}" readonly>${curentACtiviteToPrint.activite}</textarea>
+                                        <textarea rows="1" cols="${curentACtiviteToPrint.activite.length}" readonly class="couleurPasTouche">${curentACtiviteToPrint.activite}</textarea>
                                     </td>
                                     <td> 
                                         <textarea rows="1" cols="30"
                                             id="${cDialogActiviteeTabedPage._idHoraireDebut + uidLigne}" 
-                                            class="${cDialogActiviteeTabedPage._idHoraireDebut}"
+                                            class="${cDialogActiviteeTabedPage._idHoraireDebut} couleurPasTouche"
                                             readonly>${dateDebutActivite}</textarea>
                                     </td>
                                     <td> 
                                         <textarea rows="1" cols="30"
                                             id="${cDialogActiviteeTabedPage._idHoraireFin + uidLigne}" 
-                                            class="${cDialogActiviteeTabedPage._idHoraireFin}"
+                                            class="${cDialogActiviteeTabedPage._idHoraireFin} couleurPasTouche"
                                             readonly>${dateFinActivite}</textarea>
                                     </td>
                                     <td id="${cDialogActiviteeTabedPage._idHoraireDurrePresta + uidLigne}" class="${cDialogActiviteeTabedPage._idHoraireDurrePresta}">${cOutilsDivers.heureFloat2HeureString(duree.asHour())}</td>
@@ -520,22 +528,22 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
                 }
                 uneligne += `
                         <td>
-                            <select class="uk-select ${cDialogActiviteeTabedPage._idSelectActivitee}"></select>
+                            <select class="uk-select ${cDialogActiviteeTabedPage._idSelectActivitee} couleurModifiable"></select>
                         </td>`;
                 if (this._inputAsTime) {
                     uneligne += `
-                        <td><input type="time" id="${cDialogActiviteeTabedPage._idHoraireDebut + uidLigne}" class="${cDialogActiviteeTabedPage._idHoraireDebut}" name="${cDialogActiviteeTabedPage._idHoraireDebut + uidLigne}"> </td>
-                        <td><input type="time" id="${cDialogActiviteeTabedPage._idHoraireFin + uidLigne}" class="${cDialogActiviteeTabedPage._idHoraireFin}" name="${cDialogActiviteeTabedPage._idHoraireFin + uidLigne}"> </td>
+                        <td><input type="time" id="${cDialogActiviteeTabedPage._idHoraireDebut + uidLigne}" class="${cDialogActiviteeTabedPage._idHoraireDebut} couleurModifiable" name="${cDialogActiviteeTabedPage._idHoraireDebut + uidLigne}"> </td>
+                        <td><input type="time" id="${cDialogActiviteeTabedPage._idHoraireFin + uidLigne}" class="${cDialogActiviteeTabedPage._idHoraireFin} couleurModifiable" name="${cDialogActiviteeTabedPage._idHoraireFin + uidLigne}"> </td>
                     `;
                 }
                 else {
                     uneligne += `
                         <td><input type="text" id="${cDialogActiviteeTabedPage._idHoraireDebut + uidLigne}" 
-                                    class="${cDialogActiviteeTabedPage._idHoraireDebut}" name="${cDialogActiviteeTabedPage._idHoraireDebut + uidLigne}"
+                                    class="${cDialogActiviteeTabedPage._idHoraireDebut} couleurModifiable" name="${cDialogActiviteeTabedPage._idHoraireDebut + uidLigne}"
                                     pattern="[0-9]{2}:[0-9]{2}"
                                     maxlength="5" size="5"
                                     placeholder="hh:mm"></td>
-                        <td><input type="text" id="${cDialogActiviteeTabedPage._idHoraireFin + uidLigne}" class="${cDialogActiviteeTabedPage._idHoraireFin}" 
+                        <td><input type="text" id="${cDialogActiviteeTabedPage._idHoraireFin + uidLigne}" class="${cDialogActiviteeTabedPage._idHoraireFin} couleurModifiable" 
                                     name="${cDialogActiviteeTabedPage._idHoraireFin + uidLigne}"
                                     pattern="[0-9]{2}:[0-9]{2}"
                                     maxlength="5" size="5"
@@ -611,6 +619,10 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
 
             // update de la duree de travail mise en place par les activite de la DB
             this.updateDesDureeTotalDeTravail();
+
+            $(`.couleurModifiable`).css('background-color', this.couleurModifiable);
+            $(`.couleurInfo`).css('background-color', this.couleurInfo);
+            $(`.couleurPasTouche`).css('background-color', this.couleurPasTouche);
         }
     }
 

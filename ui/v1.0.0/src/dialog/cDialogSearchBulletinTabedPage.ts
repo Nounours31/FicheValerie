@@ -135,7 +135,7 @@ export default class cDialogSearchBulletinTabedPage extends cDialogAbstract {
         // add des personnes dans le selecteur
         // ------------------------------------------
         let jqIdSelectPersonne: string = `#${this._idSelectOnPersonne}`;
-        cDialogTools.addPersonneInSelect(jqIdSelectPersonne);
+        cDialogTools.addPersonneInSelect(jqIdSelectPersonne, true);
 
         let me : cDialogSearchBulletinTabedPage = this;
         $(`#${this._idValideInfo}`).on ('click', function (event) {
