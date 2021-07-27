@@ -1,14 +1,6 @@
 package sfa.fichevalerie.pdf.modele.itxt7;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -36,18 +28,24 @@ import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.element.Text;
 import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.TextAlignment;
-
-
 import com.itextpdf.layout.property.VerticalAlignment;
-import sfa.fichevalerie.mysql.api.datawrapper.*;
-import sfa.fichevalerie.mysql.db.access.*;
+
+import sfa.fichevalerie.mysql.api.datawrapper.Activite;
+import sfa.fichevalerie.mysql.api.datawrapper.BulletinSalaire;
+import sfa.fichevalerie.mysql.api.datawrapper.DepassementForfaitaire;
+import sfa.fichevalerie.mysql.api.datawrapper.Env;
+import sfa.fichevalerie.mysql.api.datawrapper.Personne;
+import sfa.fichevalerie.mysql.api.datawrapper.Rappel;
+import sfa.fichevalerie.mysql.db.access.DbActivite;
+import sfa.fichevalerie.mysql.db.access.DbDepassementForfaitaire;
+import sfa.fichevalerie.mysql.db.access.DbEnv;
+import sfa.fichevalerie.mysql.db.access.DbPersonne;
+import sfa.fichevalerie.mysql.db.access.DbRappel;
 import sfa.fichevalerie.tools.E4ALogger;
-import sfa.fichevalerie.tools.eE4ALoggerLevel;
 
 // https://kb.itextpdf.com/home/it7kb/examples
 
 public class ApiPdf {
-    private static final SimpleDateFormat _sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private boolean _debugMode =  false;
 	private PageSize _pageSize = null;;
 
@@ -68,7 +66,7 @@ public class ApiPdf {
     static private final float fontSizeMois = 10;
     static private final float fontSizeHeader = fontSizeDefaut;
     static private final float fontSizeActivite = fontSizeHeader;
-    private static final float fontSizePersonne = fontSizeActivite;
+    // private static final float fontSizePersonne = fontSizeActivite;
 
     private E4ALogger _logger = null;
 
@@ -180,7 +178,6 @@ public class ApiPdf {
 
         BuildEntete(document);
         BuildInfoPersonne(document, bs);
-        DbBulletinSalaire dbBS = new DbBulletinSalaire();
 
         DbActivite dbActivite = new DbActivite();
         Activite[] a = dbActivite.getAllActivitees(bs.getId());
@@ -191,7 +188,7 @@ public class ApiPdf {
         DbDepassementForfaitaire dbDepassementForfait = new DbDepassementForfaitaire();
         DepassementForfaitaire[] depasementForfait = dbDepassementForfait.getAllDepassementForfaitaire(bs.getId());
 
-        ArrayList<InfoActiviteeHandler> HeureTravailleeEnMinute = BuildActivitee(document, bs, a, rappels, depasementForfait);
+        ArrayList<StructNbHeureActiviteEtSonTauxHoraire> HeureTravailleeEnMinute = BuildActivitee(document, bs, a, rappels, depasementForfait);
         BuildImpot(document, HeureTravailleeEnMinute);
 
         //Close document
@@ -243,8 +240,8 @@ public class ApiPdf {
     }
 
 
-    private ArrayList<InfoActiviteeHandler> BuildActivitee(Document document, BulletinSalaire bs, Activite[] a, Rappel[] r, DepassementForfaitaire[] d) {
-        ArrayList<InfoActiviteeHandler> rc = new ArrayList<InfoActiviteeHandler>();
+    private ArrayList<StructNbHeureActiviteEtSonTauxHoraire> BuildActivitee(Document document, BulletinSalaire bulletinSalaire, Activite[] a, Rappel[] r, DepassementForfaitaire[] d) {
+        ArrayList<StructNbHeureActiviteEtSonTauxHoraire> allActiviteTimeWithLeurTaux = new ArrayList<StructNbHeureActiviteEtSonTauxHoraire>();
         float tailleTable2 = (float) (this._pageSize.getWidth());
         Table t = new Table(new float[]{
                 tailleTable2 * 0.1f,
@@ -319,14 +316,13 @@ public class ApiPdf {
         int nbActiviteMultiple = 0;
         boolean isFirstRow = false;
 
-        InfoActiviteeHandler courranteInfoActivite = null;
         for (int iIndice = 0; iIndice < a.length;  iIndice++) {
         	Activite uneActivite =  a[iIndice];
             _logger.debug(uneActivite.toString());
 
-            courranteInfoActivite = InfoActiviteeHandler.getHandler (rc, uneActivite, bs);
-
             String info = "";
+        	boolean borderRight = true; 
+        	boolean borderLeft = true; 
             Date debut = new Date();
             Date fin = new Date();
             debut.setTime(uneActivite.getGmtepoch_debut());
@@ -365,8 +361,11 @@ public class ApiPdf {
             
             // il y a des activite multiple?
             if (isFirstRow || !hasActiviteMultiple) {
-            	t.addCell (this.builCell (iJourSemaine, infoJour[0], false, true, nbActiviteMultiple));
-            	t.addCell (this.builCell (iJourSemaine, infoJour[1], true, false, nbActiviteMultiple));
+            	borderRight = false; borderLeft = true;
+            	t.addCell (this.builCell (iJourSemaine, infoJour[0], borderRight, borderLeft, nbActiviteMultiple));
+
+            	borderRight = true; borderLeft = false;
+            	t.addCell (this.builCell (iJourSemaine, infoJour[1], borderRight, borderLeft, nbActiviteMultiple));
             	isFirstRow = false;
             }
             
@@ -382,10 +381,11 @@ public class ApiPdf {
 
             // ---------------------------
             // affichage activitee
-            // ---------------------------            
-            // info = String.format("%s [Taux %d]",uneActivite.getActivite(), courranteInfoActivite.tauxIndice);
-            info = String.format("%s",uneActivite.getActivite(), courranteInfoActivite.tauxIndice);
-            t.addCell (this.builCell (iJourSemaine, info, true, true));
+            // ---------------------------
+        	// info = String.format("%s [Taux %d]",uneActivite.getActivite(), courranteInfoActivite.getUiTauxIndice());
+        	info = String.format("%s",uneActivite.getActivite());
+        	borderRight = true; borderLeft = true;
+            t.addCell (this.builCell (iJourSemaine, info, borderRight, borderLeft));
 
             // ---------------------------
             // heure de debut
@@ -393,19 +393,22 @@ public class ApiPdf {
 
             boolean center = true;
             info = tools.FromDateToHeure(debut);
-            t.addCell (this.builCell (iJourSemaine, info, true, true, center));
+        	borderRight = true; borderLeft = true;
+            t.addCell (this.builCell (iJourSemaine, info, borderRight, borderLeft, center));
 
             // ---------------------------
             // heure de fin
             // ---------------------------
             info = tools.FromDateToHeure(fin);
-            t.addCell (this.builCell (iJourSemaine, info, true, true, center));
+        	borderRight = true; borderLeft = true;
+            t.addCell (this.builCell (iJourSemaine, info, borderRight, borderLeft, center));
 
             // ---------------------------
             // duree activite
             // ---------------------------
             info = tools.FromMinutesLongToHeure(tools.FromDureeToMinutesLong(debut, fin));
-            t.addCell (this.builCell (iJourSemaine, info, true, true, center));
+        	borderRight = true; borderLeft = true;
+            t.addCell (this.builCell (iJourSemaine, info, borderRight, borderLeft, center));
 
             // ---------------------------
             // duree totale
@@ -413,14 +416,17 @@ public class ApiPdf {
             long dureeActivite = tools.FromDureeToMinutesLong(debut, fin);
             nbHeureTravailleeTotale += dureeActivite;
             info = tools.FromMinutesLongToHeure(nbHeureTravailleeTotale);
-            t.addCell (this.builCell (iJourSemaine, info, true, true, center));
+        	borderRight = true; borderLeft = true;
+            t.addCell (this.builCell (iJourSemaine, info, borderRight, borderLeft, center));
 
-            courranteInfoActivite.AddNbHeureMinutes(dureeActivite);
+            StructNbHeureActiviteEtSonTauxHoraire.AddNbHeureMinutes (allActiviteTimeWithLeurTaux, dureeActivite, uneActivite.getTarifHoraire(), bulletinSalaire.getTarifHoraire()); 
             nbLineTotal++;
         }
         document.add(t);
         
+        // --------------------------------------------
         // changer de page
+        // --------------------------------------------
         if ((nbLineTotal > 41) && (nbLineTotal < 46)) {
         	document.add(new AreaBreak());
         	nbLineTotal = 0;
@@ -436,55 +442,74 @@ public class ApiPdf {
                 tailleTable2 * 0.125f
         });
         
+        // --------------------------------------------
+        // Ligne blanche
+        // --------------------------------------------
         cell = new Cell(1,7);
         cell.setBorder(Border.NO_BORDER);
         t.addCell(cell);
 
+        // --------------------------------------------
+        // S'il y a un depassement foafaitaire le mettre
+        // --------------------------------------------
         if (d != null) {
-            cell = new Cell(1,5);
+
+            float nbHeureDepassement = 0f;
+
+            ArrayList<StructNbHeureActiviteEtSonTauxHoraire> allDepassementTimeWithLeurTaux = new ArrayList<StructNbHeureActiviteEtSonTauxHoraire>(); 
+            for (DepassementForfaitaire unDepassementForfait : d) {
+                nbHeureDepassement = unDepassementForfait.getDureeenheure();
+                StructNbHeureActiviteEtSonTauxHoraire.AddNbHeureMinutes (allDepassementTimeWithLeurTaux, (long)(nbHeureDepassement * 60.0f), unDepassementForfait.getTarifHoraire(), bulletinSalaire.getTarifHoraire());
+                StructNbHeureActiviteEtSonTauxHoraire.AddNbHeureMinutes (allActiviteTimeWithLeurTaux, (long)(nbHeureDepassement * 60.0f), unDepassementForfait.getTarifHoraire(), bulletinSalaire.getTarifHoraire());
+            }
+
+            
+            cell = new Cell(allDepassementTimeWithLeurTaux.size(),5);
             cell.add (new Paragraph(new Text(ei18n.activite_depassementforfaitaire.nls())));
             t.addCell(cell);
 
-            cell = new Cell(1,1);
-            float nbHeureDepassement = 0f;
+            for (StructNbHeureActiviteEtSonTauxHoraire depassementACeTaux : allDepassementTimeWithLeurTaux) {
+                long nbMinutesLongDepassement = depassementACeTaux.getNbHeureMinutes();
 
-            for (DepassementForfaitaire unDepassementForfait : d) {
-                nbHeureDepassement += unDepassementForfait.getDureeenheure();
-                courranteInfoActivite = InfoActiviteeHandler.getHandler(rc, unDepassementForfait, bs);
-                courranteInfoActivite.AddNbHeureMinutes((long) nbHeureDepassement * 60);
-            }
+                cell = new Cell(1,1);
+                cell.add(new Paragraph(new Text(tools.FromMinutesLongToHeure(nbMinutesLongDepassement))).setTextAlignment(TextAlignment.CENTER));
+                t.addCell(cell);				
 
-            long nbMinutesLongDepassement = (long) nbHeureDepassement * 60;
-            cell.add(new Paragraph(new Text(tools.FromMinutesLongToHeure(nbMinutesLongDepassement))).setTextAlignment(TextAlignment.CENTER));
-            t.addCell(cell);
+                nbHeureTravailleeTotale += nbMinutesLongDepassement;
+                cell = new Cell(1, 1);
+                cell.add(new Paragraph(new Text(tools.FromMinutesLongToHeure(nbHeureTravailleeTotale))).setTextAlignment(TextAlignment.CENTER));
+                t.addCell(cell);
+			}
 
-            nbHeureTravailleeTotale += nbMinutesLongDepassement;
-            cell = new Cell(1, 1);
-            cell.add(new Paragraph(new Text(tools.FromMinutesLongToHeure(nbHeureTravailleeTotale))).setTextAlignment(TextAlignment.CENTER));
-            t.addCell(cell);
         }
 
         float nbHeureReportMoisPrecedent = 0f;
         if (r != null) {
+        	
+            ArrayList<StructNbHeureActiviteEtSonTauxHoraire> allRappelTimeWithLeurTaux = new ArrayList<StructNbHeureActiviteEtSonTauxHoraire>(); 
             for (Rappel unRappel : r) {
-                nbHeureReportMoisPrecedent += unRappel.getDureeenheure();
-                courranteInfoActivite = InfoActiviteeHandler.getHandler(rc, unRappel, bs);
-                courranteInfoActivite.AddNbHeureMinutes((long) nbHeureReportMoisPrecedent * 60l);
+                nbHeureReportMoisPrecedent = unRappel.getDureeenheure();
+                StructNbHeureActiviteEtSonTauxHoraire.AddNbHeureMinutes (allRappelTimeWithLeurTaux, (long)(nbHeureReportMoisPrecedent * 60.0f), unRappel.getTarifHoraire(), bulletinSalaire.getTarifHoraire());
+                StructNbHeureActiviteEtSonTauxHoraire.AddNbHeureMinutes (allActiviteTimeWithLeurTaux, (long)(nbHeureReportMoisPrecedent * 60.0f), unRappel.getTarifHoraire(), bulletinSalaire.getTarifHoraire());
             }
 
-            cell = new Cell(1,5);
+            cell = new Cell(allRappelTimeWithLeurTaux.size(),5);
             cell.add (new Paragraph(new Text(ei18n.activite_RappelPrecedent.nls())));
             t.addCell(cell);
 
-            long nbMinutesLongReportMoisPrecedent = (long) nbHeureReportMoisPrecedent * 60;
-            cell = new Cell(1, 1);
-            cell.add(new Paragraph(new Text(tools.FromMinutesLongToHeure(nbMinutesLongReportMoisPrecedent))).setTextAlignment(TextAlignment.CENTER));
-            t.addCell(cell);
 
-            nbHeureTravailleeTotale += nbMinutesLongReportMoisPrecedent;
-            cell = new Cell(1, 1);
-            cell.add(new Paragraph(new Text(tools.FromMinutesLongToHeure(nbHeureTravailleeTotale))).setTextAlignment(TextAlignment.CENTER));
-            t.addCell(cell);
+            for (StructNbHeureActiviteEtSonTauxHoraire rappelACeTaux : allRappelTimeWithLeurTaux) {
+                long nbMinutesLongDepassement = rappelACeTaux.getNbHeureMinutes();
+
+                cell = new Cell(1,1);
+                cell.add(new Paragraph(new Text(tools.FromMinutesLongToHeure(nbMinutesLongDepassement))).setTextAlignment(TextAlignment.CENTER));
+                t.addCell(cell);				
+
+                nbHeureTravailleeTotale += nbMinutesLongDepassement;
+                cell = new Cell(1, 1);
+                cell.add(new Paragraph(new Text(tools.FromMinutesLongToHeure(nbHeureTravailleeTotale))).setTextAlignment(TextAlignment.CENTER));
+                t.addCell(cell);
+			}
         }
         cell = new Cell(1,6);
         cell.add (new Paragraph(new Text(ei18n.activite_TotalHoraire.nls())));
@@ -504,7 +529,7 @@ public class ApiPdf {
         	nbLineTotal = 0;
         }        
         
-        return rc;
+        return allActiviteTimeWithLeurTaux;
     }
 
 
@@ -519,7 +544,7 @@ public class ApiPdf {
     }
 
 	private Cell builCell(int i, String info, boolean borderRight, boolean borderLeft, boolean center) {
-        return builCell (i, info, borderRight, borderLeft, false, 1);
+        return builCell (i, info, borderRight, borderLeft, center, 1);
     }
 
 	private Cell builCell(int i, String info, boolean borderRight, boolean borderLeft, boolean center, int rowSpan) {
@@ -543,6 +568,10 @@ public class ApiPdf {
             p.setTextAlignment(TextAlignment.CENTER);
 
         Cell cell = new Cell(rowSpan,1).add(p);
+        if (center) {
+            cell.setTextAlignment(TextAlignment.CENTER);
+            cell.setHorizontalAlignment(HorizontalAlignment.CENTER);
+        }
         if (rowSpan > 1)
         	cell.setVerticalAlignment(VerticalAlignment.MIDDLE);
         
@@ -557,7 +586,7 @@ public class ApiPdf {
     }
 
     
-    private void BuildImpot(Document document, ArrayList<InfoActiviteeHandler> allInfos) {
+    private void BuildImpot(Document document, ArrayList<StructNbHeureActiviteEtSonTauxHoraire> allInfos) {
         Paragraph p = new Paragraph();
         p.add("");
         document.add(p);
@@ -594,15 +623,15 @@ public class ApiPdf {
         cell.add (new Paragraph(ei18n.impot_salaire_brut.nls()).setBold().setTextAlignment(TextAlignment.RIGHT)).setVerticalAlignment(VerticalAlignment.MIDDLE);
         cell.setBackgroundColor(_bgBlue);
         t.addCell(cell);
-        for (InfoActiviteeHandler uneInfo : allInfos) {
+        for (StructNbHeureActiviteEtSonTauxHoraire uneInfo : allInfos) {
             cell = new Cell(1,1);
             cell.add (new Paragraph(new Text(tools.FromMinutesLongToHeure(uneInfo.getNbHeureMinutes()) )).setTextAlignment(TextAlignment.CENTER));
             t.addCell(cell);
             cell = new Cell(1,1);
-            cell.add (new Paragraph(new Text(String.format("%02.2f", uneInfo.taux) + tools.encodeUTF8(tools.tauxhoraire))).setTextAlignment(TextAlignment.CENTER));
+            cell.add (new Paragraph(new Text(String.format("%02.2f", uneInfo.getTaux()) + tools.encodeUTF8(tools.tauxhoraire))).setTextAlignment(TextAlignment.CENTER));
             t.addCell(cell);
             cell = new Cell(1,1);
-            float gain = uneInfo.taux * uneInfo.getNbHeureMinutes() / 60f;
+            float gain = uneInfo.getTaux() * uneInfo.getNbHeureMinutes() / 60f;
             gainTotal += gain;
             cell.add (new Paragraph(new Text(String.format("%02.2f", gain) + tools.encodeUTF8(tools.euro))).setTextAlignment(TextAlignment.CENTER));
             t.addCell(cell);
