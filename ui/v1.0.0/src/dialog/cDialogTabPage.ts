@@ -14,7 +14,7 @@ import cDialogInfoDebugTabedPage from './cDialogInfoDebugTabedPage';
 export default class cDialogTabPage extends cDialog {
     private static _NomPrefixe: string = 'cDialogTabPage';
     private static _idTabPage: string = cDialogTabPage._NomPrefixe + "_cDialogTabPage";
-    private static _idSwitcher: string = cDialogTabPage._NomPrefixe + "_cDialogTabSwitcher";
+    public static _idSwitcher: string = cDialogTabPage._NomPrefixe + "_cDialogTabSwitcher";
 
 
     private iAddActivitee: cDialogActiviteeTabedPage = null;
@@ -66,10 +66,6 @@ export default class cDialogTabPage extends cDialog {
         this.iSearch.addCallBack();
         this.iAddInDB.addCallBack();
         this.iInfoDebug.addCallBack();
-
-        $(`#${cDialogTabPage._idSwitcher}`).on('show', function(event, area){
-            console.log("Switcher switched to ", area);
-        });
     }
 
     public getSwitcherElement(): UIkit.UIkitSwitcherElement {
