@@ -1,0 +1,16 @@
+#!/bin/bash
+
+MyCMD=""
+
+while [ "$1" != "" ]; do
+    case "$1" in 
+        "debug")
+                 curl -X GET http://www.famillefages.ovh:8080/ficheValerie-2021-07-01/v1.0.0/debug/debug;;
+
+        "fatal") 
+                 curl -X GET http://www.famillefages.ovh:8080/ficheValerie-2021-07-01/v1.0.0/debug/fatal;;
+
+        *) printf "Cas inconnu >%s<\n" "$1"
+    esac
+    shift 1  
+done
