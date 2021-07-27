@@ -8,5 +8,5 @@ export default class cEnv {
     private static PROD: number = 0;
     private static DELL: number = 1;
     private static VAPE: number = 2;
-    public static _serverURL: string = cEnv._serverURLInternal[cEnv.DELL];
+    public static _serverURL: string = cEnv._serverURLInternal[cEnv.PROD];
 }

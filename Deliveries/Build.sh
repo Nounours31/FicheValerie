@@ -1,4 +1,13 @@
 #!/bin/bash
+TO=/E/WS/GitHubPerso/FicheValerie/Deliveries/Deliveries
+mkdir -p ${TO}/war
+mkdir -p ${TO}/ui
+
+# update de la DB
+printf "Est ce que le dump de la DB a ete fait? Script d'update ?"
+read a
+cp /E/WS/GitHubPerso/FicheValerie/DB/sfa_fichevalerie_last.sql ${TO}
+printf "OK cp of the DB data\n"
 
 # version de git:
 comitBranch=$(git log HEAD^..HEAD | grep "commit" | awk 'BEGIN{FS="("}{print $2}' | tr -d ')')
@@ -47,17 +56,19 @@ read a
 cd /E/WS/GitHubPerso/FicheValerie/server/v1.0.0
 . graddle.sh
 gradle war
-cp /E/WS/GitHubPerso/FicheValerie/server/v1.0.0/lib/build/libs/*.war  /E/WS/GitHubPerso/FicheValerie/Deliveries/war
+cp /E/WS/GitHubPerso/FicheValerie/server/v1.0.0/lib/build/libs/*.war ${TO}/war
 echo "OK cp WAR"
 
 cd /E/WS/GitHubPerso/FicheValerie/ui/v1.0.0
 npm run build:prod
-cp /E/WS/GitHubPerso/FicheValerie/ui/v1.0.0/main.html /E/WS/GitHubPerso/FicheValerie/Deliveries/ui
-cp -r /E/WS/GitHubPerso/FicheValerie/ui/v1.0.0/dist /E/WS/GitHubPerso/FicheValerie/Deliveries/ui
-cp -r /E/WS/GitHubPerso/FicheValerie/ui/v1.0.0/images /E/WS/GitHubPerso/FicheValerie/Deliveries/ui
+cp /E/WS/GitHubPerso/FicheValerie/ui/v1.0.0/main.html ${TO}/ui
+cp -r /E/WS/GitHubPerso/FicheValerie/ui/v1.0.0/dist ${TO}/ui
+cp -r /E/WS/GitHubPerso/FicheValerie/ui/v1.0.0/images ${TO}/ui
 echo "OK cp UI"
 
-cd /E/WS/GitHubPerso/FicheValerie/
+cd ${TO}
+cd ..
 tar -cvf Deliveries.tar Deliveries
-mv Deliveries.tar Deliveries
 echo "Ok Tar"
+
+rm -rf ${TO}
