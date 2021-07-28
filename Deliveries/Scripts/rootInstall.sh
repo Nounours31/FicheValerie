@@ -68,7 +68,7 @@ mkdir -p  /var/www/html/FicheValerie/ui/v1.0.0
 ls -al /var/www/html/FicheValerie/ui/v1.0.0
 log2 "    OK Clean httpd"
 
-cp -p -r  ~rel/github/FicheValerie/Deliveries/Deliveries/ui /var/www/html/FicheValerie/ui/v1.0.0
+cp -p -r  ~rel/github/FicheValerie/Deliveries/Deliveries/ui/* /var/www/html/FicheValerie/ui/v1.0.0
 chown -R apache:apache /var/www/html/FicheValerie/ui/v1.0.0
 systemctl start httpd
 log2 "OK HTTPD"
