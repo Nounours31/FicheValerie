@@ -13,7 +13,7 @@ function log2 () {
 }
 
 log "Refresh GIT"
-su - rel -c "cd ~rel/github/FicheValerie; git checkout master; git pull"
+su - rel -c "cd ~rel/github/FicheValerie; git checkout DevHTTPS; git pull"
 log2 "OK Git"
 
 
