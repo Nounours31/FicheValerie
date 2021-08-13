@@ -14,7 +14,7 @@ export default class cWS {
 
     public getAllPersonnes(): iPersonne[] {
         let retour : iPersonne[] = [];
-        let URL = cEnv._serverURL + '/personne';
+        let URL = cEnv.getTomeeURL() + '/personne';
         let oResp: boolean = this.t.sendGetWS(URL);
         if (this.t.status) {
             retour = ((this.t.data as unknown) as iPersonne[]);
@@ -29,9 +29,9 @@ export default class cWS {
         let URL : string = "";
         // if (typeof abc === "number") {
         if (nom !== undefined) {
-            URL = cEnv._serverURL + `/personne/${idOrGenre}/${nom}`;
+            URL = cEnv.getTomeeURL() + `/personne/${idOrGenre}/${nom}`;
         } else {
-            URL = cEnv._serverURL + `/personne/${idOrGenre}`;
+            URL = cEnv.getTomeeURL() + `/personne/${idOrGenre}`;
         }
         let oResp: boolean = this.t.sendGetWS(URL);
         if (this.t.status) {
@@ -46,9 +46,9 @@ export default class cWS {
         let retour: iBulletinSalaire[] = [];
         let URL : string = "";
         if ((mois == null) || (annee == null))
-            URL = cEnv._serverURL + `/bulletinSalaire/${idPersonneOrIdBulletin}`;
+            URL = cEnv.getTomeeURL() + `/bulletinSalaire/${idPersonneOrIdBulletin}`;
         else
-            URL = cEnv._serverURL + `/bulletinSalaire/${idPersonneOrIdBulletin}/${mois}/${annee}`;
+            URL = cEnv.getTomeeURL() + `/bulletinSalaire/${idPersonneOrIdBulletin}/${mois}/${annee}`;
 
         let oResp: boolean = this.t.sendGetWS(URL);
         if (this.t.status) {
@@ -60,7 +60,7 @@ export default class cWS {
 
     public createBulletinSalaire(mois: number, annee: number, p: iPersonne, tarifHoraire: number): number {
         let retour: number = -1;
-        let URL = cEnv._serverURL + `/bulletinSalaire`;
+        let URL = cEnv.getTomeeURL() + `/bulletinSalaire`;
         let postData: iBulletinSalaire = {
             'annee': annee as number,
             'mois': mois as number,
@@ -77,7 +77,7 @@ export default class cWS {
 
     public getAllActivitee(idBulletinSalaire: number): iActivite[] {
         let retour: iActivite[] = [];
-        let URL = cEnv._serverURL + `/activitee/bulletin/${idBulletinSalaire}`;
+        let URL = cEnv.getTomeeURL() + `/activitee/bulletin/${idBulletinSalaire}`;
         let oResp: boolean = this.t.sendGetWS(URL);
         if (this.t.status) {
             retour = ((this.t.data as unknown) as iActivite[]);
@@ -86,7 +86,7 @@ export default class cWS {
     }
     public getActivitee(activiteId: string): iActivite[] {
         let retour: iActivite[] = [];
-        let URL = cEnv._serverURL + `/activitee/${activiteId}`;
+        let URL = cEnv.getTomeeURL() + `/activitee/${activiteId}`;
         let oResp: boolean = this.t.sendGetWS(URL);
         if (this.t.status) {
             retour = ((this.t.data as unknown) as iActivite[]);
@@ -99,7 +99,7 @@ export default class cWS {
 
     public addActivite(ficheId: number, jour: number, activite: string, debut: Date, fin: Date, tarifHoraire: number) : number {
         let retour: number = -1;
-        let URL = cEnv._serverURL + `/activitee`;
+        let URL = cEnv.getTomeeURL() + `/activitee`;
         let postData: iActivite = {
             'id': -1,
             'idBulletinSalaire': ficheId,
@@ -116,14 +116,14 @@ export default class cWS {
     }
 
     public deleteActivite (sActiviteId : string) : boolean {
-        let URL = cEnv._serverURL + `/activitee/${sActiviteId}`;
+        let URL = cEnv.getTomeeURL() + `/activitee/${sActiviteId}`;
         let oResp: boolean = this.t.sendDeleteWS(URL);
         return true;
     }
 
     public generatePdf(ficheId: number) : iPdf {
         let retour: iPdf = null;
-        let URL = cEnv._serverURL + `/pdf`;
+        let URL = cEnv.getTomeeURL() + `/pdf`;
         let postData: iPdf = {
             'id': -1,
             'idBulletinSalaire': ficheId,
@@ -138,7 +138,7 @@ export default class cWS {
 
     public getPdf(ficheId: number): iPdf {
         let retour: iPdf = null;
-        let URL = cEnv._serverURL + `/pdf/file/${ficheId}`;
+        let URL = cEnv.getTomeeURL() + `/pdf/file/${ficheId}`;
         let oResp: boolean = this.t.GetPDFFileWS(URL, 'ficheSalaire.pdf');
         if (this.t.status) {
             retour = ((this.t.data as unknown) as iPdf);
@@ -148,7 +148,7 @@ export default class cWS {
 
     public getAllPDFFromBulletinId(ficheId: number): iPdf[] {
         let retour: iPdf[] = null;
-        let URL = cEnv._serverURL + `/pdf/${ficheId}`;
+        let URL = cEnv.getTomeeURL() + `/pdf/${ficheId}`;
         let oResp: boolean = this.t.sendGetWS(URL);
         if (this.t.status) {
             retour = ((this.t.data as unknown) as iPdf[]);
@@ -159,7 +159,7 @@ export default class cWS {
 
     public addNewPersonne(genre: string, nom: string): iPersonne {
         let retour : iPersonne = null;
-        let URL = cEnv._serverURL + '/personne';
+        let URL = cEnv.getTomeeURL() + '/personne';
         let PostData: iPersonne = {
             'genre': genre,
             id: -1,
@@ -179,7 +179,7 @@ export default class cWS {
     // les cas tordu par lequel je passe par du SQL
     // ------------------------------------------------
     public setHeureReport(_idBulletinSalaire: number, nbHeure: number) {
-        let URL = cEnv._serverURL + `/sql`;
+        let URL = cEnv.getTomeeURL() + `/sql`;
         let postData: Object = {
             'infos': { 'idBulletin' : _idBulletinSalaire, 'nbHeure' : nbHeure},
             'retour': 'iHeureReport',
@@ -188,7 +188,7 @@ export default class cWS {
         return;
     }
     public setDepassementForfaitaire(_idBulletinSalaire: number, nbHeure: number) {
-        let URL = cEnv._serverURL + `/sql`;
+        let URL = cEnv.getTomeeURL() + `/sql`;
         let postData: Object = {
             'infos': { 'idBulletin' : _idBulletinSalaire, 'nbHeure' : nbHeure},
             'retour': 'iDepassementForfaitaire',
@@ -205,7 +205,7 @@ export default class cWS {
     }
     public getExtra(_idBulletinSalaire: number) : object {
         let retour: object = {};
-        let URL = cEnv._serverURL + `/sql/infosExtras/${_idBulletinSalaire}`;
+        let URL = cEnv.getTomeeURL() + `/sql/infosExtras/${_idBulletinSalaire}`;
         let oResp: boolean = this.t.sendGetWS(URL);
         if (this.t.status) {
             retour = ((this.t.data as unknown) as object);
@@ -216,7 +216,7 @@ export default class cWS {
     
     public getBulletinSalaireFromSQL(sql: string): iBulletinSalaire[] {
         let retour: iBulletinSalaire[] = [];
-        let URL = cEnv._serverURL + `/sql`;
+        let URL = cEnv.getTomeeURL() + `/sql`;
         let postData: Object = {
             'sql': sql,
             'retour': 'iBulletinSalaire',
@@ -230,7 +230,7 @@ export default class cWS {
 
     public getAllPossibleActivitees(): string[] {
         let retour: string[] = [];
-        let URL = cEnv._serverURL + `/sql`;
+        let URL = cEnv.getTomeeURL() + `/sql`;
         let postData: Object = {
             'sql': 'getAllPossibleActivitees',
             'retour': 'iListActivitee',
@@ -243,7 +243,7 @@ export default class cWS {
     }
     public addAPossibleActivitee(activitee: string) : void {
         let retour: string[] = [];
-        let URL = cEnv._serverURL + `/sql`;
+        let URL = cEnv.getTomeeURL() + `/sql`;
         let postData: Object = {
             'infos': [ 'addPossibleActivitee', activitee ],
             'retour': 'iListActivitee',
@@ -258,7 +258,7 @@ export default class cWS {
     // --------------------------------
     public getSetEnvInfo(storePath?: string, CSG? : number, TauxImposition? : number): any {
         let retour: string[] = [];
-        let URL = cEnv._serverURL + `/sql`;
+        let URL = cEnv.getTomeeURL() + `/sql`;
         let postData: any = {
             'retour': 'iEnvInfo',
             'infos': {},
@@ -282,7 +282,7 @@ export default class cWS {
 
     public getServerBuildVersion() : string {
         let retour: string = "";
-        let URL = cEnv._serverURL + `/build`;
+        let URL = cEnv.getTomeeURL() + `/build`;
         let oResp: boolean = this.t.sendGetWS(URL, 'text');
         if (this.t.status) {
             retour = ((this.t.data as unknown) as string);
@@ -292,7 +292,7 @@ export default class cWS {
 
     public setServerDebug(level : string): string {
         let retour: string = "";
-        let URL = cEnv._serverURL + `/debug/${level}`;
+        let URL = cEnv.getTomeeURL() + `/debug/${level}`;
         let oResp: boolean = this.t.sendGetWS(URL, 'text');
         if (this.t.status) {
             retour = ((this.t.data as unknown) as string);
