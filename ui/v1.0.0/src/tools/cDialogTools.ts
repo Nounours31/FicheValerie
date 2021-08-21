@@ -5,7 +5,7 @@ import UIkit from 'UIKit';
 
 import $ from 'jquery'
 import cWS from '../WS/cWS';
-import { iPdf, iPersonne } from '../WS/iWSMessages';
+import { iActivite, iActiviteEnum, iPdf, iPersonne } from '../WS/iWSMessages';
 
 export default class cDialogTools {
     constructor () {
@@ -64,10 +64,10 @@ export default class cDialogTools {
         $(jqIdSelectActivite).empty();
         
         let ws: cWS = new cWS();
-        let allActivitee: string[] = ws.getAllPossibleActivitees();
+        let allActivitee: iActiviteEnum[] = ws.getAllPossibleActivitees();
         $(jqIdSelectActivite).append($('<option>', { value: "-", text: "-" }).attr('selected', 'selected'));
         allActivitee.forEach(uneActivitee => {
-            $(jqIdSelectActivite).append($('<option>', { value: uneActivitee, text: uneActivitee }));
+            $(jqIdSelectActivite).append($('<option>', { value: uneActivitee.id, text: uneActivitee.nom }));
         });
     }
 

@@ -25,6 +25,11 @@ export interface iActivite {
     // fin?: Date;
 }
 
+export interface iActiviteEnum {
+    id: number;
+    nom: string;
+}
+
 export interface iPdf {
     id: number;
     idBulletinSalaire: number;

@@ -95,9 +95,13 @@ public abstract class DB implements iDB {
 
 	public cInfoFromSelect selectAsRest (String sql) throws Exception {
 		Connection c =  this.connect();
-		cInfoFromSelect rc = this.select(c, sql);
-		this.close(c);
-		return rc;
+		try {
+			cInfoFromSelect rc = this.select(c, sql);
+			return rc;
+		}
+		finally {
+			this.close(c);
+		}
 	}
 
 	private cInfoFromSelect select (Connection c, String sql) throws SQLException  {
@@ -105,7 +109,15 @@ public abstract class DB implements iDB {
 		cInfoFromSelect ret = new cInfoFromSelect();
 
 		Statement stmt=c.createStatement();  
-		ResultSet rs=stmt.executeQuery(sql);  
+		ResultSet rs=null;
+		try {
+			rs=stmt.executeQuery(sql);  
+		}
+		catch (SQLException e) {
+			_logger.fatal("SQL:" + sql);
+			_logger.fatal("SQL error:" + e.getMessage());
+			throw e;
+		}
 
 		ret.buildFromResultSet(rs);
 		return ret;
@@ -115,9 +127,13 @@ public abstract class DB implements iDB {
 
 	public int insertAsRest (String sql) throws Exception  {
 		Connection c =  this.connect();
-		int rc = this.insert(c, sql);
-		this.close(c);
-		return rc;        
+		try {
+			int rc = this.insert(c, sql);
+			return rc;        
+		}
+		finally {
+			this.close(c);
+		}
 	}
 
 	private int  insert (Connection c, String sql) throws SQLException {
@@ -125,18 +141,32 @@ public abstract class DB implements iDB {
 		this._logger.debug("DBAccess::insert SQL["+sql+"]");
 
 		Statement stmt=c.createStatement();  
-		boolean rc = stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);  
-		ResultSet rs = stmt.getGeneratedKeys(); 
-		if(rs.next()) {  
-			retour = rs.getInt(1);
+		try {
+			boolean rc = stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);  
+			if (rc) {
+				ResultSet rs = stmt.getGeneratedKeys(); 
+				if(rs.next()) {  
+					retour = rs.getInt(1);
+				}
+			}
+		}
+		catch (SQLException e) {
+			_logger.fatal("SQL:" + sql);
+			_logger.fatal("SQL error:" + e.getMessage());
+			throw e;
 		}
 		return retour;    
 	}
 
 	public int updateAsRest (String sql) throws Exception  {
 		Connection link =  this.connect();
-		int rc = this.update(link, sql);
-		this.close(link);
+		int rc = -1;
+		try {
+			rc = this.update(link, sql);
+		}
+		finally {
+			this.close(link);
+		}
 		return rc;
 	}
 
@@ -148,8 +178,13 @@ public abstract class DB implements iDB {
 
 	public int deleteAsRest (String sql) throws Exception  {
 		Connection link =  this.connect();
-		int rc = this.delete(link, sql);
-		this.close(link);
+		int rc = -1;
+		try {
+			rc = this.delete(link, sql);
+		}
+		finally {
+			this.close(link);
+		}
 		return rc;
 	}
 
@@ -159,16 +194,25 @@ public abstract class DB implements iDB {
 
 
 	/* others queries */
-	private int _others (Connection link, String sql, boolean updateQuery) throws Exception  {
+	private int _others (Connection c, String sql, boolean updateQuery) throws Exception  {
 
-		Statement stmt=link.createStatement();  
+		Statement stmt=c.createStatement();  
 		if (updateQuery) {
 			this._logger.debug("DBAccess::Upate SQL["+sql+"]");
 		}
 		else {
 			this._logger.debug("DBAccess::Delete SQL["+sql+"]");
 		}
-		int rc = stmt.executeUpdate(sql);
+		int rc = -1;
+		try {
+			rc = stmt.executeUpdate(sql);
+		}
+		catch (SQLException e) {
+			_logger.fatal("SQL:" + sql);
+			_logger.fatal("SQL error:" + e.getMessage());
+			throw e;
+		}
+		
 		return rc;
 	}
 
@@ -196,6 +240,4 @@ public abstract class DB implements iDB {
         s = s.replace("_","\\_");
         return s;
     }
-
-
 }

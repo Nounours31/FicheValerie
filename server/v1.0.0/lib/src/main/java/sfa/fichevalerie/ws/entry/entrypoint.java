@@ -16,6 +16,7 @@ import javax.ws.rs.core.UriInfo;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import sfa.fichevalerie.mysql.api.datawrapper.Activite;
+import sfa.fichevalerie.mysql.api.datawrapper.ActiviteEnum;
 import sfa.fichevalerie.mysql.api.datawrapper.BulletinSalaire;
 import sfa.fichevalerie.mysql.api.datawrapper.Pdf;
 import sfa.fichevalerie.mysql.api.datawrapper.Personne;
@@ -117,6 +118,17 @@ public class entrypoint {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPersonne(@PathParam("id") int id) {
     	iWS ws = cWsFactory.getImpl("getAllPersonnes");
+    	_logger.info(ws.whoami());
+
+    	ws.setArgs ("id", id);
+    	return ws.run();
+    }
+
+    @DELETE
+    @Path("/personne/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deletePersonne(@PathParam("id") int id) {
+    	iWS ws = cWsFactory.getImpl("deletePersonne");
     	_logger.info(ws.whoami());
 
     	ws.setArgs ("id", id);
@@ -227,6 +239,41 @@ public class entrypoint {
         return ws.run();
     }
 
+    // ----------------------------------------------------
+	// Gestion de la liste des activitees possible (ActiviteEnum)
+	// ----------------------------------------------------
+    @DELETE
+    @Path("/activiteeEnum/{idActiviteeEnum}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteActiviteeEnum(@PathParam("idActiviteeEnum") int idActiviteeEnum) {
+        iWS ws = cWsFactory.getImpl("deleteActiviteeEnum");
+        _logger.info(ws.whoami());
+
+        ws.setArgs ("idActiviteeEnum", idActiviteeEnum);
+        return ws.run();
+    }
+
+    @GET
+    @Path("/activiteeEnum")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllPossibleActiviteEnum() {
+        iWS ws = cWsFactory.getImpl("getActiviteeEnum");
+        _logger.info(ws.whoami());
+        return ws.run();
+    }
+
+
+    @POST
+    @Path("/activiteeEnum")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response createActiviteEnum(ActiviteEnum a) {
+        iWS ws = cWsFactory.getImpl("createActiviteeEnum");
+        _logger.info(ws.whoami());
+
+        ws.setArgs ("ActiviteeEnum", a);
+        return ws.run();
+    }
 
     
     
@@ -234,7 +281,7 @@ public class entrypoint {
 	// Divers
 	// ----------------------------------------------------
     // -------
-    // set des traces
+    // get des info de build
     // -------
     @GET
     @Path("/build")

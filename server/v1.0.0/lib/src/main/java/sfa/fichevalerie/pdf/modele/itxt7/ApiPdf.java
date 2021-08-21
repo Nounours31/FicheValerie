@@ -452,7 +452,7 @@ public class ApiPdf {
         // --------------------------------------------
         // S'il y a un depassement foafaitaire le mettre
         // --------------------------------------------
-        if (d != null) {
+        if ((d != null) && (d.length > 0)) {
 
             float nbHeureDepassement = 0f;
 
@@ -484,7 +484,7 @@ public class ApiPdf {
         }
 
         float nbHeureReportMoisPrecedent = 0f;
-        if (r != null) {
+        if ((r != null) && (r.length > 0)) {
         	
             ArrayList<StructNbHeureActiviteEtSonTauxHoraire> allRappelTimeWithLeurTaux = new ArrayList<StructNbHeureActiviteEtSonTauxHoraire>(); 
             for (Rappel unRappel : r) {

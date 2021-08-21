@@ -16,8 +16,6 @@ import org.json.JSONObject;
 import sfa.fichevalerie.mysql.api.datawrapper.BulletinSalaire;
 import sfa.fichevalerie.mysql.api.datawrapper.DepassementForfaitaire;
 import sfa.fichevalerie.mysql.api.datawrapper.Rappel;
-import sfa.fichevalerie.mysql.db.access.DB;
-import sfa.fichevalerie.mysql.db.access.DbActivite;
 import sfa.fichevalerie.mysql.db.access.DbBulletinSalaire;
 import sfa.fichevalerie.mysql.db.access.DbDepassementForfaitaire;
 import sfa.fichevalerie.mysql.db.access.DbPourFaignasse;
@@ -71,8 +69,6 @@ public class WSForFaignasse {
         }
         
         Response rc = this.parseSQLForBulletinSalaire(jsonObject);
-        if (rc == null)
-        	rc = this.parseSQLForActivitee(jsonObject);
 
         if (rc == null)
         	rc = this.parseSQLForExtraActivitee(jsonObject);
@@ -189,42 +185,7 @@ public class WSForFaignasse {
         return null;
 	}
 
-	private Response parseSQLForActivitee(JSONObject jsonObject) {
-        if (jsonObject.has("retour")) {
-        	_logger.debug("SQL retour is :" + jsonObject.getString("retour"));
-            if (jsonObject.getString("retour").equals("iListActivitee")) {
-            	_logger.debug("iListActivitee");
-                if (jsonObject.has("sql")) {
-                	_logger.debug("sql: " + jsonObject.getString("sql"));
-                    DbActivite x = new DbActivite();
-                    if (jsonObject.getString("sql").equals("getAllPossibleActivitees")) {
-                        String[] y = x.getAllPossibleActivitees();
-                        return Response.ok().type(MediaType.APPLICATION_JSON).entity(y).build();
-                    }
-                }
-                if (jsonObject.getJSONArray("infos") != null ) {
-                	_logger.debug("infos: array dispo");
-                	JSONArray infos = jsonObject.getJSONArray("infos");
-                	if (!infos.isEmpty() && (infos.length() == 2) && (infos.getString(0).equals("addPossibleActivitee"))) {
-                		 DbActivite x = new DbActivite();
-                		 String s = infos.getString(1);
-                         int y = x.insertAPossibleActivitees(s);
 
-                         _logger.debug("infos: addPossibleActivitee : " + s);
-                         
-                         return Response.ok().type(MediaType.APPLICATION_JSON).entity(new Integer(y)).build();
-                	}
-                	else {
-                    	_logger.debug("infos: length" + infos.length());
-                    	for (int pipoIndex = 0; pipoIndex < infos.length(); pipoIndex++) {
-                    		_logger.debug(String.format("infos: [%d] : %s",pipoIndex, infos.getString(pipoIndex)));
-						} 
-                	}
-                }
-            }
-        }
-        return null;
-	}
 
 	
 	public Response getExtraInfos(int idBulletin) {

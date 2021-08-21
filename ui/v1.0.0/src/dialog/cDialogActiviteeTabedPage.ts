@@ -53,6 +53,7 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
     private static _idHoraireFin: string = cDialogActiviteeTabedPage._NomPrefixe + '_idHoraireFin';
     private static _idHoraireDurrePresta: string = cDialogActiviteeTabedPage._NomPrefixe + '_idHoraireDurrePresta';
     private static _idCummulHoraireDurrePresta: string = cDialogActiviteeTabedPage._NomPrefixe + '_idCummulHoraireDurrePresta';
+    private static _idButtonLocalAddActivitee: string = cDialogActiviteeTabedPage._NomPrefixe + '_idButtonLocalAddActivitee';
     private static _idSelectActivitee: string = cDialogActiviteeTabedPage._NomPrefixe + '_idSelectActivitee';
 
     private static _idButtonOK: string = cDialogActiviteeTabedPage._NomPrefixe + '_idButtonOK';
@@ -553,8 +554,11 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
                 uneligne += `
                         <td id="${cDialogActiviteeTabedPage._idHoraireDurrePresta + uidLigne}" class="${cDialogActiviteeTabedPage._idHoraireDurrePresta}"></td>
                         <td id="${cDialogActiviteeTabedPage._idCummulHoraireDurrePresta + uidLigne}"></td>
-                        <td></td >
-                    </tr>
+                        <td><button style="background-color: yellowgreen;"
+                            class="uk-button uk-button-default uk-button-small uk-hidden"
+                            id="${cDialogActiviteeTabedPage._idButtonLocalAddActivitee + uidLigne}">+</button>
+                        </td>
+                     </tr>
                 `;
                 $(`#${cDialogActiviteeTabedPage._idTableBody}`).append(uneligne);
                 dateCourante.setDate(dateCourante.getDate() + 1);
@@ -683,6 +687,69 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
 
         // Update Page duree
         this.updateDesDureeTotalDeTravail();
+
+        // --------------------------------------------------------
+        // RI 001: Ajout d'un bouton '+' pour mettre en DB localement
+        // --------------------------------------------------------
+        idCelluleToChange = this.encodeLigneUID(cDialogActiviteeTabedPage._idButtonLocalAddActivitee, info[cDialogActiviteeTabedPage.uidLigneMapping.uid]);
+        $(`#${idCelluleToChange}`).removeClass('uk-hidden');
+        
+        let me : cDialogActiviteeTabedPage = this;
+        $(`#${idCelluleToChange}`).on('click', (event: JQuery.ClickEvent) => {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            event.stopPropagation();
+            
+            let targetId: string = event.currentTarget.id;
+            $(`#${idCelluleToChange}`).addClass('uk-hidden');
+
+            let hasChanged : boolean = false;
+            if (targetId.length > 1) {
+                let info: string[] = me.decodeLigneUID(targetId);
+
+                if (info.length == 6) {
+                    let annee: number = Number.parseInt(info[cDialogActiviteeTabedPage.uidLigneMapping.annee] as string);
+                    let mois: number = Number.parseInt(info[cDialogActiviteeTabedPage.uidLigneMapping.mois] as string);
+                    let jour: number = Number.parseInt(info[cDialogActiviteeTabedPage.uidLigneMapping.jour] as string);
+
+                    let tr_GrandFather: JQuery<HTMLTableRowElement> = $(`#${targetId}`).parent().parent() as JQuery<HTMLTableRowElement>;
+                    let sDebutHoraire: string = tr_GrandFather.find(`.${cDialogActiviteeTabedPage._idHoraireDebut}`).val() as string;
+                    let sFinHoraire: string = tr_GrandFather.find(`.${cDialogActiviteeTabedPage._idHoraireFin}`).val() as string;
+
+                    let inputDateType: string = tr_GrandFather.find(`.${cDialogActiviteeTabedPage._idHoraireFin}`).attr('type');
+                    if (((inputDateType == 'time') || (inputDateType == 'text')) && (sDebutHoraire.length > 3) && (sFinHoraire.length > 3)) {
+                        let aDebutHoraire: string[] = sDebutHoraire.split(':');
+                        let aFinHoraire: string[] = sFinHoraire.split(':');
+
+                        let heure: number = Number.parseInt(aDebutHoraire[0] as string);
+                        let minute: number = Number.parseInt(aDebutHoraire[1] as string);
+                        let debut: Date = new Date(annee, mois, jour, heure, minute);
+
+                        heure = Number.parseInt(aFinHoraire[0] as string);
+                        minute = Number.parseInt(aFinHoraire[1] as string);
+                        let fin: Date = new Date(annee, mois, jour, heure, minute);
+
+                        let activiteeChoisie: string = tr_GrandFather.find(`.${cDialogActiviteeTabedPage._idSelectActivitee} option:selected`).text();
+                        if (activiteeChoisie == "-") {
+                            UIkit.modal.alert("Une activitee doit avoir une activitee ici: ");
+                        }
+                        else {
+                            me._ws.addActivite(me._idBulletinSalaire,
+                                jour,
+                                activiteeChoisie,
+                                debut,
+                                fin,
+                                -1.0);
+                            hasChanged = true;
+                        }
+                    }
+                    else {
+                        console.log("Deja en DB : Info=" + targetId);
+                    }
+                }
+            }
+            if (hasChanged) me.refresh(me._idBulletinSalaire);
+        });
     }
 
     // -------------------------------------------------------------

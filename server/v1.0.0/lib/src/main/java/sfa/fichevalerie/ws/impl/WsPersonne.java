@@ -7,6 +7,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import sfa.fichevalerie.mysql.api.datawrapper.Personne;
+import sfa.fichevalerie.mysql.db.access.DbActiviteEnum;
 import sfa.fichevalerie.mysql.db.access.DbPersonne;
 
 public class WsPersonne extends WS implements iWS {
@@ -67,4 +68,22 @@ public class WsPersonne extends WS implements iWS {
 		Response r = Response.ok().type(MediaType.APPLICATION_JSON).entity(lP).build();
 		return r;
 	}
+	
+	@Override
+	public Response delete() {
+		DbPersonne bs = new DbPersonne();
+		int id = (Integer)this.getArgs ("id");
+		_logger.debug("Personne to delete: " + id);
+
+		try {
+			int i = bs.deleteAsRest(String.format("delete from personne where (id = %d)", id));
+			return Response.ok().type(MediaType.APPLICATION_JSON).entity(new Integer(i)).build();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return Response.status(Status.INTERNAL_SERVER_ERROR).type(MediaType.APPLICATION_JSON).entity(new Integer(0)).build();
+	}
+
 }

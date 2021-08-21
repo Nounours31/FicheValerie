@@ -1,5 +1,5 @@
 import cToolsAjax from '../tools/cToolsAjax';
-import {iPersonne, iBulletinSalaire, iActivite, iPdf } from './iWSMessages';
+import {iPersonne, iBulletinSalaire, iActivite, iPdf, iActiviteEnum } from './iWSMessages';
 import cErr from '../tools/cErr';
 import cEnv from './cEnv';
 
@@ -37,9 +37,39 @@ export default class cWS {
         if (this.t.status) {
             retour = ((this.t.data as unknown) as iPersonne[]);
         }
+        if ((retour == null) || (retour == undefined) || (retour.length == 0)) {
+            let x : iPersonne = {
+                'id': -1,
+                'genre' : 'Inconnu',
+                'nom' : 'Personne effacee'
+            };
+            retour = [ x ];
+        }
         return retour;
     }
 
+
+    public addNewPersonne(genre: string, nom: string): iPersonne {
+        let retour: iPersonne = null;
+        let URL = cEnv.getTomeeURL() + '/personne';
+        let PostData: iPersonne = {
+            'genre': genre,
+            id: -1,
+            'nom': nom
+        };
+        let oResp: boolean = this.t.sendPostWS(URL, PostData);
+        if (this.t.status) {
+            retour = ((this.t.data as unknown) as iPersonne);
+        }
+        console.log('creation de ' + genre + ' ' + nom);
+        return retour;
+    }
+
+    public deletePersone(sPersoneId: string): boolean {
+        let URL = cEnv.getTomeeURL() + `/personne/${sPersoneId}`;
+        let oResp: boolean = this.t.sendDeleteWS(URL);
+        return true;
+    }
 
 
     public getBulletinSalaire(idPersonneOrIdBulletin: number, mois: number = null, annee: number = null): iBulletinSalaire[] {
@@ -157,23 +187,6 @@ export default class cWS {
     }
     
 
-    public addNewPersonne(genre: string, nom: string): iPersonne {
-        let retour : iPersonne = null;
-        let URL = cEnv.getTomeeURL() + '/personne';
-        let PostData: iPersonne = {
-            'genre': genre,
-            id: -1,
-            'nom': nom
-        };
-        let oResp: boolean = this.t.sendPostWS(URL, PostData);
-        if (this.t.status) {
-            retour = ((this.t.data as unknown) as iPersonne);
-        }
-        console.log('creation de ' + genre + ' ' + nom);
-        return retour;
-    }
-
-
 
     // ------------------------------------------------
     // les cas tordu par lequel je passe par du SQL
@@ -228,30 +241,32 @@ export default class cWS {
         return retour;
     }
 
-    public getAllPossibleActivitees(): string[] {
-        let retour: string[] = [];
-        let URL = cEnv.getTomeeURL() + `/sql`;
-        let postData: Object = {
-            'sql': 'getAllPossibleActivitees',
-            'retour': 'iListActivitee',
-        }
-        let oResp: boolean = this.t.sendPostWS(URL, postData);
+    public getAllPossibleActivitees(): iActiviteEnum[] {
+        let retour: iActiviteEnum[] = [];
+        let URL = cEnv.getTomeeURL() + `/activiteeEnum`;
+        let oResp: boolean = this.t.sendGetWS(URL);
         if (this.t.status) {
-            retour = ((this.t.data as unknown) as string[]);
+            retour = ((this.t.data as unknown) as iActiviteEnum[]);
         }
         return retour;
     }
-    public addAPossibleActivitee(activitee: string) : void {
+    public addAPossibleActivitee(activitee: string): void {
         let retour: string[] = [];
-        let URL = cEnv.getTomeeURL() + `/sql`;
-        let postData: Object = {
-            'infos': [ 'addPossibleActivitee', activitee ],
-            'retour': 'iListActivitee',
-        }
+        let URL = cEnv.getTomeeURL() + `/activiteeEnum`;
+        let postData: iActiviteEnum = {
+            'nom': activitee,
+            id: -1,
+        };
         let oResp: boolean = this.t.sendPostWS(URL, postData);
         return;
     }
+    public deletePossibleActivite(activitee: string): boolean {
+        let URL = cEnv.getTomeeURL() + `/activiteeEnum/${activitee}`;
+        let oResp: boolean = this.t.sendDeleteWS(URL);
+        return true;
+    }
 
+    
 
     // --------------------------------
     // WS De gestion de l'envt

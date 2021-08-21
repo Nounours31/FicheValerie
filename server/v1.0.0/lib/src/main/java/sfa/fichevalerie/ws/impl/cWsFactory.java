@@ -7,6 +7,7 @@ public class cWsFactory {
 		switch (wsNom) {
 			case "getAllPersonnes" : rc =  new WsPersonne(); rc.setType(eWsTypeGetPost.get); break;
 			case "createPersonne" : rc =  new WsPersonne(); rc.setType(eWsTypeGetPost.post); break;
+			case "deletePersonne" : rc =  new WsPersonne(); rc.setType(eWsTypeGetPost.delete); break;
 
 			case "getBulletinSalaire" : rc =  new WsBulletinSalaire(); rc.setType(eWsTypeGetPost.get); break;
 			case "createBulletinSalaire" : rc =  new WsBulletinSalaire(); ; rc.setType(eWsTypeGetPost.post); break;
@@ -20,6 +21,10 @@ public class cWsFactory {
 			case "getPdfFile" :
 			case "getPdfInfoFromBulletin" : rc =  new WsPdfFile(); rc.setType(eWsTypeGetPost.get); break;
 
+			case "deleteActiviteeEnum": rc =  new WsActiviteEnum(); rc.setType(eWsTypeGetPost.delete); break;
+			case "getActiviteeEnum":	rc =  new WsActiviteEnum(); rc.setType(eWsTypeGetPost.get); break;
+			case "createActiviteeEnum":	rc =  new WsActiviteEnum(); rc.setType(eWsTypeGetPost.post); break;
+			
 			default : rc = new WsXxXNoImpl(wsNom);
 		}
 		return rc;

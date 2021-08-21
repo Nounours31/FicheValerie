@@ -160,37 +160,37 @@ export default class cDialogSearchBulletinTabedPage extends cDialogAbstract {
                 iAnnee = Number.parseInt(annee);
 
             let bHasPrevious : boolean = false;
-            let sql: string = "select * from bulletinsalaire where (";
+            let sql: string = "select bs.* from bulletinsalaire bs inner join personne p on (p.id = bs.idPersonne) where (";
             if ((genre.length > 2) && (idPersonne < 1)) {
-                sql += `(nom like '%${genre}%')`;
+                sql += `(p.genre like '%${genre}%')`;
                 bHasPrevious = true;
             }
 
             if ((idPersonne > 0)) {
                 if (bHasPrevious)
                     sql += " and ";
-                sql += `(idPersonne = ${idPersonne})`;
+                sql += `(bs.idPersonne = ${idPersonne})`;
                 bHasPrevious = true;
             }
 
             if ((iMois >= 0)) {
                 if (bHasPrevious)
                     sql += " and ";
-                sql += `(mois = ${iMois})`;
+                sql += `(bs.mois = ${iMois})`;
                 bHasPrevious = true;
             }
 
             if ((iAnnee > 0)) {
                 if (bHasPrevious)
                     sql += " and ";
-                sql += `(annee = ${iAnnee})`;
+                sql += `(bs.annee = ${iAnnee})`;
                 bHasPrevious = true;
             }
 
             if (!bHasPrevious)
                 sql += "1";
 
-            sql += ") order by idPersonne asc, annee asc, mois asc";
+            sql += ") order by bs.idPersonne asc, bs.annee asc, bs.mois asc";
 
             console.log ("SQL: " + sql);
             
