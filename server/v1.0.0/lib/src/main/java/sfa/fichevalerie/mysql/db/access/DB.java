@@ -143,12 +143,14 @@ public abstract class DB implements iDB {
 		Statement stmt=c.createStatement();  
 		try {
 			boolean rc = stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);  
-			if (rc) {
+			this._logger.debug("RC:["+rc+"]");
+			// if (rc) {
 				ResultSet rs = stmt.getGeneratedKeys(); 
 				if(rs.next()) {  
 					retour = rs.getInt(1);
 				}
-			}
+				this._logger.debug("Retour:["+retour+"]");
+			// }
 		}
 		catch (SQLException e) {
 			_logger.fatal("SQL:" + sql);

@@ -166,8 +166,16 @@ export default class cDialogAjoutDBTabedPage extends cDialogAbstract {
             let ws: cWS = new cWS();
             let allPersonne: iPersonne[] = ws.getPersonne(genre, nom);
             if ((allPersonne != null) && (allPersonne.length > 0)) {
-                UIkit.modal.alert("Cette personne existe deja en base");
-                return false;
+                let isValidPersonne : boolean = false;
+                for (let i : number = 0; i < allPersonne.length; i++) {
+                    let unePersonneToTest : iPersonne = allPersonne[i];
+                    if (unePersonneToTest.id != -1)
+                        isValidPersonne = true;
+                }
+                if (isValidPersonne) {
+                    UIkit.modal.alert("Cette personne existe deja en base");
+                    return false;
+                }
             }
 
             let newPers : iPersonne = ws.addNewPersonne(genre, nom);
