@@ -2,7 +2,10 @@ package sfa.fichevalerie.pdf.modele.itxt7;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import com.itextpdf.io.IOException;
 import com.itextpdf.io.font.PdfEncodings;
@@ -323,10 +326,12 @@ public class ApiPdf {
             String info = "";
         	boolean borderRight = true; 
         	boolean borderLeft = true; 
-            Date debut = new Date();
-            Date fin = new Date();
-            debut.setTime(uneActivite.getGmtepoch_debut());
-            fin.setTime(uneActivite.getGmtepoch_fin());
+        	GregorianCalendar debut = new GregorianCalendar();
+        	debut.setTimeZone(TimeZone.getTimeZone("GMT"));
+        	GregorianCalendar fin =new  GregorianCalendar ();
+        	fin.setTimeZone(TimeZone.getTimeZone("GMT"));
+            debut.setTimeInMillis(uneActivite.getGmtepoch_debut());
+            fin.setTimeInMillis(uneActivite.getGmtepoch_fin());
 
             String infoJour[] = tools.JourFromDate(debut);
             int[] jourSemaine = tools.JourSemaineFromDate(debut);
@@ -339,14 +344,15 @@ public class ApiPdf {
             if (!hasActiviteMultiple) {
             	int iNbActiviteCeJour = 0;
 	            Activite activiteSuivante = uneActivite;
-	            Date JourActiviteeSuivate =  new Date();
-	            JourActiviteeSuivate.setTime(activiteSuivante.getGmtepoch_debut());
+	            GregorianCalendar JourActiviteeSuivate =  new GregorianCalendar();
+	            JourActiviteeSuivate.setTimeZone(TimeZone.getTimeZone("GMT"));
+	            JourActiviteeSuivate.setTimeInMillis(activiteSuivante.getGmtepoch_debut());
 	            
-	            while (JourActiviteeSuivate.getDay() == debut.getDay()) {
+	            while (JourActiviteeSuivate.get(Calendar.DAY_OF_MONTH) == debut.get(Calendar.DAY_OF_MONTH)) {
 	            	iNbActiviteCeJour++;
 	            	if ((iIndice + iNbActiviteCeJour) >= a.length)
 	            		break;
-	                JourActiviteeSuivate.setTime(a[iIndice + iNbActiviteCeJour].getGmtepoch_debut());
+	                JourActiviteeSuivate.setTimeInMillis(a[iIndice + iNbActiviteCeJour].getGmtepoch_debut());
 	            }
 
 	            if (iNbActiviteCeJour > 1) {

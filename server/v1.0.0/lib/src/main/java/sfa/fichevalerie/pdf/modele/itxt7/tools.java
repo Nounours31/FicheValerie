@@ -1,11 +1,9 @@
 package sfa.fichevalerie.pdf.modele.itxt7;
 
-import sfa.fichevalerie.tools.E4ALogger;
-
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.TimeZone;
+
+import sfa.fichevalerie.tools.E4ALogger;
 
 public class tools {
     public static String euro = "€";
@@ -51,11 +49,10 @@ public class tools {
         return rc;
     }
 
-    static String FromDateToHeure (Date d) {
+    static String FromDateToHeure (GregorianCalendar debut) {
         String retour = "";
-        Calendar c = GregorianCalendar.getInstance(TimeZone.getTimeZone("CET"));
-        c.setTime(d);
-        _log.debug(String.format("FromDateToHeure: [%s] - c.HourOfDay [%d] - c.Minutes[%d]", d.toString(), c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE)));
+        GregorianCalendar c = debut;
+        _log.debug(String.format("FromDateToHeure: [%s] - c.HourOfDay [%d] - c.Minutes[%d]", debut.toString(), c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE)));
         retour = String.format("%02d:%02d", c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE));
         return retour;
     }
@@ -84,7 +81,7 @@ public class tools {
     // day of week: 1 -> 7 1=SUNDAY 
     // day of month: 1 -> 31 
     // -----------------------------
-    public static String[] JourFromDate(Date debut) {
+    public static String[] JourFromDate(GregorianCalendar debut) {
         String[] retour = {"", ""};
         int info[] = tools.JourSemaineFromDate(debut);
         retour[0] = tools.JourFromInt(info[0]);
@@ -92,9 +89,9 @@ public class tools {
         return retour;
     }
 
-    public static long FromDureeToMinutesLong(Date debut, Date fin) {
+    public static long FromDureeToMinutesLong(GregorianCalendar debut, GregorianCalendar fin) {
         long retour = 0l;
-        long x = fin.getTime() - debut.getTime();
+        long x = fin.getTimeInMillis() - debut.getTimeInMillis();
 
         // heure - minutes
         retour = (x / (1000l * 60l));
@@ -108,9 +105,8 @@ public class tools {
     // day of week: 1 -> 7 1=SUNDAY 
     // day of month: 1 -> 31 
     // -----------------------------
-    public static int[] JourSemaineFromDate(Date debut) {
-        Calendar c = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
-        c.setTime(debut);
+    public static int[] JourSemaineFromDate(GregorianCalendar debut) {
+        Calendar c = debut;
         _log.debug(String.format("JourSemaineFromDate: [%s] - c.dayofweek[%d] - - c.dayofmonth[%d] - c.HourOfDay [%d] - c.Minutes[%d]",
                 debut.toString(), c.get(Calendar.DAY_OF_WEEK), c.get(Calendar.DAY_OF_MONTH), c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE)));
         return new int[] {
