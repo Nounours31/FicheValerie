@@ -6,13 +6,13 @@ export default class cVersion {
 
     public getDateBuild(): string {
         let retour = "";
-        retour += "Build Date: 2021/08/21 20:16:12";
+        retour += "Build Date: 2021/08/23 19:51:59";
         return retour;
     }
 
     public getCommitVersionBuild(): string {
         let retour = "";
-        retour += "Commit Id: 7ffa8788132ac108b6372f49374a69ce482de6d2 - Commit Date:    Fri Aug 13 19:00:26 2021 +0200 - Commit branch: ";
+        retour += "Commit Id: 15ca0939f372c897cbae70f473890bb120e8e88c - Commit Date:    Mon Aug 23 19:50:57 2021 +0200 - Commit branch: ";
         return retour;
     }
 
