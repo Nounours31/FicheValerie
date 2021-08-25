@@ -1,7 +1,9 @@
 package sfa.fichevalerie.pdf.modele.itxt7;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import sfa.fichevalerie.tools.E4ALogger;
 
@@ -52,8 +54,11 @@ public class tools {
     static String FromDateToHeure (GregorianCalendar debut) {
         String retour = "";
         GregorianCalendar c = debut;
+        SimpleDateFormat sdfAsHeureMinuteCET = new SimpleDateFormat("HH:mm");
+        sdfAsHeureMinuteCET.setTimeZone(TimeZone.getTimeZone("CET"));
+        
         _log.debug(String.format("FromDateToHeure: [%s] - c.HourOfDay [%d] - c.Minutes[%d]", debut.toString(), c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE)));
-        retour = String.format("%02d:%02d", c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE));
+        retour = sdfAsHeureMinuteCET.format(debut.getTime());
         return retour;
     }
 
