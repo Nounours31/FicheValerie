@@ -849,25 +849,11 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
                 //----------------------
                 // Horaire de debut et fin
                 //----------------------
-                let sDebutHoraire: string = $(`#${cDialogActiviteeTabedPage._idHoraireDebut}_Recurence`).val() as string;
-                let sFinHoraire: string = $(`#${cDialogActiviteeTabedPage._idHoraireFin}_Recurence`).val() as string;
-
-                let inputDateType: string = $(`#${cDialogActiviteeTabedPage._idHoraireFin}_Recurence`).attr('type');
-                let heure_debut: number = 0;
-                let minute_debut: number = 0;
-                let heure_fin: number = 0;
-                let minute_fin: number = 0;
-
-                if (((inputDateType == 'time') || (inputDateType == 'text')) && (sDebutHoraire.length > 3) && (sFinHoraire.length > 3)) {
-                    let aDebutHoraire: string[] = sDebutHoraire.split(':');
-                    let aFinHoraire: string[] = sFinHoraire.split(':');
-
-                    heure_debut = Number.parseInt(aDebutHoraire[0]);
-                    minute_debut = Number.parseInt(aDebutHoraire[1]);
-                    heure_fin = Number.parseInt(aFinHoraire[0]);
-                    minute_fin = Number.parseInt(aFinHoraire[1]);
-                }
-                else {
+                let coordonneHoraireDebut: number[] = this.parseHeureMinutreFromInputById(`${cDialogActiviteeTabedPage._idHoraireDebut}_Recurence`);
+                let coordonneHoraireFin: number[] = this.parseHeureMinutreFromInputById(`${cDialogActiviteeTabedPage._idHoraireFin}_Recurence`);
+                console.log(coordonneHoraireDebut);
+                
+                if ((coordonneHoraireDebut == null) || (coordonneHoraireFin == null)) {
                     UIkit.modal.alert("Il fau definir des horaires");
                     return;
                 }
@@ -891,8 +877,8 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
                             let jourDeLaSemaine : number = jourCourant.getDay();
 
                             if (jourDeLaSemaine == iJour) {
-                                let debut: Date = new Date(annee, mois, jourCourant.getDate(), heure_debut, minute_debut);
-                                let fin: Date = new Date(annee, mois, jourCourant.getDate(), heure_fin, minute_fin);
+                                let debut: Date = new Date(annee, mois, jourCourant.getDate(), coordonneHoraireDebut[0], coordonneHoraireDebut[1]);
+                                let fin: Date = new Date(annee, mois, jourCourant.getDate(), coordonneHoraireFin[0], coordonneHoraireFin[1]);
 
                                 me._ws.addActivite(me._idBulletinSalaire,
                                     jourCourant.getDate(),
@@ -921,5 +907,52 @@ export default class cDialogActiviteeTabedPage extends cDialogAbstract {
                 }
             }
         }
+    }
+
+    private parseHeureMinutreFromInputById(inputId: string): number[] {
+        let retour : number[] = null;
+
+        let sValeur: string = $(`#${inputId}`).val() as string;
+        let inputDateType: string = $(`#${inputId}`).attr('type');
+
+        let heure: number = 0;
+        let minute: number = 0;
+
+
+        if (((inputDateType == 'time') || (inputDateType == 'text')) && (sValeur.length >=1) ) {
+            let m: string[] = null;
+
+            // ---------------------------------
+            // 1. format 10:00 10;00 10-00 ....
+            // ---------------------------------
+            const regex = /([0-9]*)[:;\.\-_#]([0-9]*)([^0-9]+.*)*/gm;
+            m = regex.exec(sValeur);
+            if ((m != null) && (m.length > 0)) {
+                let sHeure: string = m[1];
+                if (sHeure.length > 0)
+                    heure = Number.parseInt(sHeure);
+                
+                if (m.length > 1) {
+                    let sMin: string = m[2];
+                    if (sMin.length > 0)
+                        minute = Number.parseInt(sMin);
+                }
+            }
+            else {
+                const regex2 = /([0-9]*)([^0-9]+.*)*/gm;
+                m = regex.exec(sValeur);
+                if ((m != null) && (m.length > 0)) {
+                    let sHeure: string = m[1];
+                    if (sHeure.length > 0)
+                        heure = Number.parseInt(sHeure);
+                    minute = 0;
+                }
+            }
+            retour = [
+                heure,
+                minute
+            ];
+        }
+        return retour;
     }
 }
