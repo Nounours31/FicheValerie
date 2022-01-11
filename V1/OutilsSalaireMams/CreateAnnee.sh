@@ -1,6 +1,6 @@
 #bash
 
-typeset -i test=1
+typeset -i test=0
 
 if ((test == 1)); then
 	To=/e/WorkSpaces/WS/GitHub/FicheValerie/V1/OutilsSalaireMams/test
@@ -8,11 +8,10 @@ if ((test == 1)); then
 	typeset -a Mois=(Janvier Fevrier)
 else
 	To=/d/mams/BulletinsSalaire
-	Ref=/d/PAPA/OutilsSalaireMams
-	typeset -a Mois=(Janvier Fevrier Mars Avril Mai Juin Juillet Aout Septembre Octobre Novembre Decembre test)
+	Ref=/d/PAPA/OutilsSalaireMams/FicheValerie/V1/OutilsSalaireMams
+	typeset -a Mois=(Janvier Fevrier Mars Avril Mai Juin Juillet Aout Septembre Octobre Novembre Decembre)
 fi
 typeset -a files2Copy=("Ref.xlsm" "runMacro.bat")
-XLS='/c/Program Files (x86)/Microsoft Office/root/Office16/EXCEL.EXE'
 
 
 printf "Annee ? "
