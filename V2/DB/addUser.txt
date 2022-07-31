@@ -1,2 +1,0 @@
-CREATE USER 'valerie'@'localhost' IDENTIFIED BY 'pwdValerie';
-GRANT ALL PRIVILEGES ON sfa_fichevalerie.* TO 'valerie'@'localhost';
